@@ -278,8 +278,8 @@ void Renderer::CreateGraphicsPipeline()
 {
 	//(char*)"../OpenGLShared/Resources/Shaders/Win/unlitInstance.vert",
 
-	auto t_VertShaderCode = ResourceLoader::ReadFile("../../Resources/Shaders/unlitVert.spv");
-	auto t_FragShaderCode = ResourceLoader::ReadFile("../../Resources/Shaders/unlitFrag.spv");
+	//auto t_VertShaderCode = ResourceLoader::ReadFile("../../Resources/Shaders/unlitVert.spv");
+	//auto t_FragShaderCode = ResourceLoader::ReadFile("../../Resources/Shaders/unlitFrag.spv");
 }
 
 QueueFamilyIndices Renderer::FindQueueFamilies(VkPhysicalDevice a_Device)
