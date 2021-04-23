@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="MainRenderer">
+      <UniqueIdentifier>{3752728e-4e9c-441d-ab5c-2ba1406e233e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shapes">
+      <UniqueIdentifier>{bc783d42-8df8-409b-8b31-75eebbe2a873}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Debug">
+      <UniqueIdentifier>{41425b40-895c-4d50-b6f7-c413859c8a44}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="MainRenderer\Renderer.cpp">
+      <Filter>MainRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="MainRenderer\Window.cpp">
+      <Filter>MainRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="MainRenderer\Shapes\Triangle.cpp">
+      <Filter>Shapes</Filter>
+    </ClCompile>
+    <ClCompile Include="MainRenderer\Debug\VulkanDebug.cpp">
+      <Filter>Debug</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="MainRenderer\Renderer.h">
+      <Filter>MainRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="MainRenderer\Window.h">
+      <Filter>MainRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="MainRenderer\Shapes\Triangle.h">
+      <Filter>Shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="MainRenderer\Debug\VulkanDebug.h">
+      <Filter>Debug</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
