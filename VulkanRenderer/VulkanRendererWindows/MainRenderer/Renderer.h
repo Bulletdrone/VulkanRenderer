@@ -2,6 +2,7 @@
 
 #include "Window.h"
 #include "VulkanDebugger/VulkanDebug.h"
+#include "Tools/ResourceLoader.h"
 
 #include <optional>
 
@@ -34,6 +35,7 @@ public:
 	void CreateLogicalDevice();
 	void CreateSwapChain();
 	void CreateImageViews();
+	void CreateGraphicsPipeline();
 
 	//QueueFamily
 	QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice a_Device);

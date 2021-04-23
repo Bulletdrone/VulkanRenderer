@@ -11,8 +11,11 @@
     <Filter Include="Shapes">
       <UniqueIdentifier>{bc783d42-8df8-409b-8b31-75eebbe2a873}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Debug">
+    <Filter Include="VulkanDebug">
       <UniqueIdentifier>{41425b40-895c-4d50-b6f7-c413859c8a44}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tools">
+      <UniqueIdentifier>{c0b9d07d-006c-41d9-9acc-4bcc89f50352}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -26,8 +29,11 @@
     <ClCompile Include="MainRenderer\Shapes\Triangle.cpp">
       <Filter>Shapes</Filter>
     </ClCompile>
-    <ClCompile Include="MainRenderer\Debug\VulkanDebug.cpp">
-      <Filter>Debug</Filter>
+    <ClCompile Include="MainRenderer\VulkanDebugger\VulkanDebug.cpp">
+      <Filter>VulkanDebug</Filter>
+    </ClCompile>
+    <ClCompile Include="MainRenderer\Tools\ResourceLoader.cpp">
+      <Filter>Tools</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -40,8 +46,11 @@
     <ClInclude Include="MainRenderer\Shapes\Triangle.h">
       <Filter>Shapes</Filter>
     </ClInclude>
-    <ClInclude Include="MainRenderer\Debug\VulkanDebug.h">
-      <Filter>Debug</Filter>
+    <ClInclude Include="MainRenderer\VulkanDebugger\VulkanDebug.h">
+      <Filter>VulkanDebug</Filter>
+    </ClInclude>
+    <ClInclude Include="MainRenderer\Tools\ResourceLoader.h">
+      <Filter>Tools</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
