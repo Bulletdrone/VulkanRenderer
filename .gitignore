@@ -3,3 +3,5 @@ GLFW/
 ImGUI/
 Vulkan/
 .vs/
+Release/
+Debug/
