@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Window.h"
-#include "Debug/VulkanDebug.h"
+#include "VulkanDebugger/VulkanDebug.h"
 
 #include <optional>
 
