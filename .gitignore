@@ -1,2 +1,5 @@
-ExternalLibraries/
+GLM/
+GLFW/
+ImGUI/
+Vulkan/
 .vs/
