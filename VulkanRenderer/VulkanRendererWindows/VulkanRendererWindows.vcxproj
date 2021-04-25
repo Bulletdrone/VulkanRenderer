@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainRenderer\Renderer.cpp" />
+    <ClCompile Include="MainRenderer\ShaderManager.cpp" />
     <ClCompile Include="MainRenderer\Shapes\Triangle.cpp" />
     <ClCompile Include="MainRenderer\Tools\ResourceLoader.cpp" />
     <ClCompile Include="MainRenderer\VulkanDebugger\VulkanDebug.cpp" />
@@ -28,6 +29,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainRenderer\Renderer.h" />
+    <ClInclude Include="MainRenderer\ShaderManager.h" />
     <ClInclude Include="MainRenderer\Shapes\Triangle.h" />
     <ClInclude Include="MainRenderer\Tools\ResourceLoader.h" />
     <ClInclude Include="MainRenderer\VulkanDebugger\VulkanDebug.h" />

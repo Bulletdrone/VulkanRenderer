@@ -1,8 +1,9 @@
 #pragma once
 
 #include "Window.h"
+
+#include "ShaderManager.h"
 #include "VulkanDebugger/VulkanDebug.h"
-#include "Tools/ResourceLoader.h"
 
 #include <optional>
 
@@ -35,6 +36,7 @@ public:
 	void CreateLogicalDevice();
 	void CreateSwapChain();
 	void CreateImageViews();
+	void CreateRenderPass();
 	void CreateGraphicsPipeline();
 
 	//QueueFamily
@@ -57,6 +59,9 @@ private:
 	//Window Data.
 	Window* m_Window;
 
+	//ShaderData
+	ShaderManager* m_ShaderManager;
+
 	//Primary Vulkan Data;
 	VkInstance m_VKInstance;
 	VkPhysicalDevice m_VKPhysicalDevice = VK_NULL_HANDLE;
@@ -69,6 +74,11 @@ private:
 	VkSwapchainKHR m_VKSwapChain;
 	std::vector<VkImage> m_VKSwapChainImages;
 	std::vector<VkImageView> m_VKSwapChainImageViews;
+
+	//The RenderPipeline.
+	VkRenderPass m_VKRenderPass;
+	VkPipelineLayout m_VKPipelineLayout;
+	VkPipeline m_VKPipeline;
 
 	VkFormat m_VKSwapChainImageFormat;
 	VkExtent2D m_VKSwapChainExtent;

@@ -35,6 +35,9 @@
     <ClCompile Include="MainRenderer\Tools\ResourceLoader.cpp">
       <Filter>Tools</Filter>
     </ClCompile>
+    <ClCompile Include="MainRenderer\ShaderManager.cpp">
+      <Filter>MainRenderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainRenderer\Renderer.h">
@@ -51,6 +54,9 @@
     </ClInclude>
     <ClInclude Include="MainRenderer\Tools\ResourceLoader.h">
       <Filter>Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="MainRenderer\ShaderManager.h">
+      <Filter>MainRenderer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

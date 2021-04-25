@@ -25,11 +25,17 @@ Renderer::Renderer()
 	CreateLogicalDevice();
 	CreateSwapChain();
 	CreateImageViews();
+	CreateRenderPass();
+	m_ShaderManager = new ShaderManager(m_VKDevice, m_VKSwapChainExtent, m_VKPipelineLayout, m_VKPipeline);
 	CreateGraphicsPipeline();
 }
 
 Renderer::~Renderer()
 {
+	vkDestroyPipeline(m_VKDevice, m_VKPipeline, nullptr);
+	vkDestroyPipelineLayout(m_VKDevice, m_VKPipelineLayout, nullptr);
+	vkDestroyRenderPass(m_VKDevice, m_VKRenderPass, nullptr);
+
 	for (auto imageView : m_VKSwapChainImageViews) {
 		vkDestroyImageView(m_VKDevice, imageView, nullptr);
 	}
@@ -37,6 +43,7 @@ Renderer::~Renderer()
 	if (DE_EnableValidationLayers)
 		delete DE_VKDebug;
 
+	delete m_ShaderManager;
 	vkDestroySwapchainKHR(m_VKDevice, m_VKSwapChain, nullptr);
 	vkDestroyDevice(m_VKDevice, nullptr);
 
@@ -116,11 +123,10 @@ void Renderer::PickPhysicalDevice()
 		}
 	}
 
-	if (m_VKPhysicalDevice == VK_NULL_HANDLE) 
+	if (m_VKPhysicalDevice == VK_NULL_HANDLE)
 	{
 		throw std::runtime_error("failed to find a suitable GPU!");
 	}
-
 }
 
 void Renderer::CreateLogicalDevice()
@@ -141,7 +147,7 @@ void Renderer::CreateLogicalDevice()
 		t_QueueCreateInfos.push_back(queueCreateInfo);
 	}
 
-	VkPhysicalDeviceFeatures deviceFeatures{};
+	VkPhysicalDeviceFeatures t_DeviceFeatures{};
 
 	VkDeviceCreateInfo t_CreateInfo{};
 	t_CreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
@@ -149,7 +155,7 @@ void Renderer::CreateLogicalDevice()
 	t_CreateInfo.queueCreateInfoCount = static_cast<uint32_t>(t_QueueCreateInfos.size());
 	t_CreateInfo.pQueueCreateInfos = t_QueueCreateInfos.data();
 
-	t_CreateInfo.pEnabledFeatures = &deviceFeatures;
+	t_CreateInfo.pEnabledFeatures = &t_DeviceFeatures;
 
 	t_CreateInfo.enabledExtensionCount = static_cast<uint32_t>(m_DeviceExtensions.size());
 	t_CreateInfo.ppEnabledExtensionNames = m_DeviceExtensions.data();
@@ -273,13 +279,51 @@ void Renderer::CreateImageViews()
 		}
 	}
 }
-	
+
+void Renderer::CreateRenderPass()
+{
+	VkAttachmentDescription t_ColorAttachment{};
+	t_ColorAttachment.format = m_VKSwapChainImageFormat;
+	t_ColorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+
+	t_ColorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+	t_ColorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+
+	t_ColorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+	t_ColorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+
+	t_ColorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	t_ColorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+
+	//Subpasses and Attachment
+	VkAttachmentReference t_ColorAttachmentRef{};
+	t_ColorAttachmentRef.attachment = 0;
+	t_ColorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+	VkSubpassDescription t_Subpass{};
+	t_Subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+
+	t_Subpass.colorAttachmentCount = 1;
+	t_Subpass.pColorAttachments = &t_ColorAttachmentRef;
+
+	//Setting the struct.
+	VkRenderPassCreateInfo t_RenderPassInfo{};
+	t_RenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+	t_RenderPassInfo.attachmentCount = 1;
+	t_RenderPassInfo.pAttachments = &t_ColorAttachment;
+	t_RenderPassInfo.subpassCount = 1;
+	t_RenderPassInfo.pSubpasses = &t_Subpass;
+
+	if (vkCreateRenderPass(m_VKDevice, &t_RenderPassInfo, nullptr, &m_VKRenderPass) != VK_SUCCESS) {
+		throw std::runtime_error("failed to create render pass!");
+	}
+}
+
 void Renderer::CreateGraphicsPipeline()
 {
-	//(char*)"../OpenGLShared/Resources/Shaders/Win/unlitInstance.vert",
+	m_ShaderManager->CreateGraphicsPipeline(m_VKRenderPass);
 
-	auto t_VertShaderCode = ResourceLoader::ReadFile("../Resources/Shaders/unlitVert.spv");
-	auto t_FragShaderCode = ResourceLoader::ReadFile("../Resources/Shaders/unlitFrag.spv");
+	//m_ShaderManager->DestroyShaderModules();
 }
 
 QueueFamilyIndices Renderer::FindQueueFamilies(VkPhysicalDevice a_Device)
