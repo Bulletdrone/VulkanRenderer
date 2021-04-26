@@ -28,10 +28,19 @@ Renderer::Renderer()
 	CreateRenderPass();
 	m_ShaderManager = new ShaderManager(m_VKDevice, m_VKSwapChainExtent, m_VKPipelineLayout, m_VKPipeline);
 	CreateGraphicsPipeline();
+
+	CreateFrameBuffer();
+	CreateCommandPool();
 }
 
 Renderer::~Renderer()
 {
+	vkDestroyCommandPool(m_VKDevice, m_VKCommandPool, nullptr);
+
+	for (auto framebuffer : m_VKSwapChainFrameBuffers) {
+		vkDestroyFramebuffer(m_VKDevice, framebuffer, nullptr);
+	}
+
 	vkDestroyPipeline(m_VKDevice, m_VKPipeline, nullptr);
 	vkDestroyPipelineLayout(m_VKDevice, m_VKPipelineLayout, nullptr);
 	vkDestroyRenderPass(m_VKDevice, m_VKRenderPass, nullptr);
@@ -324,6 +333,100 @@ void Renderer::CreateGraphicsPipeline()
 	m_ShaderManager->CreateGraphicsPipeline(m_VKRenderPass);
 
 	//m_ShaderManager->DestroyShaderModules();
+}
+
+void Renderer::CreateFrameBuffer()
+{
+	m_VKSwapChainFrameBuffers.resize(m_VKSwapChainImageViews.size());
+
+	for (size_t i = 0; i < m_VKSwapChainImageViews.size(); i++)
+	{
+		VkImageView attachments[] = 
+		{
+			m_VKSwapChainImageViews[i]
+		};
+
+		VkFramebufferCreateInfo t_FramebufferInfo{};
+		t_FramebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+		t_FramebufferInfo.renderPass = m_VKRenderPass;
+		t_FramebufferInfo.attachmentCount = 1;
+		t_FramebufferInfo.pAttachments = attachments;
+		t_FramebufferInfo.width = m_VKSwapChainExtent.width;
+		t_FramebufferInfo.height = m_VKSwapChainExtent.height;
+		t_FramebufferInfo.layers = 1;
+
+		if (vkCreateFramebuffer(m_VKDevice, &t_FramebufferInfo, nullptr, &m_VKSwapChainFrameBuffers[i]) != VK_SUCCESS) 
+		{
+			throw std::runtime_error("failed to create framebuffer!");
+		}
+	}
+}
+
+void Renderer::CreateCommandPool()
+{
+	QueueFamilyIndices t_QueueFamilyIndices = FindQueueFamilies(m_VKPhysicalDevice);
+
+	VkCommandPoolCreateInfo t_PoolInfo{};
+	t_PoolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+	t_PoolInfo.queueFamilyIndex = t_QueueFamilyIndices.graphicsFamily.value();
+	t_PoolInfo.flags = 0; // Optional
+
+	if (vkCreateCommandPool(m_VKDevice, &t_PoolInfo, nullptr, &m_VKCommandPool) != VK_SUCCESS) {
+		throw std::runtime_error("failed to create command pool!");
+	}
+}
+
+void Renderer::CreateCommandBuffers()
+{
+	m_VKCommandBuffers.resize(m_VKSwapChainFrameBuffers.size());
+
+	VkCommandBufferAllocateInfo t_AllocInfo{};
+	t_AllocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+	t_AllocInfo.commandPool = m_VKCommandPool;
+	t_AllocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+	t_AllocInfo.commandBufferCount = (uint32_t)m_VKCommandBuffers.size();
+
+	if (vkAllocateCommandBuffers(m_VKDevice, &t_AllocInfo, m_VKCommandBuffers.data()) != VK_SUCCESS) {
+		throw std::runtime_error("failed to allocate command buffers!");
+	}
+
+	for (size_t i = 0; i < m_VKCommandBuffers.size(); i++) {
+		VkCommandBufferBeginInfo t_BeginInfo{};
+		t_BeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+		t_BeginInfo.flags = 0; // Optional
+		t_BeginInfo.pInheritanceInfo = nullptr; // Optional
+
+		if (vkBeginCommandBuffer(m_VKCommandBuffers[i], &t_BeginInfo) != VK_SUCCESS) {
+			throw std::runtime_error("failed to begin recording command buffer!");
+		}
+
+		VkRenderPassBeginInfo t_RenderPassInfo{};
+		t_RenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+		t_RenderPassInfo.renderPass = m_VKRenderPass;
+		t_RenderPassInfo.framebuffer = m_VKSwapChainFrameBuffers[i];
+
+		t_RenderPassInfo.renderArea.offset = { 0, 0 };
+		t_RenderPassInfo.renderArea.extent = m_VKSwapChainExtent;
+
+		VkClearValue t_ClearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
+		t_RenderPassInfo.clearValueCount = 1;
+		t_RenderPassInfo.pClearValues = &t_ClearColor;
+
+		//Begin the drawing.
+		vkCmdBeginRenderPass(m_VKCommandBuffers[i], &t_RenderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+		vkCmdBindPipeline(m_VKCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_VKPipeline);
+
+		//Draw the test triangles.
+		vkCmdDraw(m_VKCommandBuffers[i], 3, 1, 0, 0);
+
+		vkCmdEndRenderPass(m_VKCommandBuffers[i]);
+
+		if (vkEndCommandBuffer(m_VKCommandBuffers[i]) != VK_SUCCESS) {
+			throw std::runtime_error("failed to record command buffer!");
+		}
+	}
+
 }
 
 QueueFamilyIndices Renderer::FindQueueFamilies(VkPhysicalDevice a_Device)

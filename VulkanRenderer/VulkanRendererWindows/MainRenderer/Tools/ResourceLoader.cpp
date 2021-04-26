@@ -3,7 +3,8 @@
 std::vector<char> ResourceLoader::ReadFile(const std::string& filename) {
     std::ifstream t_File(filename, std::ios::ate | std::ios::binary);
         
-    if (!t_File.is_open()) {
+    if (!t_File.is_open()) 
+    {
         throw std::runtime_error("failed to open file!");
     }
 

@@ -37,7 +37,11 @@ public:
 	void CreateSwapChain();
 	void CreateImageViews();
 	void CreateRenderPass();
-	void CreateGraphicsPipeline();
+	void CreateGraphicsPipeline();	
+
+	void CreateFrameBuffer();
+	void CreateCommandPool();
+	void CreateCommandBuffers();
 
 	//QueueFamily
 	QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice a_Device);
@@ -74,6 +78,11 @@ private:
 	VkSwapchainKHR m_VKSwapChain;
 	std::vector<VkImage> m_VKSwapChainImages;
 	std::vector<VkImageView> m_VKSwapChainImageViews;
+	std::vector<VkFramebuffer> m_VKSwapChainFrameBuffers;
+
+	//Buffer Commands
+	VkCommandPool m_VKCommandPool;
+	std::vector<VkCommandBuffer> m_VKCommandBuffers;
 
 	//The RenderPipeline.
 	VkRenderPass m_VKRenderPass;
