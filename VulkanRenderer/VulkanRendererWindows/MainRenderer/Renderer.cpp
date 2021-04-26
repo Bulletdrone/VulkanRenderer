@@ -31,6 +31,7 @@ Renderer::Renderer()
 
 	CreateFrameBuffer();
 	CreateCommandPool();
+	CreateCommandBuffers();
 }
 
 Renderer::~Renderer()
