@@ -1,4 +1,5 @@
 #include "ShaderManager.h"
+#include "MeshData.h"
 
 #include <iostream>
 
@@ -43,12 +44,16 @@ void ShaderManager::CreateGraphicsPipeline(const VkRenderPass& r_RenderPass)
 	//These are hard coded.
 	VkPipelineShaderStageCreateInfo t_ShaderStages[] = { t_VertShaderStageInfo, t_FragShaderStageInfo };
 
+	auto t_BindingDescription = Vertex::GetBindingDescription();
+	auto t_AttributeDescriptions = Vertex::GetAttributeDescriptions();
+
 	VkPipelineVertexInputStateCreateInfo t_VertexInputInfo{};
 	t_VertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-	t_VertexInputInfo.vertexBindingDescriptionCount = 0;
-	t_VertexInputInfo.pVertexBindingDescriptions = nullptr; // Optional
-	t_VertexInputInfo.vertexAttributeDescriptionCount = 0;
-	t_VertexInputInfo.pVertexAttributeDescriptions = nullptr; // Optional
+	t_VertexInputInfo.vertexBindingDescriptionCount = 1;
+	t_VertexInputInfo.pVertexBindingDescriptions = &t_BindingDescription;
+
+	t_VertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(t_AttributeDescriptions.size());;
+	t_VertexInputInfo.pVertexAttributeDescriptions = t_AttributeDescriptions.data();
 
 	VkPipelineInputAssemblyStateCreateInfo t_InputAssembly{};
 	t_InputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;

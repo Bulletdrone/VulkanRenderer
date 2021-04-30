@@ -41,6 +41,9 @@
     <ClCompile Include="MainRenderer\ObjectManager.cpp">
       <Filter>MainRenderer</Filter>
     </ClCompile>
+    <ClCompile Include="MainRenderer\MeshData.cpp">
+      <Filter>MainRenderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainRenderer\Renderer.h">
@@ -62,6 +65,9 @@
       <Filter>MainRenderer</Filter>
     </ClInclude>
     <ClInclude Include="MainRenderer\ObjectManager.h">
+      <Filter>MainRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="MainRenderer\MeshData.h">
       <Filter>MainRenderer</Filter>
     </ClInclude>
   </ItemGroup>
