@@ -32,10 +32,14 @@ Renderer::Renderer()
 	CreateFrameBuffer();
 	CreateCommandPool();
 	CreateCommandBuffers();
+
+	CreateSemaphores();
 }
 
 Renderer::~Renderer()
 {
+	vkDestroySemaphore(m_VKDevice, m_VKRenderFinishedSemaphore, nullptr);
+	vkDestroySemaphore(m_VKDevice, m_VKImageAvailableSemaphore, nullptr);
 	vkDestroyCommandPool(m_VKDevice, m_VKCommandPool, nullptr);
 
 	for (auto framebuffer : m_VKSwapChainFrameBuffers) {
@@ -428,6 +432,44 @@ void Renderer::CreateCommandBuffers()
 		}
 	}
 
+}
+
+void Renderer::CreateSemaphores()
+{
+	VkSemaphoreCreateInfo t_SemaphoreInfo{};
+	t_SemaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
+	if (vkCreateSemaphore(m_VKDevice, &t_SemaphoreInfo, nullptr, &m_VKImageAvailableSemaphore) != VK_SUCCESS ||
+		vkCreateSemaphore(m_VKDevice, &t_SemaphoreInfo, nullptr, &m_VKRenderFinishedSemaphore) != VK_SUCCESS) {
+
+		throw std::runtime_error("failed to create semaphores!");
+	}
+}
+
+void Renderer::AcquireNextImage(uint32_t& r_ImageIndex)
+{
+	vkAcquireNextImageKHR(m_VKDevice, m_VKSwapChain, UINT64_MAX, m_VKImageAvailableSemaphore, VK_NULL_HANDLE, &r_ImageIndex);
+
+	VkSubmitInfo submitInfo{};
+	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+
+	VkSemaphore waitSemaphores[] = { m_VKImageAvailableSemaphore };
+	VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
+	submitInfo.waitSemaphoreCount = 1;
+	submitInfo.pWaitSemaphores = waitSemaphores;
+	submitInfo.pWaitDstStageMask = waitStages;
+
+	submitInfo.commandBufferCount = 1;
+	submitInfo.pCommandBuffers = &m_VKCommandBuffers[r_ImageIndex];
+
+	VkSemaphore signalSemaphores[] = { m_VKRenderFinishedSemaphore };
+	submitInfo.signalSemaphoreCount = 1;
+	submitInfo.pSignalSemaphores = signalSemaphores;
+
+	if (vkQueueSubmit(m_VKGraphicsQueue, 1, &submitInfo, VK_NULL_HANDLE) != VK_SUCCESS) 
+	{
+		throw std::runtime_error("failed to submit draw command buffer!");
+	}
 }
 
 QueueFamilyIndices Renderer::FindQueueFamilies(VkPhysicalDevice a_Device)

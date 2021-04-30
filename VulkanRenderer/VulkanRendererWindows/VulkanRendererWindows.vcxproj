@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MainRenderer\ObjectManager.cpp" />
     <ClCompile Include="MainRenderer\Renderer.cpp" />
     <ClCompile Include="MainRenderer\ShaderManager.cpp" />
     <ClCompile Include="MainRenderer\Shapes\Triangle.cpp" />
@@ -28,6 +29,7 @@
     <ClCompile Include="MainRenderer\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="MainRenderer\ObjectManager.h" />
     <ClInclude Include="MainRenderer\Renderer.h" />
     <ClInclude Include="MainRenderer\ShaderManager.h" />
     <ClInclude Include="MainRenderer\Shapes\Triangle.h" />

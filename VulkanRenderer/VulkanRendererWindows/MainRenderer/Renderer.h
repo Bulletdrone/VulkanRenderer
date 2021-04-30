@@ -43,6 +43,11 @@ public:
 	void CreateCommandPool();
 	void CreateCommandBuffers();
 
+	void CreateSemaphores();
+
+
+	void AcquireNextImage(uint32_t& r_ImageIndex);
+
 	//QueueFamily
 	QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice a_Device);
 
@@ -57,6 +62,7 @@ public:
 	//Getters
 	GLFWwindow* GetWindow() const { return m_Window->GetWindow(); }
 
+
 private:
 	bool IsDeviceSuitable(VkPhysicalDevice a_Device);
 
@@ -65,6 +71,10 @@ private:
 
 	//ShaderData
 	ShaderManager* m_ShaderManager;
+
+
+	VkSemaphore m_VKImageAvailableSemaphore;
+	VkSemaphore m_VKRenderFinishedSemaphore;
 
 	//Primary Vulkan Data;
 	VkInstance m_VKInstance;
