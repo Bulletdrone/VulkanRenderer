@@ -15,6 +15,7 @@ public:
 	~Window();
 
 	void SetupVKWindow(const VkInstance& rm_VKInstance);
+	void CheckMinimized();
 
 	std::vector<const char*> GetRequiredExtentions(const bool a_EnabledValidationLayers);
 
@@ -22,9 +23,15 @@ public:
 	GLFWwindow* GetWindow() const { return m_Window; }
 	VkSurfaceKHR& GetSurface() { return m_Surface; }
 
+	bool m_FrameBufferResized = false;
 private:
 	//GLFW Window Data
 	GLFWwindow* m_Window;
 	VkSurfaceKHR m_Surface;
 };
 
+static void FramebufferResizeCallback(GLFWwindow* window, int width, int height) 
+{
+	auto app = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
+	app->m_FrameBufferResized = true;
+}

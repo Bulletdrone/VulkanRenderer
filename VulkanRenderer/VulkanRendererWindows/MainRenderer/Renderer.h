@@ -25,11 +25,16 @@ struct SwapChainSupportDetails {
 };
 
 
+constexpr int MAX_FRAMES_IN_FLIGHT = 2;
+
 class Renderer
 {
 public:
 	Renderer();
 	~Renderer();
+
+	void CleanupSwapChain();
+	void RecreateSwapChain();
 
 	void CreateVKInstance();
 	void PickPhysicalDevice();
@@ -39,14 +44,14 @@ public:
 	void CreateRenderPass();
 	void CreateGraphicsPipeline();	
 
-	void CreateFrameBuffer();
+	void CreateFrameBuffers();
 	void CreateCommandPool();
 	void CreateCommandBuffers();
 
-	void CreateSemaphores();
+	void CreateSyncObjects();
 
 
-	void AcquireNextImage(uint32_t& r_ImageIndex);
+	void DrawFrame(uint32_t& r_ImageIndex);
 
 	//QueueFamily
 	QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice a_Device);
@@ -72,9 +77,11 @@ private:
 	//ShaderData
 	ShaderManager* m_ShaderManager;
 
-
-	VkSemaphore m_VKImageAvailableSemaphore;
-	VkSemaphore m_VKRenderFinishedSemaphore;
+	std::vector<VkSemaphore> m_VKImageAvailableSemaphore;
+	std::vector<VkSemaphore> m_VKRenderFinishedSemaphore;
+	std::vector<VkFence> m_VKInFlightFences;
+	std::vector<VkFence> m_VKImagesInFlight;
+	size_t m_CurrentFrame = 0;
 
 	//Primary Vulkan Data;
 	VkInstance m_VKInstance;

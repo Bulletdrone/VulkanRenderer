@@ -10,6 +10,9 @@ Window::Window(int a_Width, int a_Height, const char* a_WindowName)
     glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
     m_Window = glfwCreateWindow(a_Width, a_Height, a_WindowName, nullptr, nullptr);
+    
+    glfwSetWindowUserPointer(m_Window, this);
+    glfwSetFramebufferSizeCallback(m_Window, FramebufferResizeCallback);
 }
 
 Window::~Window()
@@ -28,6 +31,17 @@ void Window::SetupVKWindow(const VkInstance& rm_VKInstance)
 
     if (glfwCreateWindowSurface(rm_VKInstance, m_Window, nullptr, &m_Surface) != VK_SUCCESS) {
         throw std::runtime_error("failed to create window surface!");
+    }
+}
+
+void Window::CheckMinimized()
+{
+    int width = 0, height = 0;
+    glfwGetFramebufferSize(m_Window, &width, &height);
+    while (width == 0 || height == 0) 
+    {
+        glfwGetFramebufferSize(m_Window, &width, &height);
+        glfwWaitEvents();
     }
 }
 

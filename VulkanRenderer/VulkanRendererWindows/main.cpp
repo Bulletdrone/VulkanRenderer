@@ -1,14 +1,19 @@
 #include "MainRenderer/Renderer.h"
+#include "MainRenderer/ObjectManager.h"
 
 int main() 
 {
+    //init's the renderer.
     Renderer* m_Renderer = new Renderer();
 
-    //while (!glfwWindowShouldClose(m_Renderer->GetWindow())) {
-    //    glfwPollEvents();
+    ObjectManager* m_ObjectManager = new ObjectManager(m_Renderer);
 
-    //    m_Renderer->RenderUpdate(0);
-    //}
+    while (!glfwWindowShouldClose(m_Renderer->GetWindow())) 
+    {
+        glfwPollEvents();
+        m_ObjectManager->UpdateObjects(0);
+    }
+
 
     delete m_Renderer;
 
