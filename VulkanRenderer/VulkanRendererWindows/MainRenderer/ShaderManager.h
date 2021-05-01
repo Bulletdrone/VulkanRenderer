@@ -15,9 +15,6 @@ public:
 
 	void CreateGraphicsPipeline(const VkRenderPass& r_RenderPass);
 	VkShaderModule CreateShaderModule(const std::vector<char>& code);
-	void DestroyShaderModules();
-
-	void GetShaderModules(VkShaderModule& r_VertShad, VkShaderModule& r_FragShad);
 
 private:
 	const VkDevice& rm_VKDevice;
@@ -25,9 +22,4 @@ private:
 
 	VkPipelineLayout& rm_VKPipelineLayout;
 	VkPipeline& rm_VKPipeline;
-
-	VkBuffer m_VKVertexBuffer;
-
-	//VkShaderModule sh_Unlit[2];
-
 };

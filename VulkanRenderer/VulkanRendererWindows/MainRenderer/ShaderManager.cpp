@@ -50,9 +50,8 @@ void ShaderManager::CreateGraphicsPipeline(const VkRenderPass& r_RenderPass)
 	VkPipelineVertexInputStateCreateInfo t_VertexInputInfo{};
 	t_VertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 	t_VertexInputInfo.vertexBindingDescriptionCount = 1;
+	t_VertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(t_AttributeDescriptions.size());
 	t_VertexInputInfo.pVertexBindingDescriptions = &t_BindingDescription;
-
-	t_VertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(t_AttributeDescriptions.size());;
 	t_VertexInputInfo.pVertexAttributeDescriptions = t_AttributeDescriptions.data();
 
 	VkPipelineInputAssemblyStateCreateInfo t_InputAssembly{};
@@ -185,17 +184,4 @@ VkShaderModule ShaderManager::CreateShaderModule(const std::vector<char>& a_Code
 	}
 
 	return t_ShaderModule;
-}
-
-void ShaderManager::DestroyShaderModules()
-{
-	//Always destroy on end.
-	//vkDestroyShaderModule(rm_VKDevice, sh_Unlit[0], nullptr);
-	//vkDestroyShaderModule(rm_VKDevice, sh_Unlit[1], nullptr);
-}
-
-void ShaderManager::GetShaderModules(VkShaderModule& r_VertShad, VkShaderModule& r_FragShad)
-{
-	//r_VertShad = sh_Unlit[0];
-	//r_FragShad = sh_Unlit[1];
 }

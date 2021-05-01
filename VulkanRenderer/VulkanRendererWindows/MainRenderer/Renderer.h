@@ -5,6 +5,8 @@
 #include "ShaderManager.h"
 #include "VulkanDebugger/VulkanDebug.h"
 
+#include "MeshData.h"
+
 #include <optional>
 
 //Special struct for the Family Queue.
@@ -42,7 +44,6 @@ public:
 	void CreateSwapChain();
 	void CreateImageViews();
 	void CreateRenderPass();
-	void CreateGraphicsPipeline();	
 
 	void CreateFrameBuffers();
 	void CreateCommandPool();
@@ -50,6 +51,10 @@ public:
 
 	void CreateSyncObjects();
 
+	//BufferData
+	void SetupMesh(MeshData* a_MeshData);
+	void CreateBufferFromMesh(MeshData* a_MeshData, VkDeviceSize a_Size, VkBufferUsageFlags a_Usage, VkMemoryPropertyFlags a_Properties, VkBuffer& r_Buffer, VkDeviceMemory& r_BufferMemory);
+	void CopyBufferFromMesh(MeshData* a_MeshData, VkDeviceSize a_Size, VkBuffer& r_Buffer);
 
 	void DrawFrame(uint32_t& r_ImageIndex);
 
@@ -63,6 +68,9 @@ public:
 	VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& a_Capabilities);
 
 	bool CheckDeviceExtensionSupport(VkPhysicalDevice a_Device);
+	uint32_t FindMemoryType(uint32_t a_TypeFilter, VkMemoryPropertyFlags a_Properties, VkPhysicalDevice& r_PhysDevice);
+
+
 
 	//Getters
 	GLFWwindow* GetWindow() const { return m_Window->GetWindow(); }
@@ -70,6 +78,8 @@ public:
 
 private:
 	bool IsDeviceSuitable(VkPhysicalDevice a_Device);
+
+	MeshData* TEMPMESH;
 
 	//Window Data.
 	Window* m_Window;

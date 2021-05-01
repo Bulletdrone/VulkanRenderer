@@ -43,24 +43,28 @@ struct Vertex
 class MeshData
 {
 public:
-	MeshData(std::vector<Vertex> a_Vertices, VkDevice& r_Device, VkPhysicalDevice& r_PhysicalDevice);
+	MeshData(std::vector<Vertex> a_Vertices);
 	~MeshData();
 
-	void SetupMesh();
-	uint32_t FindMemoryType(uint32_t a_TypeFilter, VkMemoryPropertyFlags a_Properties);
+	void DeleteBuffers(VkDevice& r_Device);
+
+	const VkDeviceSize CreateBufferSize() const; //Returns the buffersize in bytes.
 
 	//Getters
+	const std::vector<Vertex>& GetVertices() const { return m_Vertices; }
 	const size_t GetVertexCount() const { return m_Vertices.size(); }
 
-	const VkBuffer GetVertBuffer() const { return mvk_VertBuffer; }
-	const VkDeviceMemory GetVertBufferMemory() const { return mvk_VertBufferMemory; }
+	VkBuffer& GetVertBuffer() { return mvk_VertBuffer; }
+	VkDeviceMemory& GetVertBufferMemory() { return mvk_VertBufferMemory; }
 
 private:
 	std::vector<Vertex> m_Vertices;
 
 	VkBuffer mvk_VertBuffer;
 	VkDeviceMemory mvk_VertBufferMemory;
-
-	VkDevice& rvk_Device;
-	VkPhysicalDevice& rvk_PhysicalDevice;
 };
+
+inline const VkDeviceSize MeshData::CreateBufferSize() const //Returns the buffersize in bytes.
+{
+	return sizeof(m_Vertices[0]) * m_Vertices.size();
+}

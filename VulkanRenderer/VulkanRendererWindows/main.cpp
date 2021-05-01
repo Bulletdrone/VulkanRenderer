@@ -8,8 +8,22 @@ int main()
 
     ObjectManager* m_ObjectManager = new ObjectManager(m_Renderer);
 
+    double t_StartTime = glfwGetTime();
+    int t_FrameCount = 0;
+
     while (!glfwWindowShouldClose(m_Renderer->GetWindow())) 
     {
+        double t_CurrentTime = glfwGetTime();
+
+        t_FrameCount++;
+        if (t_CurrentTime - t_StartTime >= 1.0)
+        {
+            printf("%d \n", t_FrameCount);
+
+            t_FrameCount = 0;
+            t_StartTime = t_CurrentTime;
+        }
+
         glfwPollEvents();
         m_ObjectManager->UpdateObjects(0);
     }

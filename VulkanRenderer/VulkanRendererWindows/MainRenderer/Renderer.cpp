@@ -1,6 +1,5 @@
 #define VK_USE_PLATFORM_WIN32_KHR
 #include "Renderer.h"
-#include "MeshData.h"
 
 #include <iostream>
 #include <set>
@@ -10,6 +9,7 @@
 
 Renderer::Renderer()
 {
+
 	//Setting up GLFW.
 	m_Window = new Window(800, 600, "VulkanTest");
 
@@ -27,11 +27,20 @@ Renderer::Renderer()
 	CreateSwapChain();
 	CreateImageViews();
 	CreateRenderPass();
+
 	m_ShaderManager = new ShaderManager(mvk_Device, mvk_SwapChainExtent, mvk_PipelineLayout, mvk_Pipeline);
-	CreateGraphicsPipeline();
+	m_ShaderManager->CreateGraphicsPipeline(mvk_RenderPass);
 
 	CreateFrameBuffers();
 	CreateCommandPool();
+
+	std::vector<Vertex> t_Vertices = {
+{{0.0f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}},
+{{0.5f, 0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}},
+{{-0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}}
+	};
+	TEMPMESH = new MeshData(t_Vertices);
+	SetupMesh(TEMPMESH);
 	CreateCommandBuffers();
 
 	CreateSyncObjects();
@@ -90,7 +99,7 @@ void Renderer::RecreateSwapChain()
 	CreateSwapChain();
 	CreateImageViews();
 	CreateRenderPass();
-	CreateGraphicsPipeline();
+	m_ShaderManager->CreateGraphicsPipeline(mvk_RenderPass);
 	CreateFrameBuffers();
 	CreateCommandBuffers();
 }
@@ -375,13 +384,6 @@ void Renderer::CreateRenderPass()
 	}
 }
 
-void Renderer::CreateGraphicsPipeline()
-{
-	m_ShaderManager->CreateGraphicsPipeline(mvk_RenderPass);
-
-	//m_ShaderManager->DestroyShaderModules();
-}
-
 void Renderer::CreateFrameBuffers()
 {
 	mvk_SwapChainFrameBuffers.resize(mvk_SwapChainImageViews.size());
@@ -464,18 +466,11 @@ void Renderer::CreateCommandBuffers()
 
 		vkCmdBindPipeline(mvk_CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, mvk_Pipeline);
 
-		std::vector<Vertex> t_Vertices = {
-	{{0.0f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}},
-	{{0.5f, 0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}},
-	{{-0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}}
-		};
-		MeshData t_MeshData(t_Vertices, mvk_Device, mvk_PhysicalDevice);
-
-		VkBuffer vertexBuffers[] = { t_MeshData.GetVertBuffer() };
-		VkDeviceSize offsets[] = { 0 };
-		vkCmdBindVertexBuffers(mvk_CommandBuffers[i], 0, 1, vertexBuffers, offsets);
+		VkBuffer t_VertexBuffers[] = { TEMPMESH->GetVertBuffer() };
+		VkDeviceSize t_Offsets[] = { 0 };
+		vkCmdBindVertexBuffers(mvk_CommandBuffers[i], 0, 1, t_VertexBuffers, t_Offsets);
 		//Draw the test triangles.
-		vkCmdDraw(mvk_CommandBuffers[i], static_cast<uint32_t>(t_MeshData.GetVertexCount()), 1, 0, 0);
+		vkCmdDraw(mvk_CommandBuffers[i], static_cast<uint32_t>(TEMPMESH->GetVertexCount()), 1, 0, 0);
 
 		vkCmdEndRenderPass(mvk_CommandBuffers[i]);
 
@@ -511,10 +506,99 @@ void Renderer::CreateSyncObjects()
 	}
 }
 
+void Renderer::SetupMesh(MeshData* a_MeshData)
+{
+	VkDeviceSize t_BufferSize = a_MeshData->CreateBufferSize();
+
+	VkBuffer t_StagingBuffer;
+	VkDeviceMemory t_StagingBufferMemory;
+	CreateBufferFromMesh(a_MeshData, t_BufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+		t_StagingBuffer, t_StagingBufferMemory);
+
+	void* t_Data;
+	vkMapMemory(mvk_Device, t_StagingBufferMemory, 0, t_BufferSize, 0, &t_Data);
+	memcpy(t_Data, a_MeshData->GetVertices().data(), (size_t)t_BufferSize);
+	vkUnmapMemory(mvk_Device, t_StagingBufferMemory);
+
+	CreateBufferFromMesh(a_MeshData, t_BufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+		a_MeshData->GetVertBuffer(), a_MeshData->GetVertBufferMemory());
+
+	CopyBufferFromMesh(a_MeshData, t_BufferSize, t_StagingBuffer);
+
+	vkDestroyBuffer(mvk_Device, t_StagingBuffer, nullptr);
+	vkFreeMemory(mvk_Device, t_StagingBufferMemory, nullptr);
+}
+
+void Renderer::CreateBufferFromMesh(MeshData* a_MeshData, VkDeviceSize a_Size, 
+	VkBufferUsageFlags a_Usage, VkMemoryPropertyFlags a_Properties, VkBuffer& r_Buffer, VkDeviceMemory& r_BufferMemory)
+{
+	VkBufferCreateInfo t_BufferInfo{};
+	t_BufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+	t_BufferInfo.size = a_Size;
+	t_BufferInfo.usage = a_Usage;
+	t_BufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+	if (vkCreateBuffer(mvk_Device, &t_BufferInfo, nullptr, &r_Buffer) != VK_SUCCESS)
+	{
+		throw std::runtime_error("failed to create vertex buffer!");
+	}
+
+	VkMemoryRequirements t_MemRequirements;
+	vkGetBufferMemoryRequirements(mvk_Device, r_Buffer, &t_MemRequirements);
+
+	VkMemoryAllocateInfo t_AllocInfo{};
+	t_AllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+	t_AllocInfo.allocationSize = t_MemRequirements.size;
+	t_AllocInfo.memoryTypeIndex = FindMemoryType(t_MemRequirements.memoryTypeBits, a_Properties, mvk_PhysicalDevice);
+
+	if (vkAllocateMemory(mvk_Device, &t_AllocInfo, nullptr, &r_BufferMemory) != VK_SUCCESS)
+	{
+		throw std::runtime_error("failed to allocate vertex buffer memory!");
+	}
+
+	vkBindBufferMemory(mvk_Device, r_Buffer, r_BufferMemory, 0);
+}
+
+void Renderer::CopyBufferFromMesh(MeshData* a_MeshData, VkDeviceSize a_Size, VkBuffer& r_Buffer)
+{
+	VkCommandBufferAllocateInfo t_AllocInfo{};
+	t_AllocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+	t_AllocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+	t_AllocInfo.commandPool = mvk_CommandPool;
+	t_AllocInfo.commandBufferCount = 1;
+
+	VkCommandBuffer t_CommandBuffer;
+	vkAllocateCommandBuffers(mvk_Device, &t_AllocInfo, &t_CommandBuffer);
+
+	VkCommandBufferBeginInfo t_BeginInfo{};
+	t_BeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+	t_BeginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+	vkBeginCommandBuffer(t_CommandBuffer, &t_BeginInfo);
+
+	VkBufferCopy t_CopyRegion{};
+	t_CopyRegion.srcOffset = 0; // Optional
+	t_CopyRegion.dstOffset = 0; // Optional
+	t_CopyRegion.size = a_Size;
+	vkCmdCopyBuffer(t_CommandBuffer, r_Buffer, a_MeshData->GetVertBuffer(), 1, &t_CopyRegion);
+
+	vkEndCommandBuffer(t_CommandBuffer);
+
+	VkSubmitInfo t_SubmitInfo{};
+	t_SubmitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+	t_SubmitInfo.commandBufferCount = 1;
+	t_SubmitInfo.pCommandBuffers = &t_CommandBuffer;
+
+	vkQueueSubmit(mvk_GraphicsQueue, 1, &t_SubmitInfo, VK_NULL_HANDLE);
+	vkQueueWaitIdle(mvk_GraphicsQueue);
+
+	vkFreeCommandBuffers(mvk_Device, mvk_CommandPool, 1, &t_CommandBuffer);
+}
+
 void Renderer::DrawFrame(uint32_t& r_ImageIndex)
 {
 	vkWaitForFences(mvk_Device, 1, &mvk_InFlightFences[m_CurrentFrame], VK_TRUE, UINT64_MAX);
-	vkResetFences(mvk_Device, 1, &mvk_InFlightFences[m_CurrentFrame]);
+	//vkResetFences(mvk_Device, 1, &mvk_InFlightFences[m_CurrentFrame]);
 
 	VkResult t_Result = vkAcquireNextImageKHR(mvk_Device, mvk_SwapChain, UINT64_MAX, mvk_ImageAvailableSemaphore[m_CurrentFrame], VK_NULL_HANDLE, &r_ImageIndex);
 
@@ -529,7 +613,8 @@ void Renderer::DrawFrame(uint32_t& r_ImageIndex)
 	}
 
 	// Check if a previous frame is using this image (i.e. there is its fence to wait on)
-	if (mvk_ImagesInFlight[r_ImageIndex] != VK_NULL_HANDLE) {
+	if (mvk_ImagesInFlight[r_ImageIndex] != VK_NULL_HANDLE) 
+	{
 		vkWaitForFences(mvk_Device, 1, &mvk_ImagesInFlight[r_ImageIndex], VK_TRUE, UINT64_MAX);
 	}
 	// Mark the image as now being in use by this frame
@@ -553,7 +638,7 @@ void Renderer::DrawFrame(uint32_t& r_ImageIndex)
 	t_SubmitInfo.pSignalSemaphores = t_SignalSemaphores;
 
 
-	vkResetFences(mvk_Device, 1, &mvk_ImagesInFlight[m_CurrentFrame]);
+	vkResetFences(mvk_Device, 1, &mvk_InFlightFences[m_CurrentFrame]);
 	if (vkQueueSubmit(mvk_GraphicsQueue, 1, &t_SubmitInfo, mvk_InFlightFences[m_CurrentFrame]) != VK_SUCCESS)
 	{
 		throw std::runtime_error("failed to submit draw command buffer!");
@@ -729,4 +814,19 @@ bool Renderer::CheckDeviceExtensionSupport(VkPhysicalDevice a_Device)
 	}
 
 	return t_RequiredExtensions.empty();
+}
+
+uint32_t Renderer::FindMemoryType(uint32_t a_TypeFilter, VkMemoryPropertyFlags a_Properties, VkPhysicalDevice& r_PhysDevice)
+{
+	VkPhysicalDeviceMemoryProperties memProperties;
+	vkGetPhysicalDeviceMemoryProperties(r_PhysDevice, &memProperties);
+
+	for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++)
+	{
+		if ((a_TypeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & a_Properties) == a_Properties) {
+			return i;
+		}
+	}
+
+	throw std::runtime_error("failed to find suitable memory type!");
 }
