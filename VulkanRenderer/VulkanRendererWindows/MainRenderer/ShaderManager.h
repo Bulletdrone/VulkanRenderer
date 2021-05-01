@@ -26,6 +26,8 @@ private:
 	VkPipelineLayout& rm_VKPipelineLayout;
 	VkPipeline& rm_VKPipeline;
 
+	VkBuffer m_VKVertexBuffer;
+
 	//VkShaderModule sh_Unlit[2];
 
 };

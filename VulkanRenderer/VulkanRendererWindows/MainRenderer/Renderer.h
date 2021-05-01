@@ -77,44 +77,44 @@ private:
 	//ShaderData
 	ShaderManager* m_ShaderManager;
 
-	std::vector<VkSemaphore> m_VKImageAvailableSemaphore;
-	std::vector<VkSemaphore> m_VKRenderFinishedSemaphore;
-	std::vector<VkFence> m_VKInFlightFences;
-	std::vector<VkFence> m_VKImagesInFlight;
+	std::vector<VkSemaphore> mvk_ImageAvailableSemaphore;
+	std::vector<VkSemaphore> mvk_RenderFinishedSemaphore;
+	std::vector<VkFence> mvk_InFlightFences;
+	std::vector<VkFence> mvk_ImagesInFlight;
 	size_t m_CurrentFrame = 0;
 
 	//Primary Vulkan Data;
-	VkInstance m_VKInstance;
-	VkPhysicalDevice m_VKPhysicalDevice = VK_NULL_HANDLE;
-	VkDevice m_VKDevice;
+	VkInstance mvk_Instance;
+	VkPhysicalDevice mvk_PhysicalDevice = VK_NULL_HANDLE;
+	VkDevice mvk_Device;
 
-	VkQueue m_VKGraphicsQueue;
-	VkQueue m_VKPresentQueue;
+	VkQueue mvk_GraphicsQueue;
+	VkQueue mvk_PresentQueue;
 
 	//The SwapChain for buffering images and more.
-	VkSwapchainKHR m_VKSwapChain;
-	std::vector<VkImage> m_VKSwapChainImages;
-	std::vector<VkImageView> m_VKSwapChainImageViews;
-	std::vector<VkFramebuffer> m_VKSwapChainFrameBuffers;
+	VkSwapchainKHR mvk_SwapChain;
+	std::vector<VkImage> mvk_SwapChainImages;
+	std::vector<VkImageView> mvk_SwapChainImageViews;
+	std::vector<VkFramebuffer> mvk_SwapChainFrameBuffers;
 
 	//Buffer Commands
-	VkCommandPool m_VKCommandPool;
-	std::vector<VkCommandBuffer> m_VKCommandBuffers;
+	VkCommandPool mvk_CommandPool;
+	std::vector<VkCommandBuffer> mvk_CommandBuffers;
 
 	//The RenderPipeline.
-	VkRenderPass m_VKRenderPass;
-	VkPipelineLayout m_VKPipelineLayout;
-	VkPipeline m_VKPipeline;
+	VkRenderPass mvk_RenderPass;
+	VkPipelineLayout mvk_PipelineLayout;
+	VkPipeline mvk_Pipeline;
 
-	VkFormat m_VKSwapChainImageFormat;
-	VkExtent2D m_VKSwapChainExtent;
+	VkFormat mvk_SwapChainImageFormat;
+	VkExtent2D mvk_SwapChainExtent;
 
 	const std::vector<const char*> m_DeviceExtensions = {
 	VK_KHR_SWAPCHAIN_EXTENSION_NAME
 	};
 
 	//DEBUGGING
-	VulkanDebug* DE_VKDebug = nullptr;
+	VulkanDebug* DE_VulkanDebug = nullptr;
 #ifdef NDEBUG
 	const bool DE_EnableValidationLayers = false;
 #else

@@ -1,4 +1,6 @@
 #pragma once
+#include <MeshData.h>
+
 class Triangle
 {
 public:
@@ -6,6 +8,5 @@ public:
 	~Triangle();
 
 private:
-
+	MeshData* m_MeshData;
 };
-
