@@ -17,6 +17,9 @@
     <Filter Include="Tools">
       <UniqueIdentifier>{c0b9d07d-006c-41d9-9acc-4bcc89f50352}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MainRenderer\Structs">
+      <UniqueIdentifier>{2146820d-b9c4-418b-87a9-36928226f43d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -69,6 +72,9 @@
     </ClInclude>
     <ClInclude Include="MainRenderer\MeshData.h">
       <Filter>MainRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="MainRenderer\Structs\BufferData.h">
+      <Filter>MainRenderer\Structs</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -53,8 +53,10 @@ public:
 
 	//BufferData
 	void SetupMesh(MeshData* a_MeshData);
-	void CreateBufferFromMesh(MeshData* a_MeshData, VkDeviceSize a_Size, VkBufferUsageFlags a_Usage, VkMemoryPropertyFlags a_Properties, VkBuffer& r_Buffer, VkDeviceMemory& r_BufferMemory);
-	void CopyBufferFromMesh(MeshData* a_MeshData, VkDeviceSize a_Size, VkBuffer& r_Buffer);
+	void CreateVertexBuffers(BufferData<Vertex>* a_VertexData);
+	void CreateIndexBuffers(BufferData<uint16_t>* a_IndexData);
+	void CreateBufferFromMesh(VkDeviceSize a_Size, VkBufferUsageFlags a_Usage, VkMemoryPropertyFlags a_Properties, VkBuffer& r_Buffer, VkDeviceMemory& r_BufferMemory);
+	void CopyBufferFromMesh(VkDeviceSize a_Size, VkBuffer& r_SrcBuffer, VkBuffer& r_DstBuffer);
 
 	void DrawFrame(uint32_t& r_ImageIndex);
 

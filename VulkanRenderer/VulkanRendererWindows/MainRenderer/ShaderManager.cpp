@@ -15,8 +15,6 @@ ShaderManager::~ShaderManager()
 
 void ShaderManager::CreateGraphicsPipeline(const VkRenderPass& r_RenderPass)
 {
-	//(char*)"../OpenGLShared/Resources/Shaders/Win/unlitInstance.vert",
-
 	auto t_VertShaderCode = ResourceLoader::ReadFile("../Resources/Shaders/unlitVert.spv");
 	auto t_FragShaderCode = ResourceLoader::ReadFile("../Resources/Shaders/unlitFrag.spv");
 

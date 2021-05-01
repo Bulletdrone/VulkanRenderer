@@ -35,6 +35,7 @@
     <ClInclude Include="MainRenderer\Renderer.h" />
     <ClInclude Include="MainRenderer\ShaderManager.h" />
     <ClInclude Include="MainRenderer\Shapes\Triangle.h" />
+    <ClInclude Include="MainRenderer\Structs\BufferData.h" />
     <ClInclude Include="MainRenderer\Tools\ResourceLoader.h" />
     <ClInclude Include="MainRenderer\VulkanDebugger\VulkanDebug.h" />
     <ClInclude Include="MainRenderer\Window.h" />

@@ -35,11 +35,16 @@ Renderer::Renderer()
 	CreateCommandPool();
 
 	std::vector<Vertex> t_Vertices = {
-{{0.0f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}},
-{{0.5f, 0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}},
-{{-0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}}
+	{{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}},
+	{{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}},
+	{{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}},
+	{{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}}
 	};
-	TEMPMESH = new MeshData(t_Vertices);
+	const std::vector<uint16_t> t_Indices = {
+	0, 1, 2, 2, 3, 0
+	};
+
+	TEMPMESH = new MeshData(t_Vertices, t_Indices);
 	SetupMesh(TEMPMESH);
 	CreateCommandBuffers();
 
@@ -466,11 +471,16 @@ void Renderer::CreateCommandBuffers()
 
 		vkCmdBindPipeline(mvk_CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, mvk_Pipeline);
 
-		VkBuffer t_VertexBuffers[] = { TEMPMESH->GetVertBuffer() };
+		VkBuffer t_VertexBuffers[] = { TEMPMESH->GetVertexData()->GetBuffer() };
 		VkDeviceSize t_Offsets[] = { 0 };
 		vkCmdBindVertexBuffers(mvk_CommandBuffers[i], 0, 1, t_VertexBuffers, t_Offsets);
+		
+		vkCmdBindIndexBuffer(mvk_CommandBuffers[i], TEMPMESH->GetIndexData()->GetBuffer(), 0, VK_INDEX_TYPE_UINT16);
+		
+		
 		//Draw the test triangles.
-		vkCmdDraw(mvk_CommandBuffers[i], static_cast<uint32_t>(TEMPMESH->GetVertexCount()), 1, 0, 0);
+		//vkCmdDraw(mvk_CommandBuffers[i], static_cast<uint32_t>(TEMPMESH->GetVertexData()->GetElementCount()), 1, 0, 0);
+		vkCmdDrawIndexed(mvk_CommandBuffers[i], static_cast<uint32_t>(TEMPMESH->GetIndexData()->GetElementCount()), 1, 0, 0, 0);
 
 		vkCmdEndRenderPass(mvk_CommandBuffers[i]);
 
@@ -508,29 +518,57 @@ void Renderer::CreateSyncObjects()
 
 void Renderer::SetupMesh(MeshData* a_MeshData)
 {
-	VkDeviceSize t_BufferSize = a_MeshData->CreateBufferSize();
+	CreateVertexBuffers(a_MeshData->GetVertexData());
+	CreateIndexBuffers(a_MeshData->GetIndexData());
+}
+
+void Renderer::CreateVertexBuffers(BufferData<Vertex>* a_VertexData)
+{
+	VkDeviceSize t_BufferSize = a_VertexData->CreateBufferSize();
 
 	VkBuffer t_StagingBuffer;
 	VkDeviceMemory t_StagingBufferMemory;
-	CreateBufferFromMesh(a_MeshData, t_BufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+	CreateBufferFromMesh(t_BufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 		t_StagingBuffer, t_StagingBufferMemory);
 
 	void* t_Data;
 	vkMapMemory(mvk_Device, t_StagingBufferMemory, 0, t_BufferSize, 0, &t_Data);
-	memcpy(t_Data, a_MeshData->GetVertices().data(), (size_t)t_BufferSize);
+	memcpy(t_Data, a_VertexData->GetElements().data(), (size_t)t_BufferSize);
 	vkUnmapMemory(mvk_Device, t_StagingBufferMemory);
 
-	CreateBufferFromMesh(a_MeshData, t_BufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-		a_MeshData->GetVertBuffer(), a_MeshData->GetVertBufferMemory());
+	CreateBufferFromMesh(t_BufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+		a_VertexData->GetBuffer(), a_VertexData->GetBufferMemory());
 
-	CopyBufferFromMesh(a_MeshData, t_BufferSize, t_StagingBuffer);
+	CopyBufferFromMesh(t_BufferSize, t_StagingBuffer, a_VertexData->GetBuffer());
 
 	vkDestroyBuffer(mvk_Device, t_StagingBuffer, nullptr);
 	vkFreeMemory(mvk_Device, t_StagingBufferMemory, nullptr);
 }
 
-void Renderer::CreateBufferFromMesh(MeshData* a_MeshData, VkDeviceSize a_Size, 
-	VkBufferUsageFlags a_Usage, VkMemoryPropertyFlags a_Properties, VkBuffer& r_Buffer, VkDeviceMemory& r_BufferMemory)
+void Renderer::CreateIndexBuffers(BufferData<uint16_t>* a_IndexData)
+{
+	VkDeviceSize t_BufferSize = a_IndexData->CreateBufferSize();
+
+	VkBuffer t_StagingBuffer;
+	VkDeviceMemory t_StagingBufferMemory;
+	CreateBufferFromMesh(t_BufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+		t_StagingBuffer, t_StagingBufferMemory);
+
+	void* t_Data;
+	vkMapMemory(mvk_Device, t_StagingBufferMemory, 0, t_BufferSize, 0, &t_Data);
+	memcpy(t_Data, a_IndexData->GetElements().data(), (size_t)t_BufferSize);
+	vkUnmapMemory(mvk_Device, t_StagingBufferMemory);
+
+	CreateBufferFromMesh(t_BufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+		a_IndexData->GetBuffer(), a_IndexData->GetBufferMemory());
+
+	CopyBufferFromMesh(t_BufferSize, t_StagingBuffer, a_IndexData->GetBuffer());
+
+	vkDestroyBuffer(mvk_Device, t_StagingBuffer, nullptr);
+	vkFreeMemory(mvk_Device, t_StagingBufferMemory, nullptr);
+}
+
+void Renderer::CreateBufferFromMesh(VkDeviceSize a_Size, VkBufferUsageFlags a_Usage, VkMemoryPropertyFlags a_Properties, VkBuffer& r_Buffer, VkDeviceMemory& r_BufferMemory)
 {
 	VkBufferCreateInfo t_BufferInfo{};
 	t_BufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -540,7 +578,7 @@ void Renderer::CreateBufferFromMesh(MeshData* a_MeshData, VkDeviceSize a_Size,
 
 	if (vkCreateBuffer(mvk_Device, &t_BufferInfo, nullptr, &r_Buffer) != VK_SUCCESS)
 	{
-		throw std::runtime_error("failed to create vertex buffer!");
+		throw std::runtime_error("failed to create buffer!");
 	}
 
 	VkMemoryRequirements t_MemRequirements;
@@ -559,7 +597,7 @@ void Renderer::CreateBufferFromMesh(MeshData* a_MeshData, VkDeviceSize a_Size,
 	vkBindBufferMemory(mvk_Device, r_Buffer, r_BufferMemory, 0);
 }
 
-void Renderer::CopyBufferFromMesh(MeshData* a_MeshData, VkDeviceSize a_Size, VkBuffer& r_Buffer)
+void Renderer::CopyBufferFromMesh(VkDeviceSize a_Size, VkBuffer& r_SrcBuffer, VkBuffer& r_DstBuffer)
 {
 	VkCommandBufferAllocateInfo t_AllocInfo{};
 	t_AllocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -580,7 +618,7 @@ void Renderer::CopyBufferFromMesh(MeshData* a_MeshData, VkDeviceSize a_Size, VkB
 	t_CopyRegion.srcOffset = 0; // Optional
 	t_CopyRegion.dstOffset = 0; // Optional
 	t_CopyRegion.size = a_Size;
-	vkCmdCopyBuffer(t_CommandBuffer, r_Buffer, a_MeshData->GetVertBuffer(), 1, &t_CopyRegion);
+	vkCmdCopyBuffer(t_CommandBuffer, r_SrcBuffer, r_DstBuffer, 1, &t_CopyRegion);
 
 	vkEndCommandBuffer(t_CommandBuffer);
 
