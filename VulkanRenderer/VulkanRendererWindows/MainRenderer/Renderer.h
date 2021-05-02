@@ -67,7 +67,7 @@ public:
 	void CreateBuffer(VkDeviceSize a_Size, VkBufferUsageFlags a_Usage, VkMemoryPropertyFlags a_Properties, VkBuffer& r_Buffer, VkDeviceMemory& r_BufferMemory);
 	void CopyBuffer(VkDeviceSize a_Size, VkBuffer& r_SrcBuffer, VkBuffer& r_DstBuffer);
 
-	void DrawFrame(uint32_t& r_ImageIndex);
+	void DrawFrame(uint32_t& r_ImageIndex, float a_dt);
 	void UpdateUniformBuffer(uint32_t a_CurrentImage, float a_dt);
 
 	//QueueFamily

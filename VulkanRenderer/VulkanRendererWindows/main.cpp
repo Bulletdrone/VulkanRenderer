@@ -13,6 +13,7 @@ int main()
 
 
     double t_StartTime = glfwGetTime();
+    float deltaTime = 0.1f;
     int t_FrameCount = 0;
 
     while (!glfwWindowShouldClose(m_Renderer->GetWindow())) 
@@ -29,7 +30,10 @@ int main()
         }
 
         glfwPollEvents();
-        m_ObjectManager->UpdateObjects(0);
+        m_ObjectManager->UpdateObjects(deltaTime);
+
+        double t_End = glfwGetTime();
+        deltaTime = static_cast<float>(t_End - t_CurrentTime);
     }
 
     delete m_ObjectManager;

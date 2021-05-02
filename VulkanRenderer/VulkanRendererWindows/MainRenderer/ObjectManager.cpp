@@ -48,7 +48,7 @@ ObjectManager::~ObjectManager()
 void ObjectManager::UpdateObjects(float a_Dt)
 {
 	uint32_t t_ImageIndex;
-	p_Renderer->DrawFrame(t_ImageIndex);
+	p_Renderer->DrawFrame(t_ImageIndex, a_Dt);
 }
 
 void ObjectManager::SetupRenderObjects()
