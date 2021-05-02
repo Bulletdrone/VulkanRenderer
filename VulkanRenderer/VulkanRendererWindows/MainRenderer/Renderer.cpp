@@ -91,7 +91,7 @@ void Renderer::CleanupSwapChain()
 
 	vkDestroySwapchainKHR(mvk_Device, mvk_SwapChain, nullptr);
 
-	for (size_t i = 0; i < mvk_UniformBuffers.size(); i++)
+	for (size_t i = 0; i < mvk_SwapChainImages.size(); i++)
 	{
 		vkDestroyBuffer(mvk_Device, mvk_UniformBuffers[i], nullptr);
 		vkFreeMemory(mvk_Device, mvk_UniformBuffersMemory[i], nullptr);
@@ -104,7 +104,7 @@ void Renderer::RecreateSwapChain()
 	m_Window->CheckMinimized();
 
 	vkDeviceWaitIdle(mvk_Device);
-
+		
 	CleanupSwapChain();
 
 	CreateSwapChain();
@@ -114,11 +114,7 @@ void Renderer::RecreateSwapChain()
 	m_ShaderManager->CreateGraphicsPipeline(mvk_RenderPass);
 	CreateFrameBuffers();
 
-	CreateUniformBuffers();
-	CreateDescriptorPool();
-	CreateDescriptorSets();
-
-	CreateCommandBuffers();
+	SetupRenderObjects();
 }
 
 void Renderer::CreateVKInstance()
@@ -723,6 +719,8 @@ void Renderer::CopyBuffer(VkDeviceSize a_Size, VkBuffer& r_SrcBuffer, VkBuffer& 
 
 void Renderer::DrawFrame(uint32_t& r_ImageIndex)
 {
+	bool recreateSwapChain = false;
+
 	vkWaitForFences(mvk_Device, 1, &mvk_InFlightFences[m_CurrentFrame], VK_TRUE, UINT64_MAX);
 	//vkResetFences(mvk_Device, 1, &mvk_InFlightFences[m_CurrentFrame]);
 
@@ -732,6 +730,7 @@ void Renderer::DrawFrame(uint32_t& r_ImageIndex)
 	{
 		m_Window->m_FrameBufferResized = false;
 		RecreateSwapChain();
+		return;
 	}
 	else if (t_Result != VK_SUCCESS) 
 	{
