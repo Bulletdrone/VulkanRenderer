@@ -12,7 +12,6 @@ public:
 		VkPipelineLayout& r_VKPipelineLayout, VkPipeline& r_VKPipeline);
 	~ShaderManager();
 
-
 	void CreateGraphicsPipeline(const VkRenderPass& r_RenderPass);
 	VkShaderModule CreateShaderModule(const std::vector<char>& code);
 

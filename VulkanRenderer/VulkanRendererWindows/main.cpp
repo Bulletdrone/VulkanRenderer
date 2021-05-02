@@ -7,6 +7,10 @@ int main()
     Renderer* m_Renderer = new Renderer();
 
     ObjectManager* m_ObjectManager = new ObjectManager(m_Renderer);
+    m_ObjectManager->SetupRenderObjects();
+
+    m_Renderer->SetupRenderObjects();
+
 
     double t_StartTime = glfwGetTime();
     int t_FrameCount = 0;
@@ -27,7 +31,6 @@ int main()
         glfwPollEvents();
         m_ObjectManager->UpdateObjects(0);
     }
-
 
     delete m_Renderer;
 

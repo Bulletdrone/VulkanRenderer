@@ -9,7 +9,6 @@
 
 Renderer::Renderer()
 {
-
 	//Setting up GLFW.
 	m_Window = new Window(800, 600, "VulkanTest");
 
@@ -33,22 +32,6 @@ Renderer::Renderer()
 
 	CreateFrameBuffers();
 	CreateCommandPool();
-
-	std::vector<Vertex> t_Vertices = {
-	{{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}},
-	{{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}},
-	{{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}},
-	{{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}}
-	};
-	const std::vector<uint16_t> t_Indices = {
-	0, 1, 2, 2, 3, 0
-	};
-
-	TEMPMESH = new MeshData(t_Vertices, t_Indices);
-	SetupMesh(TEMPMESH);
-	CreateCommandBuffers();
-
-	CreateSyncObjects();
 }
 
 Renderer::~Renderer()
@@ -72,6 +55,13 @@ Renderer::~Renderer()
 	vkDestroySurfaceKHR(mvk_Instance, m_Window->GetSurface(), nullptr);
 	vkDestroyInstance(mvk_Instance, nullptr);
 	delete m_Window;
+}
+
+//Call this after the creation of Vulkan.
+void Renderer::SetupRenderObjects()
+{
+	CreateCommandBuffers();
+	CreateSyncObjects();
 }
 
 void Renderer::CleanupSwapChain()
@@ -470,17 +460,20 @@ void Renderer::CreateCommandBuffers()
 		vkCmdBeginRenderPass(mvk_CommandBuffers[i], &t_RenderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 		vkCmdBindPipeline(mvk_CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, mvk_Pipeline);
+		for (size_t j = 0; j < p_RenderObjects->size(); j++)
+		{
+			VkBuffer t_VertexBuffers[] = { p_RenderObjects->at(j)->GetVertexData()->GetBuffer() };
+			VkDeviceSize t_Offsets[] = { 0 };
+			vkCmdBindVertexBuffers(mvk_CommandBuffers[i], 0, 1, t_VertexBuffers, t_Offsets);
 
-		VkBuffer t_VertexBuffers[] = { TEMPMESH->GetVertexData()->GetBuffer() };
-		VkDeviceSize t_Offsets[] = { 0 };
-		vkCmdBindVertexBuffers(mvk_CommandBuffers[i], 0, 1, t_VertexBuffers, t_Offsets);
-		
-		vkCmdBindIndexBuffer(mvk_CommandBuffers[i], TEMPMESH->GetIndexData()->GetBuffer(), 0, VK_INDEX_TYPE_UINT16);
-		
-		
-		//Draw the test triangles.
-		//vkCmdDraw(mvk_CommandBuffers[i], static_cast<uint32_t>(TEMPMESH->GetVertexData()->GetElementCount()), 1, 0, 0);
-		vkCmdDrawIndexed(mvk_CommandBuffers[i], static_cast<uint32_t>(TEMPMESH->GetIndexData()->GetElementCount()), 1, 0, 0, 0);
+			vkCmdBindIndexBuffer(mvk_CommandBuffers[i], p_RenderObjects->at(j)->GetIndexData()->GetBuffer(), 0, VK_INDEX_TYPE_UINT16);
+			
+
+			//Draw the test triangles.
+			//vkCmdDraw(mvk_CommandBuffers[i], static_cast<uint32_t>(TEMPMESH->GetVertexData()->GetElementCount()), 1, 0, 0);
+			vkCmdDrawIndexed(mvk_CommandBuffers[i], static_cast<uint32_t>(p_RenderObjects->at(j)->GetIndexData()->GetElementCount()), 1, 0, 0, 0);
+
+		}
 
 		vkCmdEndRenderPass(mvk_CommandBuffers[i]);
 

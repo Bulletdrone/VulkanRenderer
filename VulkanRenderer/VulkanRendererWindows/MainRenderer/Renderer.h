@@ -35,6 +35,9 @@ public:
 	Renderer();
 	~Renderer();
 
+	//Setting up that is done later.
+	void SetupRenderObjects();
+
 	void CleanupSwapChain();
 	void RecreateSwapChain();
 
@@ -47,8 +50,9 @@ public:
 
 	void CreateFrameBuffers();
 	void CreateCommandPool();
-	void CreateCommandBuffers();
 
+	//BufferObject Creation.
+	void CreateCommandBuffers();
 	void CreateSyncObjects();
 
 	//BufferData
@@ -72,16 +76,16 @@ public:
 	bool CheckDeviceExtensionSupport(VkPhysicalDevice a_Device);
 	uint32_t FindMemoryType(uint32_t a_TypeFilter, VkMemoryPropertyFlags a_Properties, VkPhysicalDevice& r_PhysDevice);
 
-
-
 	//Getters
 	GLFWwindow* GetWindow() const { return m_Window->GetWindow(); }
 
+	void SetRenderObjectsVector(std::vector<MeshData*>* a_RenderObjects);
 
 private:
 	bool IsDeviceSuitable(VkPhysicalDevice a_Device);
 
-	MeshData* TEMPMESH;
+	//All the renderObjects in ObjectManager.
+	std::vector<MeshData*>* p_RenderObjects;
 
 	//Window Data.
 	Window* m_Window;
@@ -133,3 +137,9 @@ private:
 	const bool DE_EnableValidationLayers = true;
 #endif
 };
+
+//SetRenderObjects from ObjectManager.
+inline void Renderer::SetRenderObjectsVector(std::vector<MeshData*>* a_RenderObjects)
+{
+	p_RenderObjects = a_RenderObjects;
+}
