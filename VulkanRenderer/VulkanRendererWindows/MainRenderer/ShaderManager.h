@@ -9,16 +9,19 @@ class ShaderManager
 {
 public:
 	ShaderManager(const VkDevice& r_VKDevice, const VkExtent2D& r_VKSwapChainExtent, 
-		VkPipelineLayout& r_VKPipelineLayout, VkPipeline& r_VKPipeline);
+		VkDescriptorSetLayout& r_DescriptorSetLayout, VkPipelineLayout& r_VKPipelineLayout, VkPipeline& r_VKPipeline);
 	~ShaderManager();
 
 	void CreateGraphicsPipeline(const VkRenderPass& r_RenderPass);
+	void CreateDescriptorSetLayout();
+	
 	VkShaderModule CreateShaderModule(const std::vector<char>& code);
 
 private:
-	const VkDevice& rm_VKDevice;
-	const VkExtent2D& rm_VKSwapChainExtent;
+	const VkDevice& rmvk_Device;
+	const VkExtent2D& rmvk_SwapChainExtent;
 
-	VkPipelineLayout& rm_VKPipelineLayout;
-	VkPipeline& rm_VKPipeline;
+	VkDescriptorSetLayout& rmvk_DescriptorSetLayout;
+	VkPipelineLayout& rmvk_PipelineLayout;
+	VkPipeline& rmvk_Pipeline;
 };

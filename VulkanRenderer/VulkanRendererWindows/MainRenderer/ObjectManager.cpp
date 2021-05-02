@@ -37,6 +37,12 @@ ObjectManager::ObjectManager(Renderer* a_Renderer)
 
 ObjectManager::~ObjectManager()
 {
+	for (size_t i = 0; i < m_RenderObjects.size(); i++)
+	{
+		m_RenderObjects[i]->DeleteBuffers(p_Renderer->GetLogicalDevice());
+		delete m_RenderObjects[i];
+	}
+	m_RenderObjects.clear();
 }
 
 void ObjectManager::UpdateObjects(float a_Dt)

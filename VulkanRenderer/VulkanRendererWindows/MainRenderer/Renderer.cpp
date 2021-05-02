@@ -6,6 +6,8 @@
 #include <cstdint>
 #include <algorithm>
 
+//TEMP
+#include <chrono>
 
 Renderer::Renderer()
 {
@@ -27,7 +29,8 @@ Renderer::Renderer()
 	CreateImageViews();
 	CreateRenderPass();
 
-	m_ShaderManager = new ShaderManager(mvk_Device, mvk_SwapChainExtent, mvk_PipelineLayout, mvk_Pipeline);
+	m_ShaderManager = new ShaderManager(mvk_Device, mvk_SwapChainExtent, mvk_DescriptorSetLayout, mvk_PipelineLayout, mvk_Pipeline);
+	m_ShaderManager->CreateDescriptorSetLayout();
 	m_ShaderManager->CreateGraphicsPipeline(mvk_RenderPass);
 
 	CreateFrameBuffers();
@@ -36,8 +39,10 @@ Renderer::Renderer()
 
 Renderer::~Renderer()
 {
-	CleanupSwapChain();
 	vkDeviceWaitIdle(mvk_Device);
+	CleanupSwapChain();
+
+	vkDestroyDescriptorSetLayout(mvk_Device, mvk_DescriptorSetLayout, nullptr);
 
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
 		vkDestroySemaphore(mvk_Device, mvk_RenderFinishedSemaphore[i], nullptr);
@@ -60,6 +65,10 @@ Renderer::~Renderer()
 //Call this after the creation of Vulkan.
 void Renderer::SetupRenderObjects()
 {
+	CreateUniformBuffers();
+	CreateDescriptorPool();
+	CreateDescriptorSets();
+
 	CreateCommandBuffers();
 	CreateSyncObjects();
 }
@@ -81,6 +90,13 @@ void Renderer::CleanupSwapChain()
 	}
 
 	vkDestroySwapchainKHR(mvk_Device, mvk_SwapChain, nullptr);
+
+	for (size_t i = 0; i < mvk_UniformBuffers.size(); i++)
+	{
+		vkDestroyBuffer(mvk_Device, mvk_UniformBuffers[i], nullptr);
+		vkFreeMemory(mvk_Device, mvk_UniformBuffersMemory[i], nullptr);
+	}
+	vkDestroyDescriptorPool(mvk_Device, mvk_DescriptorPool, nullptr);
 }
 
 void Renderer::RecreateSwapChain()
@@ -94,8 +110,14 @@ void Renderer::RecreateSwapChain()
 	CreateSwapChain();
 	CreateImageViews();
 	CreateRenderPass();
+	m_ShaderManager->CreateDescriptorSetLayout();
 	m_ShaderManager->CreateGraphicsPipeline(mvk_RenderPass);
 	CreateFrameBuffers();
+
+	CreateUniformBuffers();
+	CreateDescriptorPool();
+	CreateDescriptorSets();
+
 	CreateCommandBuffers();
 }
 
@@ -379,6 +401,63 @@ void Renderer::CreateRenderPass()
 	}
 }
 
+void Renderer::CreateDescriptorPool()
+{
+	VkDescriptorPoolSize t_PoolSize{};
+	t_PoolSize.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	t_PoolSize.descriptorCount = static_cast<uint32_t>(mvk_SwapChainImages.size());
+
+	VkDescriptorPoolCreateInfo t_PoolInfo{};
+	t_PoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+	t_PoolInfo.poolSizeCount = 1;
+	t_PoolInfo.pPoolSizes = &t_PoolSize;
+
+	t_PoolInfo.maxSets = static_cast<uint32_t>(mvk_SwapChainImages.size());
+
+	if (vkCreateDescriptorPool(mvk_Device, &t_PoolInfo, nullptr, &mvk_DescriptorPool) != VK_SUCCESS) 
+	{
+		throw std::runtime_error("failed to create descriptor pool!");
+	}
+}
+
+void Renderer::CreateDescriptorSets()
+{
+	std::vector<VkDescriptorSetLayout> t_Layouts(mvk_SwapChainImages.size(), mvk_DescriptorSetLayout);
+	
+	VkDescriptorSetAllocateInfo t_AllocInfo{};
+	t_AllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+	t_AllocInfo.descriptorPool = mvk_DescriptorPool;
+	t_AllocInfo.descriptorSetCount = static_cast<uint32_t>(mvk_SwapChainImages.size());
+	t_AllocInfo.pSetLayouts = t_Layouts.data();
+	
+	mvk_DescriptorSets.resize(mvk_SwapChainImages.size());
+	if (vkAllocateDescriptorSets(mvk_Device, &t_AllocInfo, mvk_DescriptorSets.data()) != VK_SUCCESS) 
+	{
+		throw std::runtime_error("failed to allocate descriptor sets!");
+	}
+
+	for (size_t i = 0; i < mvk_SwapChainImages.size(); i++) 
+	{
+		VkDescriptorBufferInfo t_BufferInfo{};
+		t_BufferInfo.buffer = mvk_UniformBuffers[i];
+		t_BufferInfo.offset = 0;
+		t_BufferInfo.range = sizeof(UniformBufferObject);
+
+		VkWriteDescriptorSet t_DescriptorWrite{};
+		t_DescriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		t_DescriptorWrite.dstSet = mvk_DescriptorSets[i];
+		t_DescriptorWrite.dstBinding = 0;
+		t_DescriptorWrite.dstArrayElement = 0;
+		t_DescriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		t_DescriptorWrite.descriptorCount = 1;
+		t_DescriptorWrite.pBufferInfo = &t_BufferInfo;
+		t_DescriptorWrite.pImageInfo = nullptr; // Optional
+		t_DescriptorWrite.pTexelBufferView = nullptr; // Optional
+
+		vkUpdateDescriptorSets(mvk_Device, 1, &t_DescriptorWrite, 0, nullptr);
+	}
+}
+
 void Renderer::CreateFrameBuffers()
 {
 	mvk_SwapChainFrameBuffers.resize(mvk_SwapChainImageViews.size());
@@ -460,6 +539,9 @@ void Renderer::CreateCommandBuffers()
 		vkCmdBeginRenderPass(mvk_CommandBuffers[i], &t_RenderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 		vkCmdBindPipeline(mvk_CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, mvk_Pipeline);
+		
+		//BIND THE UNIFORM BUFFER.
+		vkCmdBindDescriptorSets(mvk_CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, mvk_PipelineLayout, 0, 1, &mvk_DescriptorSets[i], 0, nullptr);
 		for (size_t j = 0; j < p_RenderObjects->size(); j++)
 		{
 			VkBuffer t_VertexBuffers[] = { p_RenderObjects->at(j)->GetVertexData()->GetBuffer() };
@@ -521,7 +603,7 @@ void Renderer::CreateVertexBuffers(BufferData<Vertex>* a_VertexData)
 
 	VkBuffer t_StagingBuffer;
 	VkDeviceMemory t_StagingBufferMemory;
-	CreateBufferFromMesh(t_BufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+	CreateBuffer(t_BufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 		t_StagingBuffer, t_StagingBufferMemory);
 
 	void* t_Data;
@@ -529,10 +611,10 @@ void Renderer::CreateVertexBuffers(BufferData<Vertex>* a_VertexData)
 	memcpy(t_Data, a_VertexData->GetElements().data(), (size_t)t_BufferSize);
 	vkUnmapMemory(mvk_Device, t_StagingBufferMemory);
 
-	CreateBufferFromMesh(t_BufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+	CreateBuffer(t_BufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
 		a_VertexData->GetBuffer(), a_VertexData->GetBufferMemory());
 
-	CopyBufferFromMesh(t_BufferSize, t_StagingBuffer, a_VertexData->GetBuffer());
+	CopyBuffer(t_BufferSize, t_StagingBuffer, a_VertexData->GetBuffer());
 
 	vkDestroyBuffer(mvk_Device, t_StagingBuffer, nullptr);
 	vkFreeMemory(mvk_Device, t_StagingBufferMemory, nullptr);
@@ -544,7 +626,7 @@ void Renderer::CreateIndexBuffers(BufferData<uint16_t>* a_IndexData)
 
 	VkBuffer t_StagingBuffer;
 	VkDeviceMemory t_StagingBufferMemory;
-	CreateBufferFromMesh(t_BufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+	CreateBuffer(t_BufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 		t_StagingBuffer, t_StagingBufferMemory);
 
 	void* t_Data;
@@ -552,16 +634,29 @@ void Renderer::CreateIndexBuffers(BufferData<uint16_t>* a_IndexData)
 	memcpy(t_Data, a_IndexData->GetElements().data(), (size_t)t_BufferSize);
 	vkUnmapMemory(mvk_Device, t_StagingBufferMemory);
 
-	CreateBufferFromMesh(t_BufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+	CreateBuffer(t_BufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
 		a_IndexData->GetBuffer(), a_IndexData->GetBufferMemory());
 
-	CopyBufferFromMesh(t_BufferSize, t_StagingBuffer, a_IndexData->GetBuffer());
+	CopyBuffer(t_BufferSize, t_StagingBuffer, a_IndexData->GetBuffer());
 
 	vkDestroyBuffer(mvk_Device, t_StagingBuffer, nullptr);
 	vkFreeMemory(mvk_Device, t_StagingBufferMemory, nullptr);
 }
 
-void Renderer::CreateBufferFromMesh(VkDeviceSize a_Size, VkBufferUsageFlags a_Usage, VkMemoryPropertyFlags a_Properties, VkBuffer& r_Buffer, VkDeviceMemory& r_BufferMemory)
+void Renderer::CreateUniformBuffers()
+{
+	VkDeviceSize t_BufferSize = sizeof(UniformBufferObject);
+
+	mvk_UniformBuffers.resize(mvk_SwapChainImages.size());
+	mvk_UniformBuffersMemory.resize(mvk_SwapChainImages.size());
+
+	for (size_t i = 0; i < mvk_SwapChainImages.size(); i++) 
+	{
+		CreateBuffer(t_BufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, mvk_UniformBuffers[i], mvk_UniformBuffersMemory[i]);
+	}
+}
+
+void Renderer::CreateBuffer(VkDeviceSize a_Size, VkBufferUsageFlags a_Usage, VkMemoryPropertyFlags a_Properties, VkBuffer& r_Buffer, VkDeviceMemory& r_BufferMemory)
 {
 	VkBufferCreateInfo t_BufferInfo{};
 	t_BufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -590,7 +685,7 @@ void Renderer::CreateBufferFromMesh(VkDeviceSize a_Size, VkBufferUsageFlags a_Us
 	vkBindBufferMemory(mvk_Device, r_Buffer, r_BufferMemory, 0);
 }
 
-void Renderer::CopyBufferFromMesh(VkDeviceSize a_Size, VkBuffer& r_SrcBuffer, VkBuffer& r_DstBuffer)
+void Renderer::CopyBuffer(VkDeviceSize a_Size, VkBuffer& r_SrcBuffer, VkBuffer& r_DstBuffer)
 {
 	VkCommandBufferAllocateInfo t_AllocInfo{};
 	t_AllocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -651,6 +746,8 @@ void Renderer::DrawFrame(uint32_t& r_ImageIndex)
 	// Mark the image as now being in use by this frame
 	mvk_ImagesInFlight[r_ImageIndex] = mvk_InFlightFences[m_CurrentFrame];
 
+	//Update Uniform Buffer
+	UpdateUniformBuffer(r_ImageIndex, 0.1f);
 
 	VkSubmitInfo t_SubmitInfo{};
 	t_SubmitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -701,6 +798,26 @@ void Renderer::DrawFrame(uint32_t& r_ImageIndex)
 	//vkQueueWaitIdle(m_VKPresentQueue);
 
 	m_CurrentFrame = (m_CurrentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+}
+
+void Renderer::UpdateUniformBuffer(uint32_t a_CurrentImage, float a_dt)
+{
+	static auto startTime = std::chrono::high_resolution_clock::now();
+
+	auto currentTime = std::chrono::high_resolution_clock::now();
+	float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+
+
+	UniformBufferObject ubo{};
+	ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+	ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+	ubo.proj = glm::perspective(glm::radians(45.0f), mvk_SwapChainExtent.width / (float)mvk_SwapChainExtent.height, 0.1f, 10.0f);
+	ubo.proj[1][1] *= -1;
+
+	void* data;
+	vkMapMemory(mvk_Device, mvk_UniformBuffersMemory[a_CurrentImage], 0, sizeof(ubo), 0, &data);
+	memcpy(data, &ubo, sizeof(ubo));
+	vkUnmapMemory(mvk_Device, mvk_UniformBuffersMemory[a_CurrentImage]);
 }
 
 QueueFamilyIndices Renderer::FindQueueFamilies(VkPhysicalDevice a_Device)

@@ -32,6 +32,7 @@ int main()
         m_ObjectManager->UpdateObjects(0);
     }
 
+    delete m_ObjectManager;
     delete m_Renderer;
 
     return 0;

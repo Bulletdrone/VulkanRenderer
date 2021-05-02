@@ -4,14 +4,14 @@
 #include <iostream>
 
 ShaderManager::ShaderManager(const VkDevice& r_VKDevice, const VkExtent2D& r_VKSwapChainExtent,
-	VkPipelineLayout& r_VKPipelineLayout, VkPipeline& r_VKPipeline)
-	:	rm_VKDevice(r_VKDevice), rm_VKSwapChainExtent(r_VKSwapChainExtent), 
-		rm_VKPipelineLayout(r_VKPipelineLayout), rm_VKPipeline(r_VKPipeline)
+	VkDescriptorSetLayout& r_DescriptorSetLayout, VkPipelineLayout& r_VKPipelineLayout, VkPipeline& r_VKPipeline)
+	:	rmvk_Device(r_VKDevice), rmvk_SwapChainExtent(r_VKSwapChainExtent),
+		rmvk_DescriptorSetLayout(r_DescriptorSetLayout),
+		rmvk_PipelineLayout(r_VKPipelineLayout), rmvk_Pipeline(r_VKPipeline)
 {}
 
 ShaderManager::~ShaderManager()
-{
-}
+{}
 
 void ShaderManager::CreateGraphicsPipeline(const VkRenderPass& r_RenderPass)
 {
@@ -60,14 +60,14 @@ void ShaderManager::CreateGraphicsPipeline(const VkRenderPass& r_RenderPass)
 	VkViewport t_Viewport{};
 	t_Viewport.x = 0.0f;
 	t_Viewport.y = 0.0f;
-	t_Viewport.width = (float)rm_VKSwapChainExtent.width;
-	t_Viewport.height = (float)rm_VKSwapChainExtent.height;
+	t_Viewport.width = (float)rmvk_SwapChainExtent.width;
+	t_Viewport.height = (float)rmvk_SwapChainExtent.height;
 	t_Viewport.minDepth = 0.0f;
 	t_Viewport.maxDepth = 1.0f;
 
 	VkRect2D t_Scissor{};
 	t_Scissor.offset = { 0, 0 };
-	t_Scissor.extent = rm_VKSwapChainExtent;
+	t_Scissor.extent = rmvk_SwapChainExtent;
 
 
 	VkPipelineViewportStateCreateInfo t_ViewportState{};
@@ -86,7 +86,7 @@ void ShaderManager::CreateGraphicsPipeline(const VkRenderPass& r_RenderPass)
 	t_Rasterizer.lineWidth = 1.0f;
 
 	t_Rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
-	t_Rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
+	t_Rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
 
 	t_Rasterizer.depthBiasEnable = VK_FALSE;
 	t_Rasterizer.depthBiasConstantFactor = 0.0f; // Optional
@@ -130,12 +130,12 @@ void ShaderManager::CreateGraphicsPipeline(const VkRenderPass& r_RenderPass)
 	//Generating the Actual Pipeline
 	VkPipelineLayoutCreateInfo t_PipelineLayoutInfo{};
 	t_PipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-	t_PipelineLayoutInfo.setLayoutCount = 0; // Optional
-	t_PipelineLayoutInfo.pSetLayouts = nullptr; // Optional
+	t_PipelineLayoutInfo.setLayoutCount = 1; // Optional
+	t_PipelineLayoutInfo.pSetLayouts = &rmvk_DescriptorSetLayout; // Optional
 	t_PipelineLayoutInfo.pushConstantRangeCount = 0; // Optional
 	t_PipelineLayoutInfo.pPushConstantRanges = nullptr; // Optional
 
-	if (vkCreatePipelineLayout(rm_VKDevice, &t_PipelineLayoutInfo, nullptr, &rm_VKPipelineLayout) != VK_SUCCESS) {
+	if (vkCreatePipelineLayout(rmvk_Device, &t_PipelineLayoutInfo, nullptr, &rmvk_PipelineLayout) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create pipeline layout!");
 	}
 
@@ -153,7 +153,7 @@ void ShaderManager::CreateGraphicsPipeline(const VkRenderPass& r_RenderPass)
 	t_PipelineInfo.pColorBlendState = &t_ColorBlending;
 	t_PipelineInfo.pDynamicState = nullptr; // Optional
 
-	t_PipelineInfo.layout = rm_VKPipelineLayout;
+	t_PipelineInfo.layout = rmvk_PipelineLayout;
 
 	t_PipelineInfo.renderPass = r_RenderPass;
 	t_PipelineInfo.subpass = 0;
@@ -161,12 +161,31 @@ void ShaderManager::CreateGraphicsPipeline(const VkRenderPass& r_RenderPass)
 	t_PipelineInfo.basePipelineHandle = VK_NULL_HANDLE; // Optional
 	t_PipelineInfo.basePipelineIndex = -1; // Optional
 
-	if (vkCreateGraphicsPipelines(rm_VKDevice, VK_NULL_HANDLE, 1, &t_PipelineInfo, nullptr, &rm_VKPipeline) != VK_SUCCESS) {
+	if (vkCreateGraphicsPipelines(rmvk_Device, VK_NULL_HANDLE, 1, &t_PipelineInfo, nullptr, &rmvk_Pipeline) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create graphics pipeline!");
 	}
 
-	vkDestroyShaderModule(rm_VKDevice, t_VertShaderModule, nullptr);
-	vkDestroyShaderModule(rm_VKDevice, t_FragShaderModule, nullptr);
+	vkDestroyShaderModule(rmvk_Device, t_VertShaderModule, nullptr);
+	vkDestroyShaderModule(rmvk_Device, t_FragShaderModule, nullptr);
+}
+
+void ShaderManager::CreateDescriptorSetLayout()
+{
+	VkDescriptorSetLayoutBinding t_UboLayoutBinding{};
+	t_UboLayoutBinding.binding = 0;
+	t_UboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	t_UboLayoutBinding.descriptorCount = 1;
+	t_UboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+	t_UboLayoutBinding.pImmutableSamplers = nullptr; // Optional
+
+	VkDescriptorSetLayoutCreateInfo t_LayoutInfo{};
+	t_LayoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+	t_LayoutInfo.bindingCount = 1;
+	t_LayoutInfo.pBindings = &t_UboLayoutBinding;
+
+	if (vkCreateDescriptorSetLayout(rmvk_Device, &t_LayoutInfo, nullptr, &rmvk_DescriptorSetLayout) != VK_SUCCESS) {
+		throw std::runtime_error("failed to create descriptor set layout!");
+	}
 }
 
 VkShaderModule ShaderManager::CreateShaderModule(const std::vector<char>& a_Code)
@@ -177,7 +196,7 @@ VkShaderModule ShaderManager::CreateShaderModule(const std::vector<char>& a_Code
 	t_CreateInfo.pCode = reinterpret_cast<const uint32_t*>(a_Code.data());
 
 	VkShaderModule t_ShaderModule;
-	if (vkCreateShaderModule(rm_VKDevice, &t_CreateInfo, nullptr, &t_ShaderModule) != VK_SUCCESS) {
+	if (vkCreateShaderModule(rmvk_Device, &t_CreateInfo, nullptr, &t_ShaderModule) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create shader module!");
 	}
 

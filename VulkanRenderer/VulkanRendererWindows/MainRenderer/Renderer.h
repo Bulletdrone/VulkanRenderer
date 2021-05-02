@@ -48,6 +48,9 @@ public:
 	void CreateImageViews();
 	void CreateRenderPass();
 
+	void CreateDescriptorPool();
+	void CreateDescriptorSets();
+
 	void CreateFrameBuffers();
 	void CreateCommandPool();
 
@@ -59,10 +62,13 @@ public:
 	void SetupMesh(MeshData* a_MeshData);
 	void CreateVertexBuffers(BufferData<Vertex>* a_VertexData);
 	void CreateIndexBuffers(BufferData<uint16_t>* a_IndexData);
-	void CreateBufferFromMesh(VkDeviceSize a_Size, VkBufferUsageFlags a_Usage, VkMemoryPropertyFlags a_Properties, VkBuffer& r_Buffer, VkDeviceMemory& r_BufferMemory);
-	void CopyBufferFromMesh(VkDeviceSize a_Size, VkBuffer& r_SrcBuffer, VkBuffer& r_DstBuffer);
+	void CreateUniformBuffers();
+	
+	void CreateBuffer(VkDeviceSize a_Size, VkBufferUsageFlags a_Usage, VkMemoryPropertyFlags a_Properties, VkBuffer& r_Buffer, VkDeviceMemory& r_BufferMemory);
+	void CopyBuffer(VkDeviceSize a_Size, VkBuffer& r_SrcBuffer, VkBuffer& r_DstBuffer);
 
 	void DrawFrame(uint32_t& r_ImageIndex);
+	void UpdateUniformBuffer(uint32_t a_CurrentImage, float a_dt);
 
 	//QueueFamily
 	QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice a_Device);
@@ -78,6 +84,7 @@ public:
 
 	//Getters
 	GLFWwindow* GetWindow() const { return m_Window->GetWindow(); }
+	VkDevice& GetLogicalDevice() { return mvk_Device; }
 
 	void SetRenderObjectsVector(std::vector<MeshData*>* a_RenderObjects);
 
@@ -92,6 +99,9 @@ private:
 
 	//ShaderData
 	ShaderManager* m_ShaderManager;
+	std::vector<VkBuffer> mvk_UniformBuffers;
+	std::vector<VkDeviceMemory> mvk_UniformBuffersMemory;
+
 
 	std::vector<VkSemaphore> mvk_ImageAvailableSemaphore;
 	std::vector<VkSemaphore> mvk_RenderFinishedSemaphore;
@@ -119,6 +129,11 @@ private:
 
 	//The RenderPipeline.
 	VkRenderPass mvk_RenderPass;
+
+	VkDescriptorSetLayout mvk_DescriptorSetLayout;
+	VkDescriptorPool mvk_DescriptorPool;
+	std::vector<VkDescriptorSet> mvk_DescriptorSets;
+
 	VkPipelineLayout mvk_PipelineLayout;
 	VkPipeline mvk_Pipeline;
 
