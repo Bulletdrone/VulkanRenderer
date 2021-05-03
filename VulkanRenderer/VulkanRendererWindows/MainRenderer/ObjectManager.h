@@ -21,7 +21,6 @@ private:
 	size_t m_CurrentRenderID;
 
 	std::vector<BaseRenderObject*> m_RenderObjects;
-	std::vector<MeshData*> m_PointerToMeshes;
 
 	Renderer* p_Renderer;
 };

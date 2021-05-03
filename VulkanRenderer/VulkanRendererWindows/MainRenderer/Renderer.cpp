@@ -93,8 +93,8 @@ void Renderer::CleanupSwapChain()
 
 	for (size_t i = 0; i < mvk_SwapChainImages.size(); i++)
 	{
-		vkDestroyBuffer(mvk_Device, mvk_UniformBuffers[i], nullptr);
-		vkFreeMemory(mvk_Device, mvk_UniformBuffersMemory[i], nullptr);
+		vkDestroyBuffer(mvk_Device, mvk_ViewProjectionBuffers[i], nullptr);
+		vkFreeMemory(mvk_Device, mvk_ViewProjectionBuffersMemory[i], nullptr);
 	}
 	vkDestroyDescriptorPool(mvk_Device, mvk_DescriptorPool, nullptr);
 }
@@ -435,9 +435,9 @@ void Renderer::CreateDescriptorSets()
 	for (size_t i = 0; i < mvk_SwapChainImages.size(); i++) 
 	{
 		VkDescriptorBufferInfo t_BufferInfo{};
-		t_BufferInfo.buffer = mvk_UniformBuffers[i];
+		t_BufferInfo.buffer = mvk_ViewProjectionBuffers[i];
 		t_BufferInfo.offset = 0;
-		t_BufferInfo.range = sizeof(UniformBufferObject);
+		t_BufferInfo.range = sizeof(ViewProjection);
 
 		VkWriteDescriptorSet t_DescriptorWrite{};
 		t_DescriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -538,18 +538,20 @@ void Renderer::CreateCommandBuffers()
 		
 		//BIND THE UNIFORM BUFFER.
 		vkCmdBindDescriptorSets(mvk_CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, mvk_PipelineLayout, 0, 1, &mvk_DescriptorSets[i], 0, nullptr);
-		for (size_t j = 0; j < p_Meshes->size(); j++)
+		for (size_t j = 0; j < p_RenderObjects->size(); j++)
 		{
-			VkBuffer t_VertexBuffers[] = { p_Meshes->at(j)->GetVertexData()->GetBuffer() };
+			VkBuffer t_VertexBuffers[] = { p_RenderObjects->at(j)->GetVertexData()->GetBuffer() };
 			VkDeviceSize t_Offsets[] = { 0 };
 			vkCmdBindVertexBuffers(mvk_CommandBuffers[i], 0, 1, t_VertexBuffers, t_Offsets);
 
-			vkCmdBindIndexBuffer(mvk_CommandBuffers[i], p_Meshes->at(j)->GetIndexData()->GetBuffer(), 0, VK_INDEX_TYPE_UINT16);
-			
+			vkCmdBindIndexBuffer(mvk_CommandBuffers[i], p_RenderObjects->at(j)->GetIndexData()->GetBuffer(), 0, VK_INDEX_TYPE_UINT16);
+
+			//ConstantPushing, look in ShaderManager for more information.
+			vkCmdPushConstants(mvk_CommandBuffers[i], mvk_PipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(InstanceModel), &p_RenderObjects->at(j)->GetModelMatrix());
 
 			//Draw the test triangles.
 			//vkCmdDraw(mvk_CommandBuffers[i], static_cast<uint32_t>(TEMPMESH->GetVertexData()->GetElementCount()), 1, 0, 0);
-			vkCmdDrawIndexed(mvk_CommandBuffers[i], static_cast<uint32_t>(p_Meshes->at(j)->GetIndexData()->GetElementCount()), 1, 0, 0, 0);
+			vkCmdDrawIndexed(mvk_CommandBuffers[i], static_cast<uint32_t>(p_RenderObjects->at(j)->GetIndexData()->GetElementCount()), 1, 0, 0, 0);
 
 		}
 
@@ -641,14 +643,24 @@ void Renderer::CreateIndexBuffers(BufferData<uint16_t>* a_IndexData)
 
 void Renderer::CreateUniformBuffers()
 {
-	VkDeviceSize t_BufferSize = sizeof(UniformBufferObject);
+	VkDeviceSize t_BufferSize = sizeof(ViewProjection);
 
-	mvk_UniformBuffers.resize(mvk_SwapChainImages.size());
-	mvk_UniformBuffersMemory.resize(mvk_SwapChainImages.size());
+	mvk_ViewProjectionBuffers.resize(mvk_SwapChainImages.size());
+	mvk_ViewProjectionBuffersMemory.resize(mvk_SwapChainImages.size());
 
 	for (size_t i = 0; i < mvk_SwapChainImages.size(); i++) 
 	{
-		CreateBuffer(t_BufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, mvk_UniformBuffers[i], mvk_UniformBuffersMemory[i]);
+		CreateBuffer(t_BufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, mvk_ViewProjectionBuffers[i], mvk_ViewProjectionBuffersMemory[i]);
+	}
+
+	VkDeviceSize t_UniBufferSize = sizeof(ViewProjection);
+
+	mvk_ViewProjectionBuffers.resize(mvk_SwapChainImages.size());
+	mvk_ViewProjectionBuffersMemory.resize(mvk_SwapChainImages.size());
+
+	for (size_t i = 0; i < mvk_SwapChainImages.size(); i++)
+	{
+		CreateBuffer(t_BufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, mvk_ViewProjectionBuffers[i], mvk_ViewProjectionBuffersMemory[i]);
 	}
 }
 
@@ -803,16 +815,16 @@ void Renderer::UpdateUniformBuffer(uint32_t a_CurrentImage, float a_dt)
 	auto currentTime = std::chrono::high_resolution_clock::now();
 	float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
-	UniformBufferObject ubo{};
-	ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+	ViewProjection ubo{};
+	//ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 	ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 	ubo.proj = glm::perspective(glm::radians(45.0f), mvk_SwapChainExtent.width / (float)mvk_SwapChainExtent.height, 0.1f, 10.0f);
 	ubo.proj[1][1] *= -1;
 
 	void* data;
-	vkMapMemory(mvk_Device, mvk_UniformBuffersMemory[a_CurrentImage], 0, sizeof(ubo), 0, &data);
+	vkMapMemory(mvk_Device, mvk_ViewProjectionBuffersMemory[a_CurrentImage], 0, sizeof(ubo), 0, &data);
 	memcpy(data, &ubo, sizeof(ubo));
-	vkUnmapMemory(mvk_Device, mvk_UniformBuffersMemory[a_CurrentImage]);
+	vkUnmapMemory(mvk_Device, mvk_ViewProjectionBuffersMemory[a_CurrentImage]);
 }
 
 QueueFamilyIndices Renderer::FindQueueFamilies(VkPhysicalDevice a_Device)

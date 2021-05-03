@@ -127,13 +127,19 @@ void ShaderManager::CreateGraphicsPipeline(const VkRenderPass& r_RenderPass)
 	t_ColorBlending.blendConstants[2] = 0.0f; // Optional
 	t_ColorBlending.blendConstants[3] = 0.0f; // Optional
 
+	//If you go over 128 bytes (1 matrix is 64 bytes) then use UBO's.
+	VkPushConstantRange t_InstanceModelPushConstantRange{};
+	t_InstanceModelPushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+	t_InstanceModelPushConstantRange.offset = 0;
+	t_InstanceModelPushConstantRange.size = sizeof(InstanceModel);
+
 	//Generating the Actual Pipeline
 	VkPipelineLayoutCreateInfo t_PipelineLayoutInfo{};
 	t_PipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 	t_PipelineLayoutInfo.setLayoutCount = 1; // Optional
 	t_PipelineLayoutInfo.pSetLayouts = &rmvk_DescriptorSetLayout; // Optional
-	t_PipelineLayoutInfo.pushConstantRangeCount = 0; // Optional
-	t_PipelineLayoutInfo.pPushConstantRanges = nullptr; // Optional
+	t_PipelineLayoutInfo.pushConstantRangeCount = 1; // Optional
+	t_PipelineLayoutInfo.pPushConstantRanges = &t_InstanceModelPushConstantRange; // Optional
 
 	if (vkCreatePipelineLayout(rmvk_Device, &t_PipelineLayoutInfo, nullptr, &rmvk_PipelineLayout) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create pipeline layout!");

@@ -5,3 +5,4 @@ Vulkan/
 .vs/
 Release/
 Debug/
+VulkanMemoryAllocator/

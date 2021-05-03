@@ -1,8 +1,5 @@
 #include "MainRenderer/Renderer.h"
 #include "MainRenderer/ObjectManager.h"
-
-Transform* t_Transform = new Transform();
-
 int main() 
 {
     //init's the renderer.
@@ -10,8 +7,11 @@ int main()
 
     ObjectManager* m_ObjectManager = new ObjectManager(m_Renderer);
 
-    m_ObjectManager->CreateShape(ShapeType::Rectangle, t_Transform);
-    m_ObjectManager->CreateShape(ShapeType::Triangle, t_Transform);
+    Transform* t_Transform1 = new Transform(glm::vec3(0.7f, 0, 0), 1);
+    Transform* t_Transform2 = new Transform(glm::vec3(-0.7f, 0, 0), 1);
+
+    m_ObjectManager->CreateShape(ShapeType::Rectangle, t_Transform1);
+    m_ObjectManager->CreateShape(ShapeType::Triangle, t_Transform2);
 
     m_Renderer->SetupRenderObjects();
 

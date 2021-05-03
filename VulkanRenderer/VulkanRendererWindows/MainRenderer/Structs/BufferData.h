@@ -6,11 +6,15 @@
 #include <array>
 #include <vector>
 
-struct UniformBufferObject 
+struct ViewProjection 
 {
-	alignas(16) glm::mat4 model;
 	alignas(16) glm::mat4 view;
 	alignas(16) glm::mat4 proj;
+};
+
+struct InstanceModel
+{
+	alignas(16) glm::mat4 model;
 };
 
 struct Vertex

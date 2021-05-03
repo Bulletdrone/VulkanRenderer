@@ -5,7 +5,7 @@
 #include "ShaderManager.h"
 #include "VulkanDebugger/VulkanDebug.h"
 
-#include "MeshData.h"
+#include "RenderObjects/BaseRenderObject.h"
 
 #include <optional>
 
@@ -87,22 +87,21 @@ public:
 	VkDevice& GetLogicalDevice() { return mvk_Device; }
 
 	//Set the mesh vector pointer in the Renderer from the one in ObjectManager.
-	void SetRenderObjectsVector(std::vector<MeshData*>* a_Meshes);
+	void SetRenderObjectsVector(std::vector<BaseRenderObject*>* a_RenderObjects);
 
 private:
 	bool IsDeviceSuitable(VkPhysicalDevice a_Device);
 
 	//All the renderObjects in ObjectManager.
-	std::vector<MeshData*>* p_Meshes;
+	std::vector<BaseRenderObject*>* p_RenderObjects;
 
 	//Window Data.
 	Window* m_Window;
 
 	//ShaderData
 	ShaderManager* m_ShaderManager;
-	std::vector<VkBuffer> mvk_UniformBuffers;
-	std::vector<VkDeviceMemory> mvk_UniformBuffersMemory;
-
+	std::vector<VkBuffer> mvk_ViewProjectionBuffers;
+	std::vector<VkDeviceMemory> mvk_ViewProjectionBuffersMemory;
 
 	std::vector<VkSemaphore> mvk_ImageAvailableSemaphore;
 	std::vector<VkSemaphore> mvk_RenderFinishedSemaphore;
@@ -155,7 +154,7 @@ private:
 };
 
 //SetRenderObjects from ObjectManager.
-inline void Renderer::SetRenderObjectsVector(std::vector<MeshData*>* a_Meshes)
+inline void Renderer::SetRenderObjectsVector(std::vector<BaseRenderObject*>* a_RenderObjects)
 {
-	p_Meshes = a_Meshes;
+	p_RenderObjects = a_RenderObjects;
 }
