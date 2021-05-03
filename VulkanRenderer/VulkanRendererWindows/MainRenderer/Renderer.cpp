@@ -538,18 +538,18 @@ void Renderer::CreateCommandBuffers()
 		
 		//BIND THE UNIFORM BUFFER.
 		vkCmdBindDescriptorSets(mvk_CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, mvk_PipelineLayout, 0, 1, &mvk_DescriptorSets[i], 0, nullptr);
-		for (size_t j = 0; j < p_RenderObjects->size(); j++)
+		for (size_t j = 0; j < p_Meshes->size(); j++)
 		{
-			VkBuffer t_VertexBuffers[] = { p_RenderObjects->at(j)->GetVertexData()->GetBuffer() };
+			VkBuffer t_VertexBuffers[] = { p_Meshes->at(j)->GetVertexData()->GetBuffer() };
 			VkDeviceSize t_Offsets[] = { 0 };
 			vkCmdBindVertexBuffers(mvk_CommandBuffers[i], 0, 1, t_VertexBuffers, t_Offsets);
 
-			vkCmdBindIndexBuffer(mvk_CommandBuffers[i], p_RenderObjects->at(j)->GetIndexData()->GetBuffer(), 0, VK_INDEX_TYPE_UINT16);
+			vkCmdBindIndexBuffer(mvk_CommandBuffers[i], p_Meshes->at(j)->GetIndexData()->GetBuffer(), 0, VK_INDEX_TYPE_UINT16);
 			
 
 			//Draw the test triangles.
 			//vkCmdDraw(mvk_CommandBuffers[i], static_cast<uint32_t>(TEMPMESH->GetVertexData()->GetElementCount()), 1, 0, 0);
-			vkCmdDrawIndexed(mvk_CommandBuffers[i], static_cast<uint32_t>(p_RenderObjects->at(j)->GetIndexData()->GetElementCount()), 1, 0, 0, 0);
+			vkCmdDrawIndexed(mvk_CommandBuffers[i], static_cast<uint32_t>(p_Meshes->at(j)->GetIndexData()->GetElementCount()), 1, 0, 0, 0);
 
 		}
 
@@ -745,9 +745,6 @@ void Renderer::DrawFrame(uint32_t& r_ImageIndex, float a_dt)
 	// Mark the image as now being in use by this frame
 	mvk_ImagesInFlight[r_ImageIndex] = mvk_InFlightFences[m_CurrentFrame];
 
-	//Update Uniform Buffer
-	UpdateUniformBuffer(r_ImageIndex, a_dt);
-
 	VkSubmitInfo t_SubmitInfo{};
 	t_SubmitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
@@ -801,8 +798,13 @@ void Renderer::DrawFrame(uint32_t& r_ImageIndex, float a_dt)
 
 void Renderer::UpdateUniformBuffer(uint32_t a_CurrentImage, float a_dt)
 {
+	static auto startTime = std::chrono::high_resolution_clock::now();
+
+	auto currentTime = std::chrono::high_resolution_clock::now();
+	float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+
 	UniformBufferObject ubo{};
-	ubo.model = glm::rotate(glm::mat4(1.0f), a_dt * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+	ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 	ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 	ubo.proj = glm::perspective(glm::radians(45.0f), mvk_SwapChainExtent.width / (float)mvk_SwapChainExtent.height, 0.1f, 10.0f);
 	ubo.proj[1][1] *= -1;

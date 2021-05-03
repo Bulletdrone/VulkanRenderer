@@ -3,58 +3,36 @@
 ObjectManager::ObjectManager(Renderer* a_Renderer)
 	:	p_Renderer(a_Renderer)
 {
-	std::vector<Vertex> t0_Vertices = 
-	{
-		{{0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
-		{{1.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}},
-		{{1.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},
-		{{0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}}
-	};
-	const std::vector<uint16_t> t0_Indices = 
-	{
-		0, 1, 2, 2, 3, 0
-	};
-
-	MeshData* t0 = new MeshData(t0_Vertices, t0_Indices);
-	m_RenderObjects.push_back(t0);
-
-	std::vector<Vertex> t1_Vertices =
-	{
-		{{0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
-		{{-1.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}},
-		{{-0.5f, -1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},
-	};
-	const std::vector<uint16_t> t1_Indices =
-	{
-		0, 1, 2
-	};
-
-	MeshData* t1 = new MeshData(t1_Vertices, t1_Indices);
-	m_RenderObjects.push_back(t1);
-
-	p_Renderer->SetRenderObjectsVector(&m_RenderObjects);
+	p_Renderer->SetRenderObjectsVector(&m_PointerToMeshes);
 }
 
 ObjectManager::~ObjectManager()
 {
 	for (size_t i = 0; i < m_RenderObjects.size(); i++)
 	{
-		m_RenderObjects[i]->DeleteBuffers(p_Renderer->GetLogicalDevice());
+		m_RenderObjects[i]->GetMeshData()->DeleteBuffers(p_Renderer->GetLogicalDevice());
 		delete m_RenderObjects[i];
 	}
 	m_RenderObjects.clear();
+	m_PointerToMeshes.clear();
 }
 
 void ObjectManager::UpdateObjects(float a_Dt)
 {
 	uint32_t t_ImageIndex;
 	p_Renderer->DrawFrame(t_ImageIndex, a_Dt);
+
+	//Update Uniform Buffer
+	p_Renderer->UpdateUniformBuffer(t_ImageIndex, a_Dt);
 }
 
-void ObjectManager::SetupRenderObjects()
+void ObjectManager::CreateShape(ShapeType a_ShapeType, Transform* a_Transform)
 {
-	for (size_t i = 0; i < m_RenderObjects.size(); i++)
-	{
-		p_Renderer->SetupMesh(m_RenderObjects[i]);
-	}
+	BaseRenderObject* t_NewShape = RenderFactory::CreateShape(GetNextRenderID(), a_ShapeType, a_Transform);
+	m_RenderObjects.push_back(t_NewShape);
+
+	//Push the MeshData towards the Renderer as well.
+	m_PointerToMeshes.push_back(t_NewShape->GetMeshData());
+	
+	p_Renderer->SetupMesh(t_NewShape->GetMeshData());
 }

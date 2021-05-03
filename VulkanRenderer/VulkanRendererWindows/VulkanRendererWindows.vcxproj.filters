@@ -8,9 +8,6 @@
     <Filter Include="MainRenderer">
       <UniqueIdentifier>{3752728e-4e9c-441d-ab5c-2ba1406e233e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Shapes">
-      <UniqueIdentifier>{bc783d42-8df8-409b-8b31-75eebbe2a873}</UniqueIdentifier>
-    </Filter>
     <Filter Include="VulkanDebug">
       <UniqueIdentifier>{41425b40-895c-4d50-b6f7-c413859c8a44}</UniqueIdentifier>
     </Filter>
@@ -20,6 +17,12 @@
     <Filter Include="MainRenderer\Structs">
       <UniqueIdentifier>{2146820d-b9c4-418b-87a9-36928226f43d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="RenderObjects">
+      <UniqueIdentifier>{710ff287-2efa-465b-a31c-3dd9cd475013}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RenderObjects\Components">
+      <UniqueIdentifier>{6c37c9d5-8c83-4c7b-88c4-d446abe75012}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -28,9 +31,6 @@
     </ClCompile>
     <ClCompile Include="MainRenderer\Window.cpp">
       <Filter>MainRenderer</Filter>
-    </ClCompile>
-    <ClCompile Include="MainRenderer\Shapes\Triangle.cpp">
-      <Filter>Shapes</Filter>
     </ClCompile>
     <ClCompile Include="MainRenderer\VulkanDebugger\VulkanDebug.cpp">
       <Filter>VulkanDebug</Filter>
@@ -47,6 +47,15 @@
     <ClCompile Include="MainRenderer\MeshData.cpp">
       <Filter>MainRenderer</Filter>
     </ClCompile>
+    <ClCompile Include="MainRenderer\RenderObjects\BaseRenderObject.cpp">
+      <Filter>RenderObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="MainRenderer\RenderObjects\RenderShape.cpp">
+      <Filter>RenderObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="MainRenderer\RenderObjects\RenderFactory.cpp">
+      <Filter>RenderObjects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainRenderer\Renderer.h">
@@ -54,9 +63,6 @@
     </ClInclude>
     <ClInclude Include="MainRenderer\Window.h">
       <Filter>MainRenderer</Filter>
-    </ClInclude>
-    <ClInclude Include="MainRenderer\Shapes\Triangle.h">
-      <Filter>Shapes</Filter>
     </ClInclude>
     <ClInclude Include="MainRenderer\VulkanDebugger\VulkanDebug.h">
       <Filter>VulkanDebug</Filter>
@@ -75,6 +81,18 @@
     </ClInclude>
     <ClInclude Include="MainRenderer\Structs\BufferData.h">
       <Filter>MainRenderer\Structs</Filter>
+    </ClInclude>
+    <ClInclude Include="MainRenderer\RenderObjects\Components\Transform.h">
+      <Filter>RenderObjects\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="MainRenderer\RenderObjects\BaseRenderObject.h">
+      <Filter>RenderObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="MainRenderer\RenderObjects\RenderShape.h">
+      <Filter>RenderObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="MainRenderer\RenderObjects\RenderFactory.h">
+      <Filter>RenderObjects</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

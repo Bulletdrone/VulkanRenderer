@@ -86,13 +86,14 @@ public:
 	GLFWwindow* GetWindow() const { return m_Window->GetWindow(); }
 	VkDevice& GetLogicalDevice() { return mvk_Device; }
 
-	void SetRenderObjectsVector(std::vector<MeshData*>* a_RenderObjects);
+	//Set the mesh vector pointer in the Renderer from the one in ObjectManager.
+	void SetRenderObjectsVector(std::vector<MeshData*>* a_Meshes);
 
 private:
 	bool IsDeviceSuitable(VkPhysicalDevice a_Device);
 
 	//All the renderObjects in ObjectManager.
-	std::vector<MeshData*>* p_RenderObjects;
+	std::vector<MeshData*>* p_Meshes;
 
 	//Window Data.
 	Window* m_Window;
@@ -154,7 +155,7 @@ private:
 };
 
 //SetRenderObjects from ObjectManager.
-inline void Renderer::SetRenderObjectsVector(std::vector<MeshData*>* a_RenderObjects)
+inline void Renderer::SetRenderObjectsVector(std::vector<MeshData*>* a_Meshes)
 {
-	p_RenderObjects = a_RenderObjects;
+	p_Meshes = a_Meshes;
 }

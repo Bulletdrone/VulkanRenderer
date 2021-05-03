@@ -1,16 +1,19 @@
 #include "MainRenderer/Renderer.h"
 #include "MainRenderer/ObjectManager.h"
 
+Transform* t_Transform = new Transform();
+
 int main() 
 {
     //init's the renderer.
     Renderer* m_Renderer = new Renderer();
 
     ObjectManager* m_ObjectManager = new ObjectManager(m_Renderer);
-    m_ObjectManager->SetupRenderObjects();
+
+    m_ObjectManager->CreateShape(ShapeType::Rectangle, t_Transform);
+    m_ObjectManager->CreateShape(ShapeType::Triangle, t_Transform);
 
     m_Renderer->SetupRenderObjects();
-
 
     double t_StartTime = glfwGetTime();
     float deltaTime = 0.1f;
