@@ -23,6 +23,9 @@
     <Filter Include="RenderObjects\Components">
       <UniqueIdentifier>{6c37c9d5-8c83-4c7b-88c4-d446abe75012}</UniqueIdentifier>
     </Filter>
+    <Filter Include="RenderObjects\RenderFactory">
+      <UniqueIdentifier>{da181359-a571-4d9f-a616-c21aad912025}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -53,8 +56,8 @@
     <ClCompile Include="MainRenderer\RenderObjects\RenderShape.cpp">
       <Filter>RenderObjects</Filter>
     </ClCompile>
-    <ClCompile Include="MainRenderer\RenderObjects\RenderFactory.cpp">
-      <Filter>RenderObjects</Filter>
+    <ClCompile Include="MainRenderer\RenderObjects\RenderFactories\RenderFactory.cpp">
+      <Filter>RenderObjects\RenderFactory</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -91,8 +94,11 @@
     <ClInclude Include="MainRenderer\RenderObjects\RenderShape.h">
       <Filter>RenderObjects</Filter>
     </ClInclude>
-    <ClInclude Include="MainRenderer\RenderObjects\RenderFactory.h">
-      <Filter>RenderObjects</Filter>
+    <ClInclude Include="MainRenderer\RenderObjects\Components\RenderObjectData.h">
+      <Filter>RenderObjects\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="MainRenderer\RenderObjects\RenderFactories\RenderFactory.h">
+      <Filter>RenderObjects\RenderFactory</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,6 +1,7 @@
 #pragma once
 #include <MeshData.h>
 #include "Components/Transform.h"
+#include "Components/RenderObjectData.h"
 
 class BaseRenderObject
 {
@@ -21,11 +22,11 @@ public:
 	//Getters
 	const glm::mat4& GetModelMatrix() const { return m_Model; }
 
-	MeshData* GetMeshData() const { return m_MeshData; }
+	MeshData* GetMeshData() const { return p_RenderObjectData->m_MeshData; }
 	Transform* GetTransform() const { return m_Transform; }
 
-	BufferData<Vertex>* GetVertexData() const { return m_MeshData->GetVertexData(); }
-	BufferData<uint16_t>* GetIndexData() const { return m_MeshData->GetIndexData(); }
+	BufferData<Vertex>* GetVertexData() const { return p_RenderObjectData->m_MeshData->GetVertexData(); }
+	BufferData<uint16_t>* GetIndexData() const { return p_RenderObjectData->m_MeshData->GetIndexData(); }
 
 protected:
 	const size_t m_ID;
@@ -37,5 +38,5 @@ protected:
 	Transform* m_Transform = nullptr;
 
 	//Vertex Data with it's buffers.
-	MeshData* m_MeshData = nullptr;
+	RenderObjectData* p_RenderObjectData = nullptr;
 };

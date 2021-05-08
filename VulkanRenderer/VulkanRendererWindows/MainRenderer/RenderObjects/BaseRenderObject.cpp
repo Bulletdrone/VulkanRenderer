@@ -10,7 +10,6 @@ BaseRenderObject::BaseRenderObject(const size_t a_ID, Transform* a_Transform)
 BaseRenderObject::~BaseRenderObject()
 {
 	delete m_Transform;
-	delete m_MeshData;
 }
 
 glm::mat4& BaseRenderObject::UpdateModelMatrix()

@@ -4,6 +4,8 @@ ObjectManager::ObjectManager(Renderer* a_Renderer)
 	:	p_Renderer(a_Renderer)
 {
 	p_Renderer->SetRenderObjectsVector(&m_RenderObjects);
+
+	m_RenderFactory = new RenderFactory();
 }
 
 ObjectManager::~ObjectManager()
@@ -27,7 +29,7 @@ void ObjectManager::UpdateObjects(float a_Dt)
 
 void ObjectManager::CreateShape(ShapeType a_ShapeType, Transform* a_Transform)
 {
-	BaseRenderObject* t_NewShape = RenderFactory::CreateShape(GetNextRenderID(), a_ShapeType, a_Transform);
+	BaseRenderObject* t_NewShape = m_RenderFactory->CreateRenderObject(GetNextRenderID(), a_ShapeType, a_Transform);
 	m_RenderObjects.push_back(t_NewShape);
 	
 	p_Renderer->SetupMesh(t_NewShape->GetMeshData());
