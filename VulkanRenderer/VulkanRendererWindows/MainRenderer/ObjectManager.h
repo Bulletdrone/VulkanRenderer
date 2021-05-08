@@ -24,6 +24,6 @@ private:
 	Renderer* p_Renderer;
 	RenderFactory* m_RenderFactory;
 
-
+	TextureData m_Textures[1];
 };
 
