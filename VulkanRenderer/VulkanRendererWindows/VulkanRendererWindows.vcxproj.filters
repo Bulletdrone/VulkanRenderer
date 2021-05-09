@@ -68,6 +68,9 @@
     <ClCompile Include="MainRenderer\Handlers\BufferHandler.cpp">
       <Filter>MainRenderer\Handlers</Filter>
     </ClCompile>
+    <ClCompile Include="MainRenderer\Handlers\ImageHandler.cpp">
+      <Filter>MainRenderer\Handlers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainRenderer\Renderer.h">
@@ -113,6 +116,9 @@
       <Filter>MainRenderer\Handlers</Filter>
     </ClInclude>
     <ClInclude Include="MainRenderer\Handlers\BufferHandler.h">
+      <Filter>MainRenderer\Handlers</Filter>
+    </ClInclude>
+    <ClInclude Include="MainRenderer\Handlers\ImageHandler.h">
       <Filter>MainRenderer\Handlers</Filter>
     </ClInclude>
   </ItemGroup>

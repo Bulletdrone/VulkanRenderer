@@ -22,6 +22,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainRenderer\Handlers\BufferHandler.cpp" />
     <ClCompile Include="MainRenderer\Handlers\CommandHandler.cpp" />
+    <ClCompile Include="MainRenderer\Handlers\ImageHandler.cpp" />
     <ClCompile Include="MainRenderer\MeshData.cpp" />
     <ClCompile Include="MainRenderer\ObjectManager.cpp" />
     <ClCompile Include="MainRenderer\Renderer.cpp" />
@@ -36,6 +37,7 @@
   <ItemGroup>
     <ClInclude Include="MainRenderer\Handlers\BufferHandler.h" />
     <ClInclude Include="MainRenderer\Handlers\CommandHandler.h" />
+    <ClInclude Include="MainRenderer\Handlers\ImageHandler.h" />
     <ClInclude Include="MainRenderer\MeshData.h" />
     <ClInclude Include="MainRenderer\ObjectManager.h" />
     <ClInclude Include="MainRenderer\Renderer.h" />

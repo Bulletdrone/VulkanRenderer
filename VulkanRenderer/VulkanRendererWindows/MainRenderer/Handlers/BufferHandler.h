@@ -29,6 +29,7 @@ private:
 	void CreateBuffer(VkDeviceSize a_Size, VkBufferUsageFlags a_Usage,
 		VkMemoryPropertyFlags a_Properties, VkBuffer& r_Buffer, VkDeviceMemory& r_BufferMemory);
 	void CopyBuffer(VkDeviceSize a_Size, VkBuffer& r_SrcBuffer, VkBuffer& r_DstBuffer);
+	void CopyBufferToImage(VkBuffer a_Buffer, VkImage a_Image, uint32_t a_Width, uint32_t a_Height);
 
 	uint32_t FindMemoryType(uint32_t a_TypeFilter, VkMemoryPropertyFlags a_Properties);
 
@@ -37,4 +38,3 @@ private:
 
 	CommandHandler* p_CommandHandler;
 };
-

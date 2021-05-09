@@ -4,12 +4,13 @@ ObjectManager::ObjectManager(Renderer* a_Renderer)
 	: p_Renderer(a_Renderer)
 {
 	p_Renderer->SetRenderObjectsVector(&m_RenderObjects);
+	p_Renderer->SetTextureDataVector(&m_Textures);
 
 	m_RenderFactory = new RenderFactory();
 
-
+	m_Textures.resize(1);
 	//Load Texture
-	p_Renderer->SetupImage(m_Textures[0], "../Resources/Images/texture.jpg");
+	p_Renderer->SetupImage(m_Textures[0], "../Resources/Images/Background.png");
 }
 
 ObjectManager::~ObjectManager()

@@ -51,9 +51,10 @@ void RenderFactory::SetSceneObjects(std::vector<ShapeType>& a_AvailableShapes)
 		switch (a_AvailableShapes[i])
 		{
 		case ShapeType::Triangle:
-			t_Vertices = { {{0.0f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}},
-				{{0.5f, 0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}},
-				{{-0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}}, };
+			t_Vertices = { {{0.0f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 1.0f} },
+				{{0.5f, 0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
+				{{-0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
+		};
 
 			t_Indices = { 0, 1, 2 };
 
@@ -62,10 +63,10 @@ void RenderFactory::SetSceneObjects(std::vector<ShapeType>& a_AvailableShapes)
 			m_RenderObjectsData[t_VecPos] = new RenderObjectData(t_Mesh);
 			break;
 		case ShapeType::Rectangle:
-			t_Vertices = { {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}},
-							{{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}},
-							{{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}},
-							{{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}} };
+			t_Vertices = { {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
+							{{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
+							{{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
+							{{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}} };
 
 			t_Indices = { 0, 1, 2, 2, 3, 0 };
 

@@ -8,10 +8,6 @@
 
 Renderer::Renderer()
 {
-	//Setup Handlers.
-	m_CommandHandler = new CommandHandler(mvk_Device, mvk_CommandPool, mvk_GraphicsQueue);
-	m_BufferHandler = new BufferHandler(mvk_Device, mvk_PhysicalDevice, m_CommandHandler);
-
 	//Setting up GLFW.
 	m_Window = new Window(800, 600, "VulkanTest");
 
@@ -26,6 +22,8 @@ Renderer::Renderer()
 	m_Window->SetupVKWindow(mvk_Instance);
 	PickPhysicalDevice();
 	CreateLogicalDevice();
+	
+	SetupHandlers();
 	CreateSwapChain();
 	CreateImageViews();
 	CreateRenderPass();
@@ -61,6 +59,17 @@ Renderer::~Renderer()
 	vkDestroySurfaceKHR(mvk_Instance, m_Window->GetSurface(), nullptr);
 	vkDestroyInstance(mvk_Instance, nullptr);
 	delete m_Window;
+}
+
+//Must be done after setting up the physical device.
+void Renderer::SetupHandlers()
+{
+	m_CommandHandler = new CommandHandler(mvk_Device, mvk_CommandPool, mvk_GraphicsQueue);
+	m_BufferHandler = new BufferHandler(mvk_Device, mvk_PhysicalDevice, m_CommandHandler);
+	
+	VkPhysicalDeviceProperties properties{};
+	vkGetPhysicalDeviceProperties(mvk_PhysicalDevice, &properties);
+	m_ImageHandler = new ImageHandler(mvk_Device, properties.limits.maxSamplerAnisotropy);
 }
 
 //Call this after the creation of Vulkan.
@@ -219,6 +228,7 @@ void Renderer::CreateLogicalDevice()
 	}
 
 	VkPhysicalDeviceFeatures t_DeviceFeatures{};
+	t_DeviceFeatures.samplerAnisotropy = VK_TRUE;
 
 	VkDeviceCreateInfo t_CreateInfo{};
 	t_CreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
@@ -323,31 +333,9 @@ void Renderer::CreateImageViews()
 {
 	mvk_SwapChainImageViews.resize(mvk_SwapChainImages.size());
 
-	for (size_t i = 0; i < mvk_SwapChainImages.size(); i++)
+	for (uint32_t i = 0; i < mvk_SwapChainImages.size(); i++) 
 	{
-		VkImageViewCreateInfo t_CreateInfo{};
-		t_CreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-		t_CreateInfo.image = mvk_SwapChainImages[i];
-		t_CreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-		t_CreateInfo.format = mvk_SwapChainImageFormat;
-
-		//The standard color values.
-		t_CreateInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
-		t_CreateInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
-		t_CreateInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
-		t_CreateInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
-
-		//What is the Image's Purpose
-		t_CreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-		t_CreateInfo.subresourceRange.baseMipLevel = 0;
-		t_CreateInfo.subresourceRange.levelCount = 1;
-		t_CreateInfo.subresourceRange.baseArrayLayer = 0;
-		t_CreateInfo.subresourceRange.layerCount = 1;
-
-		if (vkCreateImageView(mvk_Device, &t_CreateInfo, nullptr, &mvk_SwapChainImageViews[i]) != VK_SUCCESS)
-		{
-			throw std::runtime_error("failed to create image views!");
-		}
+		mvk_SwapChainImageViews[i] = m_ImageHandler->CreateImageView(mvk_SwapChainImages[i], mvk_SwapChainImageFormat);
 	}
 }
 
@@ -405,15 +393,16 @@ void Renderer::CreateRenderPass()
 
 void Renderer::CreateDescriptorPool()
 {
-	VkDescriptorPoolSize t_PoolSize{};
-	t_PoolSize.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	t_PoolSize.descriptorCount = static_cast<uint32_t>(mvk_SwapChainImages.size());
+	std::array<VkDescriptorPoolSize, 2> t_PoolSizes{};
+	t_PoolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	t_PoolSizes[0].descriptorCount = static_cast<uint32_t>(mvk_SwapChainImages.size());
+	t_PoolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+	t_PoolSizes[1].descriptorCount = static_cast<uint32_t>(mvk_SwapChainImages.size());
 
 	VkDescriptorPoolCreateInfo t_PoolInfo{};
 	t_PoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-	t_PoolInfo.poolSizeCount = 1;
-	t_PoolInfo.pPoolSizes = &t_PoolSize;
-
+	t_PoolInfo.poolSizeCount = static_cast<uint32_t>(t_PoolSizes.size());
+	t_PoolInfo.pPoolSizes = t_PoolSizes.data();
 	t_PoolInfo.maxSets = static_cast<uint32_t>(mvk_SwapChainImages.size());
 
 	if (vkCreateDescriptorPool(mvk_Device, &t_PoolInfo, nullptr, &mvk_DescriptorPool) != VK_SUCCESS) 
@@ -445,18 +434,31 @@ void Renderer::CreateDescriptorSets()
 		t_BufferInfo.offset = 0;
 		t_BufferInfo.range = sizeof(ViewProjection);
 
-		VkWriteDescriptorSet t_DescriptorWrite{};
-		t_DescriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		t_DescriptorWrite.dstSet = mvk_DescriptorSets[i];
-		t_DescriptorWrite.dstBinding = 0;
-		t_DescriptorWrite.dstArrayElement = 0;
-		t_DescriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-		t_DescriptorWrite.descriptorCount = 1;
-		t_DescriptorWrite.pBufferInfo = &t_BufferInfo;
-		t_DescriptorWrite.pImageInfo = nullptr; // Optional
-		t_DescriptorWrite.pTexelBufferView = nullptr; // Optional
+		VkDescriptorImageInfo t_ImageInfo{};
+		t_ImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+		t_ImageInfo.imageView = p_Textures->at(0).textureImageView;
+		t_ImageInfo.sampler = p_Textures->at(0).textureSampler;
 
-		vkUpdateDescriptorSets(mvk_Device, 1, &t_DescriptorWrite, 0, nullptr);
+		std::array<VkWriteDescriptorSet, 2> t_DescriptorWrites{};
+		//Uniform Info
+		t_DescriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		t_DescriptorWrites[0].dstSet = mvk_DescriptorSets[i];
+		t_DescriptorWrites[0].dstBinding = 0;
+		t_DescriptorWrites[0].dstArrayElement = 0;
+		t_DescriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		t_DescriptorWrites[0].descriptorCount = 1;
+		t_DescriptorWrites[0].pBufferInfo = &t_BufferInfo;
+		//Image Info
+		t_DescriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		t_DescriptorWrites[1].dstSet = mvk_DescriptorSets[i];
+		t_DescriptorWrites[1].dstBinding = 1;
+		t_DescriptorWrites[1].dstArrayElement = 0;
+		t_DescriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		t_DescriptorWrites[1].descriptorCount = 1;
+		t_DescriptorWrites[1].pImageInfo = &t_ImageInfo;
+
+		vkUpdateDescriptorSets(mvk_Device, static_cast<uint32_t>(t_DescriptorWrites.size()), 
+			t_DescriptorWrites.data(), 0, nullptr);
 	}
 }
 
@@ -607,6 +609,9 @@ void Renderer::SetupImage(TextureData& a_TextureData, const char* a_ImagePath)
 
 	m_BufferHandler->CreateTextureImage(a_TextureData.textureImage, a_TextureData.textureImageMemory,
 		a_ImagePath, t_Size, t_Width, t_Height, t_Channels);
+
+	a_TextureData.textureImageView = m_ImageHandler->CreateImageView(a_TextureData.textureImage, VK_FORMAT_R8G8B8A8_SRGB);
+	a_TextureData.textureSampler = m_ImageHandler->CreateTextureSampler();
 }
 
 void Renderer::DrawFrame(uint32_t& r_ImageIndex, float a_dt)
@@ -614,7 +619,6 @@ void Renderer::DrawFrame(uint32_t& r_ImageIndex, float a_dt)
 	bool recreateSwapChain = false;
 
 	vkWaitForFences(mvk_Device, 1, &mvk_InFlightFences[m_CurrentFrame], VK_TRUE, UINT64_MAX);
-	//vkResetFences(mvk_Device, 1, &mvk_InFlightFences[m_CurrentFrame]);
 
 	VkResult t_Result = vkAcquireNextImageKHR(mvk_Device, mvk_SwapChain, UINT64_MAX, mvk_ImageAvailableSemaphore[m_CurrentFrame], VK_NULL_HANDLE, &r_ImageIndex);
 
@@ -824,8 +828,11 @@ bool Renderer::IsDeviceSuitable(VkPhysicalDevice a_Device)
 		t_SwapChainAdequate = !swapChainSupport.formats.empty() && !swapChainSupport.presentModes.empty();
 	}
 
+	VkPhysicalDeviceFeatures t_SupportedFeatures;
+	vkGetPhysicalDeviceFeatures(a_Device, &t_SupportedFeatures);
+
 	//The device works with everything that the program needs.
-	return t_Indices.isComplete() && t_ExtensionsSupported && t_SwapChainAdequate;
+	return t_Indices.isComplete() && t_ExtensionsSupported && t_SwapChainAdequate && t_SupportedFeatures.samplerAnisotropy;;
 }
 
 bool Renderer::CheckDeviceExtensionSupport(VkPhysicalDevice a_Device)

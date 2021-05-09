@@ -184,10 +184,19 @@ void ShaderManager::CreateDescriptorSetLayout()
 	t_UboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 	t_UboLayoutBinding.pImmutableSamplers = nullptr; // Optional
 
+	VkDescriptorSetLayoutBinding t_SamplerLayoutBinding{};
+	t_SamplerLayoutBinding.binding = 1;
+	t_SamplerLayoutBinding.descriptorCount = 1;
+	t_SamplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+	t_SamplerLayoutBinding.pImmutableSamplers = nullptr;
+	t_SamplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+
+	std::array<VkDescriptorSetLayoutBinding, 2> t_Bindings = { t_UboLayoutBinding, t_SamplerLayoutBinding };
 	VkDescriptorSetLayoutCreateInfo t_LayoutInfo{};
 	t_LayoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-	t_LayoutInfo.bindingCount = 1;
-	t_LayoutInfo.pBindings = &t_UboLayoutBinding;
+	t_LayoutInfo.bindingCount = static_cast<uint32_t>(t_Bindings.size());
+	t_LayoutInfo.pBindings = t_Bindings.data();
+
 
 	if (vkCreateDescriptorSetLayout(rmvk_Device, &t_LayoutInfo, nullptr, &rmvk_DescriptorSetLayout) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create descriptor set layout!");

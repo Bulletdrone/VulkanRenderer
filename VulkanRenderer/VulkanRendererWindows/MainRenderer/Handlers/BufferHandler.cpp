@@ -122,6 +122,14 @@ void BufferHandler::CreateTextureImage(VkImage& r_Image, VkDeviceMemory& r_Image
 
     CreateImage(r_Image, r_ImageMemory, r_TexWidth, r_TexHeight, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_TILING_OPTIMAL,
         VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+
+    TransitionImageLayout(r_Image, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+    CopyBufferToImage(t_StagingBuffer, r_Image, static_cast<uint32_t>(r_TexWidth), static_cast<uint32_t>(r_TexHeight));
+
+    TransitionImageLayout(r_Image, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    
+    vkDestroyBuffer(rm_Device, t_StagingBuffer, nullptr);
+    vkFreeMemory(rm_Device, t_StagingBufferMemory, nullptr);
 }
 
 void BufferHandler::CreateImage(VkImage& r_Image, VkDeviceMemory& r_ImageMemory,
@@ -182,12 +190,31 @@ void BufferHandler::TransitionImageLayout(VkImage a_Image, VkFormat a_Format, Vk
     t_Barrier.subresourceRange.baseArrayLayer = 0;
     t_Barrier.subresourceRange.layerCount = 1;
 
-    t_Barrier.srcAccessMask = 0; // TODO
-    t_Barrier.dstAccessMask = 0; // TODO
+    //Pipeline Layout setting.
+    VkPipelineStageFlags t_SourceStage;
+    VkPipelineStageFlags t_DestinationStage;
+
+    if (a_OldLayout == VK_IMAGE_LAYOUT_UNDEFINED && a_NewLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL) {
+        t_Barrier.srcAccessMask = 0;
+        t_Barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+
+        t_SourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+        t_DestinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+    }
+    else if (a_OldLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL && a_NewLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
+        t_Barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+        t_Barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+
+        t_SourceStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+        t_DestinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+    }
+    else {
+        throw std::invalid_argument("unsupported layout transition!");
+    }
 
     vkCmdPipelineBarrier(
         t_CommandBuffer,
-        0 /* TODO */, 0 /* TODO */,
+        t_SourceStage, t_DestinationStage,
         0,
         0, nullptr,
         0, nullptr,
@@ -242,6 +269,38 @@ void BufferHandler::CopyBuffer(VkDeviceSize a_Size, VkBuffer& r_SrcBuffer, VkBuf
     vkCmdCopyBuffer(t_CommandBuffer, r_SrcBuffer, r_DstBuffer, 1, &t_CopyRegion);
 
     p_CommandHandler->EndSingleTimeCommands(t_CommandBuffer);
+}
+
+void BufferHandler::CopyBufferToImage(VkBuffer a_Buffer, VkImage a_Image, uint32_t a_Width, uint32_t a_Height)
+{
+    VkCommandBuffer commandBuffer = p_CommandHandler->BeginSingleTimeCommands();
+
+    VkBufferImageCopy region{};
+    region.bufferOffset = 0;
+    region.bufferRowLength = 0;
+    region.bufferImageHeight = 0;
+
+    region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    region.imageSubresource.mipLevel = 0;
+    region.imageSubresource.baseArrayLayer = 0;
+    region.imageSubresource.layerCount = 1;
+
+    region.imageOffset = { 0, 0, 0 };
+    region.imageExtent = {
+        a_Width,
+        a_Height,
+        1
+    };
+
+    vkCmdCopyBufferToImage(commandBuffer,
+        a_Buffer,
+        a_Image,
+        VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+        1,
+        &region
+    );
+
+    p_CommandHandler->EndSingleTimeCommands(commandBuffer);
 }
 
 #pragma endregion

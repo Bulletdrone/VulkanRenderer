@@ -20,10 +20,11 @@ private:
 	size_t m_CurrentRenderID = 0;
 
 	std::vector<BaseRenderObject*> m_RenderObjects;
+	std::vector<TextureData> m_Textures;
 
 	Renderer* p_Renderer;
 	RenderFactory* m_RenderFactory;
 
-	TextureData m_Textures[1];
+	
 };
 
