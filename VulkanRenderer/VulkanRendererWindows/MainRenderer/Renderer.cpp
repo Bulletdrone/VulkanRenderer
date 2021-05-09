@@ -69,12 +69,15 @@ void Renderer::SetupHandlers()
 	
 	VkPhysicalDeviceProperties properties{};
 	vkGetPhysicalDeviceProperties(mvk_PhysicalDevice, &properties);
-	m_ImageHandler = new ImageHandler(mvk_Device, properties.limits.maxSamplerAnisotropy);
+	m_ImageHandler = new ImageHandler(mvk_Device, properties.limits.maxSamplerAnisotropy, m_BufferHandler);
+
+	m_DepthHandler = new DepthHandler(mvk_Device, mvk_PhysicalDevice, m_ImageHandler);
 }
 
 //Call this after the creation of Vulkan.
 void Renderer::SetupRenderObjects()
 {
+	CreateDepthResources();
 	m_BufferHandler->CreateUniformBuffers(mvk_ViewProjectionBuffers, mvk_ViewProjectionBuffersMemory, mvk_SwapChainImages.size());
 	CreateDescriptorPool();
 	CreateDescriptorSets();
@@ -335,7 +338,7 @@ void Renderer::CreateImageViews()
 
 	for (uint32_t i = 0; i < mvk_SwapChainImages.size(); i++) 
 	{
-		mvk_SwapChainImageViews[i] = m_ImageHandler->CreateImageView(mvk_SwapChainImages[i], mvk_SwapChainImageFormat);
+		mvk_SwapChainImageViews[i] = m_ImageHandler->CreateImageView(mvk_SwapChainImages[i], mvk_SwapChainImageFormat, VK_IMAGE_ASPECT_COLOR_BIT);
 	}
 }
 
@@ -503,6 +506,11 @@ void Renderer::CreateCommandPool()
 	}
 }
 
+void Renderer::CreateDepthResources()
+{
+
+}
+
 void Renderer::CreateCommandBuffers()
 {
 	mvk_CommandBuffers.resize(mvk_SwapChainFrameBuffers.size());
@@ -607,10 +615,10 @@ void Renderer::SetupImage(TextureData& a_TextureData, const char* a_ImagePath)
 	VkDeviceSize t_Size;
 	int t_Width, t_Height, t_Channels;
 
-	m_BufferHandler->CreateTextureImage(a_TextureData.textureImage, a_TextureData.textureImageMemory,
+	m_ImageHandler->CreateTextureImage(a_TextureData.textureImage, a_TextureData.textureImageMemory,
 		a_ImagePath, t_Size, t_Width, t_Height, t_Channels);
 
-	a_TextureData.textureImageView = m_ImageHandler->CreateImageView(a_TextureData.textureImage, VK_FORMAT_R8G8B8A8_SRGB);
+	a_TextureData.textureImageView = m_ImageHandler->CreateImageView(a_TextureData.textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_ASPECT_COLOR_BIT);
 	a_TextureData.textureSampler = m_ImageHandler->CreateTextureSampler();
 }
 

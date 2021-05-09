@@ -71,6 +71,9 @@
     <ClCompile Include="MainRenderer\RenderObjects\Components\MeshData.cpp">
       <Filter>RenderObjects\Components</Filter>
     </ClCompile>
+    <ClCompile Include="MainRenderer\Handlers\DepthHandler.cpp">
+      <Filter>MainRenderer\Handlers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainRenderer\Renderer.h">
@@ -120,6 +123,9 @@
     </ClInclude>
     <ClInclude Include="MainRenderer\RenderObjects\Components\MeshData.h">
       <Filter>RenderObjects\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="MainRenderer\Handlers\DepthHandler.h">
+      <Filter>MainRenderer\Handlers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

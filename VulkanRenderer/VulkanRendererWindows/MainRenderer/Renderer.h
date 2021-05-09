@@ -11,6 +11,7 @@
 #include "Handlers/BufferHandler.h"
 #include "Handlers/CommandHandler.h"
 #include "Handlers/ImageHandler.h"
+#include "Handlers/DepthHandler.h"
 
 #include <optional>
 
@@ -60,6 +61,8 @@ public:
 	void CreateFrameBuffers();
 	void CreateCommandPool();
 
+	void CreateDepthResources();
+
 	//BufferObject Creation.
 	void CreateCommandBuffers();
 	void CreateSyncObjects();
@@ -105,6 +108,7 @@ private:
 	BufferHandler* m_BufferHandler;
 	CommandHandler* m_CommandHandler;
 	ImageHandler* m_ImageHandler;
+	DepthHandler* m_DepthHandler;
 
 	//ShaderData
 	ShaderManager* m_ShaderManager;

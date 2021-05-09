@@ -2,9 +2,6 @@
 
 #include <fstream>
 
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb/stb_image.h>
-
 #include "CommandHandler.h"
 
 BufferHandler::BufferHandler(VkDevice& r_Device, VkPhysicalDevice& r_PhysDevice, CommandHandler* a_CommandHandler)
@@ -92,85 +89,6 @@ void BufferHandler::CreateUniformBuffers(std::vector<VkBuffer>& r_UniformBuffers
 
 #pragma endregion
 
-#pragma region ImageCreation
-
-void BufferHandler::CreateTextureImage(VkImage& r_Image, VkDeviceMemory& r_ImageMemory,
-    const char* a_FilePath, VkDeviceSize& r_ImageSize, int& r_TexWidth, int& r_TexHeight, int& r_TexChannels)
-{
-    stbi_uc* t_ImagePixels = stbi_load(a_FilePath, &r_TexWidth, &r_TexHeight, &r_TexChannels, STBI_rgb_alpha);
-
-    r_ImageSize = static_cast<VkDeviceSize>(r_TexWidth * r_TexHeight * 4);
-
-    if (!t_ImagePixels)
-    {
-        throw std::runtime_error("failed to load texture image!");
-    }
-
-    VkBuffer t_StagingBuffer;
-    VkDeviceMemory t_StagingBufferMemory;
-
-    CreateBuffer(r_ImageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-        t_StagingBuffer, t_StagingBufferMemory);
-
-    void* data;
-    vkMapMemory(rm_Device, t_StagingBufferMemory, 0, r_ImageSize, 0, &data);
-    memcpy(data, t_ImagePixels, static_cast<size_t>(r_ImageSize));
-    vkUnmapMemory(rm_Device, t_StagingBufferMemory);
-
-    stbi_image_free(t_ImagePixels);
-
-    CreateImage(r_Image, r_ImageMemory, r_TexWidth, r_TexHeight, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_TILING_OPTIMAL,
-        VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-
-    TransitionImageLayout(r_Image, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-    CopyBufferToImage(t_StagingBuffer, r_Image, static_cast<uint32_t>(r_TexWidth), static_cast<uint32_t>(r_TexHeight));
-
-    TransitionImageLayout(r_Image, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-    
-    vkDestroyBuffer(rm_Device, t_StagingBuffer, nullptr);
-    vkFreeMemory(rm_Device, t_StagingBufferMemory, nullptr);
-}
-
-void BufferHandler::CreateImage(VkImage& r_Image, VkDeviceMemory& r_ImageMemory,
-    uint32_t a_Width, uint32_t a_Height, VkFormat a_Format, VkImageTiling a_Tiling, VkImageUsageFlags a_Usage, VkMemoryPropertyFlags a_Properties)
-{
-    VkImageCreateInfo imageInfo{};
-    imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-    imageInfo.imageType = VK_IMAGE_TYPE_2D;
-    imageInfo.extent.width = static_cast<uint32_t>(a_Width);
-    imageInfo.extent.height = static_cast<uint32_t>(a_Height);
-    imageInfo.extent.depth = 1;
-    imageInfo.mipLevels = 1;
-    imageInfo.arrayLayers = 1;
-    imageInfo.format = a_Format;
-    imageInfo.tiling = a_Tiling;
-    imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    imageInfo.usage = a_Usage;
-    imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-    imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
-    imageInfo.flags = 0;
-
-    if (vkCreateImage(rm_Device, &imageInfo, nullptr, &r_Image) != VK_SUCCESS)
-    {
-        throw std::runtime_error("failed to create image!");
-    }
-
-    VkMemoryRequirements memRequirements;
-    vkGetImageMemoryRequirements(rm_Device, r_Image, &memRequirements);
-
-    VkMemoryAllocateInfo allocInfo{};
-    allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-    allocInfo.allocationSize = memRequirements.size;
-    allocInfo.memoryTypeIndex = FindMemoryType(memRequirements.memoryTypeBits, a_Properties);
-
-    if (vkAllocateMemory(rm_Device, &allocInfo, nullptr, &r_ImageMemory) != VK_SUCCESS) {
-        throw std::runtime_error("failed to allocate image memory!");
-    }
-
-    vkBindImageMemory(rm_Device, r_Image, r_ImageMemory, 0);
-}
-
 void BufferHandler::TransitionImageLayout(VkImage a_Image, VkFormat a_Format, VkImageLayout a_OldLayout, VkImageLayout a_NewLayout)
 {
     VkCommandBuffer t_CommandBuffer = p_CommandHandler->BeginSingleTimeCommands();
@@ -223,9 +141,6 @@ void BufferHandler::TransitionImageLayout(VkImage a_Image, VkFormat a_Format, Vk
 
     p_CommandHandler->EndSingleTimeCommands(t_CommandBuffer);
 }
-
-#pragma endregion
-
 
 //PRIVATES
 
