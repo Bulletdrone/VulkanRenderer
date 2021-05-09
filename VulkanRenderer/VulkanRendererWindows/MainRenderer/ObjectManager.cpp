@@ -1,7 +1,7 @@
 #include "ObjectManager.h"
 
 ObjectManager::ObjectManager(Renderer* a_Renderer)
-	:	p_Renderer(a_Renderer)
+	: p_Renderer(a_Renderer)
 {
 	p_Renderer->SetRenderObjectsVector(&m_RenderObjects);
 
@@ -9,11 +9,7 @@ ObjectManager::ObjectManager(Renderer* a_Renderer)
 
 
 	//Load Texture
-	//VkDeviceSize t_Size;
-	//int t_Width, t_Height, t_Channels;
-	//ResourceLoader::CreateImage(p_Renderer->GetLogicalDevice(), "", t_Size,
-	//	&t_Width, &t_Height, &t_Channels, &p_Renderer->CreateBuffer);
-	//m_Textures[0];
+	p_Renderer->SetupImage(m_Textures[0], "../Resources/Images/texture.jpg");
 }
 
 ObjectManager::~ObjectManager()

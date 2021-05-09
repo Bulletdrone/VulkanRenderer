@@ -26,6 +26,9 @@
     <Filter Include="RenderObjects\RenderFactory">
       <UniqueIdentifier>{da181359-a571-4d9f-a616-c21aad912025}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MainRenderer\Handlers">
+      <UniqueIdentifier>{b0619442-1d33-408c-afd4-75b096f981a0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -40,9 +43,6 @@
     </ClCompile>
     <ClCompile Include="MainRenderer\Tools\ResourceLoader.cpp">
       <Filter>Tools</Filter>
-    </ClCompile>
-    <ClCompile Include="MainRenderer\ShaderManager.cpp">
-      <Filter>MainRenderer</Filter>
     </ClCompile>
     <ClCompile Include="MainRenderer\ObjectManager.cpp">
       <Filter>MainRenderer</Filter>
@@ -59,6 +59,15 @@
     <ClCompile Include="MainRenderer\RenderObjects\RenderFactories\RenderFactory.cpp">
       <Filter>RenderObjects\RenderFactory</Filter>
     </ClCompile>
+    <ClCompile Include="MainRenderer\ShaderManager.cpp">
+      <Filter>MainRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="MainRenderer\Handlers\CommandHandler.cpp">
+      <Filter>MainRenderer\Handlers</Filter>
+    </ClCompile>
+    <ClCompile Include="MainRenderer\Handlers\BufferHandler.cpp">
+      <Filter>MainRenderer\Handlers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainRenderer\Renderer.h">
@@ -72,9 +81,6 @@
     </ClInclude>
     <ClInclude Include="MainRenderer\Tools\ResourceLoader.h">
       <Filter>Tools</Filter>
-    </ClInclude>
-    <ClInclude Include="MainRenderer\ShaderManager.h">
-      <Filter>MainRenderer</Filter>
     </ClInclude>
     <ClInclude Include="MainRenderer\ObjectManager.h">
       <Filter>MainRenderer</Filter>
@@ -99,6 +105,15 @@
     </ClInclude>
     <ClInclude Include="MainRenderer\RenderObjects\RenderFactories\RenderFactory.h">
       <Filter>RenderObjects\RenderFactory</Filter>
+    </ClInclude>
+    <ClInclude Include="MainRenderer\ShaderManager.h">
+      <Filter>MainRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="MainRenderer\Handlers\CommandHandler.h">
+      <Filter>MainRenderer\Handlers</Filter>
+    </ClInclude>
+    <ClInclude Include="MainRenderer\Handlers\BufferHandler.h">
+      <Filter>MainRenderer\Handlers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

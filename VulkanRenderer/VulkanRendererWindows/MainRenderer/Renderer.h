@@ -7,6 +7,10 @@
 
 #include "RenderObjects/BaseRenderObject.h"
 
+//Handlers
+#include "Handlers/BufferHandler.h"
+#include "Handlers/CommandHandler.h"
+
 #include <optional>
 
 //Special struct for the Family Queue.
@@ -60,11 +64,7 @@ public:
 
 	//BufferData
 	void SetupMesh(MeshData* a_MeshData);
-	void CreateVertexBuffers(BufferData<Vertex>* a_VertexData);
-	void CreateIndexBuffers(BufferData<uint16_t>* a_IndexData);
-	void CreateUniformBuffers();
-	
-	void CopyBuffer(VkDeviceSize a_Size, VkBuffer& r_SrcBuffer, VkBuffer& r_DstBuffer);
+	void SetupImage(TextureData& a_TextureData, const char* a_ImagePath);
 
 	void DrawFrame(uint32_t& r_ImageIndex, float a_dt);
 	void UpdateUniformBuffer(uint32_t a_CurrentImage, float a_dt);
@@ -79,11 +79,11 @@ public:
 	VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& a_Capabilities);
 
 	bool CheckDeviceExtensionSupport(VkPhysicalDevice a_Device);
-	uint32_t FindMemoryType(uint32_t a_TypeFilter, VkMemoryPropertyFlags a_Properties, VkPhysicalDevice& r_PhysDevice);
 
 	//Getters
 	GLFWwindow* GetWindow() const { return m_Window->GetWindow(); }
 	VkDevice& GetLogicalDevice() { return mvk_Device; }
+	VkPhysicalDevice& GetPhysicalDevice() { return mvk_PhysicalDevice; }
 
 	//Set the mesh vector pointer in the Renderer from the one in ObjectManager.
 	void SetRenderObjectsVector(std::vector<BaseRenderObject*>* a_RenderObjects);
@@ -96,6 +96,10 @@ private:
 
 	//Window Data.
 	Window* m_Window;
+
+	//Handlers
+	BufferHandler* m_BufferHandler;
+	CommandHandler* m_CommandHandler;
 
 	//ShaderData
 	ShaderManager* m_ShaderManager;

@@ -6,11 +6,12 @@
 #include <cstdint>
 #include <algorithm>
 
-//TEMP
-#include <chrono>
-
 Renderer::Renderer()
 {
+	//Setup Handlers.
+	m_CommandHandler = new CommandHandler(mvk_Device, mvk_CommandPool, mvk_GraphicsQueue);
+	m_BufferHandler = new BufferHandler(mvk_Device, mvk_PhysicalDevice, m_CommandHandler);
+
 	//Setting up GLFW.
 	m_Window = new Window(800, 600, "VulkanTest");
 
@@ -65,7 +66,7 @@ Renderer::~Renderer()
 //Call this after the creation of Vulkan.
 void Renderer::SetupRenderObjects()
 {
-	CreateUniformBuffers();
+	m_BufferHandler->CreateUniformBuffers(mvk_ViewProjectionBuffers, mvk_ViewProjectionBuffersMemory, mvk_SwapChainImages.size());
 	CreateDescriptorPool();
 	CreateDescriptorSets();
 
@@ -183,8 +184,13 @@ void Renderer::PickPhysicalDevice()
 	{
 		if (IsDeviceSuitable(device)) 
 		{
-			mvk_PhysicalDevice = device;
-			break;
+			VkPhysicalDeviceProperties t_PhysDeviceProperties;
+			vkGetPhysicalDeviceProperties(device, &t_PhysDeviceProperties);
+			if (t_PhysDeviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
+			{
+				mvk_PhysicalDevice = device;
+				break;
+			}
 		}
 	}
 
@@ -590,113 +596,17 @@ void Renderer::CreateSyncObjects()
 
 void Renderer::SetupMesh(MeshData* a_MeshData)
 {
-	CreateVertexBuffers(a_MeshData->GetVertexData());
-	CreateIndexBuffers(a_MeshData->GetIndexData());
+	m_BufferHandler->CreateVertexBuffers(a_MeshData->GetVertexData());
+	m_BufferHandler->CreateIndexBuffers(a_MeshData->GetIndexData());
 }
 
-void Renderer::CreateVertexBuffers(BufferData<Vertex>* a_VertexData)
+void Renderer::SetupImage(TextureData& a_TextureData, const char* a_ImagePath)
 {
-	VkDeviceSize t_BufferSize = a_VertexData->CreateBufferSize();
+	VkDeviceSize t_Size;
+	int t_Width, t_Height, t_Channels;
 
-	VkBuffer t_StagingBuffer;
-	VkDeviceMemory t_StagingBufferMemory;
-	ResourceLoader::CreateBuffer(mvk_Device, mvk_PhysicalDevice, t_BufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-		t_StagingBuffer, t_StagingBufferMemory);
-
-	void* t_Data;
-	vkMapMemory(mvk_Device, t_StagingBufferMemory, 0, t_BufferSize, 0, &t_Data);
-	memcpy(t_Data, a_VertexData->GetElements().data(), (size_t)t_BufferSize);
-	vkUnmapMemory(mvk_Device, t_StagingBufferMemory);
-
-	ResourceLoader::CreateBuffer(mvk_Device, mvk_PhysicalDevice, t_BufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-		a_VertexData->GetBuffer(), a_VertexData->GetBufferMemory());
-
-	CopyBuffer(t_BufferSize, t_StagingBuffer, a_VertexData->GetBuffer());
-
-	vkDestroyBuffer(mvk_Device, t_StagingBuffer, nullptr);
-	vkFreeMemory(mvk_Device, t_StagingBufferMemory, nullptr);
-}
-
-void Renderer::CreateIndexBuffers(BufferData<uint16_t>* a_IndexData)
-{
-	VkDeviceSize t_BufferSize = a_IndexData->CreateBufferSize();
-
-	VkBuffer t_StagingBuffer;
-	VkDeviceMemory t_StagingBufferMemory;
-	ResourceLoader::CreateBuffer(mvk_Device, mvk_PhysicalDevice, t_BufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-		t_StagingBuffer, t_StagingBufferMemory);
-
-	void* t_Data;
-	vkMapMemory(mvk_Device, t_StagingBufferMemory, 0, t_BufferSize, 0, &t_Data);
-	memcpy(t_Data, a_IndexData->GetElements().data(), (size_t)t_BufferSize);
-	vkUnmapMemory(mvk_Device, t_StagingBufferMemory);
-
-	ResourceLoader::CreateBuffer(mvk_Device, mvk_PhysicalDevice, t_BufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-		a_IndexData->GetBuffer(), a_IndexData->GetBufferMemory());
-
-	CopyBuffer(t_BufferSize, t_StagingBuffer, a_IndexData->GetBuffer());
-
-	vkDestroyBuffer(mvk_Device, t_StagingBuffer, nullptr);
-	vkFreeMemory(mvk_Device, t_StagingBufferMemory, nullptr);
-}
-
-void Renderer::CreateUniformBuffers()
-{
-	VkDeviceSize t_BufferSize = sizeof(ViewProjection);
-
-	mvk_ViewProjectionBuffers.resize(mvk_SwapChainImages.size());
-	mvk_ViewProjectionBuffersMemory.resize(mvk_SwapChainImages.size());
-
-	for (size_t i = 0; i < mvk_SwapChainImages.size(); i++) 
-	{
-		ResourceLoader::CreateBuffer(mvk_Device, mvk_PhysicalDevice, t_BufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, mvk_ViewProjectionBuffers[i], mvk_ViewProjectionBuffersMemory[i]);
-	}
-
-	VkDeviceSize t_UniBufferSize = sizeof(ViewProjection);
-
-	mvk_ViewProjectionBuffers.resize(mvk_SwapChainImages.size());
-	mvk_ViewProjectionBuffersMemory.resize(mvk_SwapChainImages.size());
-
-	for (size_t i = 0; i < mvk_SwapChainImages.size(); i++)
-	{
-		ResourceLoader::CreateBuffer(mvk_Device, mvk_PhysicalDevice, t_BufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, mvk_ViewProjectionBuffers[i], mvk_ViewProjectionBuffersMemory[i]);
-	}
-}
-
-void Renderer::CopyBuffer(VkDeviceSize a_Size, VkBuffer& r_SrcBuffer, VkBuffer& r_DstBuffer)
-{
-	VkCommandBufferAllocateInfo t_AllocInfo{};
-	t_AllocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-	t_AllocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-	t_AllocInfo.commandPool = mvk_CommandPool;
-	t_AllocInfo.commandBufferCount = 1;
-
-	VkCommandBuffer t_CommandBuffer;
-	vkAllocateCommandBuffers(mvk_Device, &t_AllocInfo, &t_CommandBuffer);
-
-	VkCommandBufferBeginInfo t_BeginInfo{};
-	t_BeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-	t_BeginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-
-	vkBeginCommandBuffer(t_CommandBuffer, &t_BeginInfo);
-
-	VkBufferCopy t_CopyRegion{};
-	t_CopyRegion.srcOffset = 0; // Optional
-	t_CopyRegion.dstOffset = 0; // Optional
-	t_CopyRegion.size = a_Size;
-	vkCmdCopyBuffer(t_CommandBuffer, r_SrcBuffer, r_DstBuffer, 1, &t_CopyRegion);
-
-	vkEndCommandBuffer(t_CommandBuffer);
-
-	VkSubmitInfo t_SubmitInfo{};
-	t_SubmitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-	t_SubmitInfo.commandBufferCount = 1;
-	t_SubmitInfo.pCommandBuffers = &t_CommandBuffer;
-
-	vkQueueSubmit(mvk_GraphicsQueue, 1, &t_SubmitInfo, VK_NULL_HANDLE);
-	vkQueueWaitIdle(mvk_GraphicsQueue);
-
-	vkFreeCommandBuffers(mvk_Device, mvk_CommandPool, 1, &t_CommandBuffer);
+	m_BufferHandler->CreateTextureImage(a_TextureData.textureImage, a_TextureData.textureImageMemory,
+		a_ImagePath, t_Size, t_Width, t_Height, t_Channels);
 }
 
 void Renderer::DrawFrame(uint32_t& r_ImageIndex, float a_dt)
@@ -780,11 +690,6 @@ void Renderer::DrawFrame(uint32_t& r_ImageIndex, float a_dt)
 
 void Renderer::UpdateUniformBuffer(uint32_t a_CurrentImage, float a_dt)
 {
-	static auto startTime = std::chrono::high_resolution_clock::now();
-
-	auto currentTime = std::chrono::high_resolution_clock::now();
-	float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
-
 	ViewProjection ubo{};
 	//ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 	ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
