@@ -1,5 +1,5 @@
 #include "ShaderManager.h"
-#include "MeshData.h"
+#include <Structs/BufferData.h>
 
 #include <iostream>
 

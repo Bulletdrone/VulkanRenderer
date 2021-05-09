@@ -23,10 +23,10 @@
     <ClCompile Include="MainRenderer\Handlers\BufferHandler.cpp" />
     <ClCompile Include="MainRenderer\Handlers\CommandHandler.cpp" />
     <ClCompile Include="MainRenderer\Handlers\ImageHandler.cpp" />
-    <ClCompile Include="MainRenderer\MeshData.cpp" />
     <ClCompile Include="MainRenderer\ObjectManager.cpp" />
     <ClCompile Include="MainRenderer\Renderer.cpp" />
     <ClCompile Include="MainRenderer\RenderObjects\BaseRenderObject.cpp" />
+    <ClCompile Include="MainRenderer\RenderObjects\Components\MeshData.cpp" />
     <ClCompile Include="MainRenderer\RenderObjects\RenderFactories\RenderFactory.cpp" />
     <ClCompile Include="MainRenderer\RenderObjects\RenderShape.cpp" />
     <ClCompile Include="MainRenderer\ShaderManager.cpp" />
@@ -38,10 +38,10 @@
     <ClInclude Include="MainRenderer\Handlers\BufferHandler.h" />
     <ClInclude Include="MainRenderer\Handlers\CommandHandler.h" />
     <ClInclude Include="MainRenderer\Handlers\ImageHandler.h" />
-    <ClInclude Include="MainRenderer\MeshData.h" />
     <ClInclude Include="MainRenderer\ObjectManager.h" />
     <ClInclude Include="MainRenderer\Renderer.h" />
     <ClInclude Include="MainRenderer\RenderObjects\BaseRenderObject.h" />
+    <ClInclude Include="MainRenderer\RenderObjects\Components\MeshData.h" />
     <ClInclude Include="MainRenderer\RenderObjects\Components\RenderObjectData.h" />
     <ClInclude Include="MainRenderer\RenderObjects\Components\Transform.h" />
     <ClInclude Include="MainRenderer\RenderObjects\RenderFactories\RenderFactory.h" />

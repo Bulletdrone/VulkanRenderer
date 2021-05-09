@@ -47,9 +47,6 @@
     <ClCompile Include="MainRenderer\ObjectManager.cpp">
       <Filter>MainRenderer</Filter>
     </ClCompile>
-    <ClCompile Include="MainRenderer\MeshData.cpp">
-      <Filter>MainRenderer</Filter>
-    </ClCompile>
     <ClCompile Include="MainRenderer\RenderObjects\BaseRenderObject.cpp">
       <Filter>RenderObjects</Filter>
     </ClCompile>
@@ -71,6 +68,9 @@
     <ClCompile Include="MainRenderer\Handlers\ImageHandler.cpp">
       <Filter>MainRenderer\Handlers</Filter>
     </ClCompile>
+    <ClCompile Include="MainRenderer\RenderObjects\Components\MeshData.cpp">
+      <Filter>RenderObjects\Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainRenderer\Renderer.h">
@@ -86,9 +86,6 @@
       <Filter>Tools</Filter>
     </ClInclude>
     <ClInclude Include="MainRenderer\ObjectManager.h">
-      <Filter>MainRenderer</Filter>
-    </ClInclude>
-    <ClInclude Include="MainRenderer\MeshData.h">
       <Filter>MainRenderer</Filter>
     </ClInclude>
     <ClInclude Include="MainRenderer\Structs\BufferData.h">
@@ -120,6 +117,9 @@
     </ClInclude>
     <ClInclude Include="MainRenderer\Handlers\ImageHandler.h">
       <Filter>MainRenderer\Handlers</Filter>
+    </ClInclude>
+    <ClInclude Include="MainRenderer\RenderObjects\Components\MeshData.h">
+      <Filter>RenderObjects\Components</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
