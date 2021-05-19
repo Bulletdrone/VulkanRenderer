@@ -1,17 +1,21 @@
 #include "ImageHandler.h"
 
 #include "BufferHandler.h"
+#include "CommandHandler.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
 
 #include <fstream>
 
-ImageHandler::ImageHandler(VkDevice& r_Device, float a_AnisotropicMax, BufferHandler* a_BufferHandler)
-	:	rm_Device(r_Device)
+
+
+ImageHandler::ImageHandler(VkDevice& r_Device, float a_AnisotropicMax, BufferHandler* a_BufferHandler, CommandHandler* a_CommandHandler)
+    : rm_Device(r_Device)
 {
-	m_AnisotropicMax = a_AnisotropicMax;
+    m_AnisotropicMax = a_AnisotropicMax;
     p_BufferHandler = a_BufferHandler;
+    p_CommandHandler = a_CommandHandler;
 }
 
 ImageHandler::~ImageHandler()
@@ -85,13 +89,66 @@ void ImageHandler::CreateTextureImage(VkImage& r_Image, VkDeviceMemory& r_ImageM
     CreateImage(r_Image, r_ImageMemory, r_TexWidth, r_TexHeight, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_TILING_OPTIMAL,
         VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-    p_BufferHandler->TransitionImageLayout(r_Image, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+    TransitionImageLayout(r_Image, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
     p_BufferHandler->CopyBufferToImage(t_StagingBuffer, r_Image, static_cast<uint32_t>(r_TexWidth), static_cast<uint32_t>(r_TexHeight));
 
-    p_BufferHandler->TransitionImageLayout(r_Image, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    TransitionImageLayout(r_Image, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
     vkDestroyBuffer(rm_Device, t_StagingBuffer, nullptr);
     vkFreeMemory(rm_Device, t_StagingBufferMemory, nullptr);
+}
+
+void ImageHandler::TransitionImageLayout(VkImage a_Image, VkFormat a_Format, VkImageLayout a_OldLayout, VkImageLayout a_NewLayout)
+{
+    VkCommandBuffer t_CommandBuffer = p_CommandHandler->BeginSingleTimeCommands();
+
+    VkImageMemoryBarrier t_Barrier{};
+    t_Barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+    t_Barrier.oldLayout = a_OldLayout;
+    t_Barrier.newLayout = a_NewLayout;
+
+    t_Barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    t_Barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+
+    t_Barrier.image = a_Image;
+    t_Barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    t_Barrier.subresourceRange.baseMipLevel = 0;
+    t_Barrier.subresourceRange.levelCount = 1;
+    t_Barrier.subresourceRange.baseArrayLayer = 0;
+    t_Barrier.subresourceRange.layerCount = 1;
+
+    //Pipeline Layout setting.
+    VkPipelineStageFlags t_SourceStage;
+    VkPipelineStageFlags t_DestinationStage;
+
+    if (a_OldLayout == VK_IMAGE_LAYOUT_UNDEFINED && a_NewLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL) {
+        t_Barrier.srcAccessMask = 0;
+        t_Barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+
+        t_SourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+        t_DestinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+    }
+    else if (a_OldLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL && a_NewLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
+        t_Barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+        t_Barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+
+        t_SourceStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+        t_DestinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+    }
+    else {
+        throw std::invalid_argument("unsupported layout transition!");
+    }
+
+    vkCmdPipelineBarrier(
+        t_CommandBuffer,
+        t_SourceStage, t_DestinationStage,
+        0,
+        0, nullptr,
+        0, nullptr,
+        1, &t_Barrier
+    );
+
+    p_CommandHandler->EndSingleTimeCommands(t_CommandBuffer);
 }
 
 VkImageView ImageHandler::CreateImageView(VkImage a_Image, VkFormat a_Format, VkImageAspectFlags a_AspectFlags)

@@ -69,7 +69,7 @@ void Renderer::SetupHandlers()
 	
 	VkPhysicalDeviceProperties properties{};
 	vkGetPhysicalDeviceProperties(mvk_PhysicalDevice, &properties);
-	m_ImageHandler = new ImageHandler(mvk_Device, properties.limits.maxSamplerAnisotropy, m_BufferHandler);
+	m_ImageHandler = new ImageHandler(mvk_Device, properties.limits.maxSamplerAnisotropy, m_BufferHandler, m_CommandHandler);
 
 	m_DepthHandler = new DepthHandler(mvk_Device, mvk_PhysicalDevice, m_ImageHandler);
 }

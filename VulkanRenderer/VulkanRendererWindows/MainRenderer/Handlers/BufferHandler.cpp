@@ -89,59 +89,6 @@ void BufferHandler::CreateUniformBuffers(std::vector<VkBuffer>& r_UniformBuffers
 
 #pragma endregion
 
-void BufferHandler::TransitionImageLayout(VkImage a_Image, VkFormat a_Format, VkImageLayout a_OldLayout, VkImageLayout a_NewLayout)
-{
-    VkCommandBuffer t_CommandBuffer = p_CommandHandler->BeginSingleTimeCommands();
-
-    VkImageMemoryBarrier t_Barrier{};
-    t_Barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-    t_Barrier.oldLayout = a_OldLayout;
-    t_Barrier.newLayout = a_NewLayout;
-
-    t_Barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-    t_Barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-
-    t_Barrier.image = a_Image;
-    t_Barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-    t_Barrier.subresourceRange.baseMipLevel = 0;
-    t_Barrier.subresourceRange.levelCount = 1;
-    t_Barrier.subresourceRange.baseArrayLayer = 0;
-    t_Barrier.subresourceRange.layerCount = 1;
-
-    //Pipeline Layout setting.
-    VkPipelineStageFlags t_SourceStage;
-    VkPipelineStageFlags t_DestinationStage;
-
-    if (a_OldLayout == VK_IMAGE_LAYOUT_UNDEFINED && a_NewLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL) {
-        t_Barrier.srcAccessMask = 0;
-        t_Barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-
-        t_SourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
-        t_DestinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
-    }
-    else if (a_OldLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL && a_NewLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
-        t_Barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-        t_Barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-
-        t_SourceStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
-        t_DestinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-    }
-    else {
-        throw std::invalid_argument("unsupported layout transition!");
-    }
-
-    vkCmdPipelineBarrier(
-        t_CommandBuffer,
-        t_SourceStage, t_DestinationStage,
-        0,
-        0, nullptr,
-        0, nullptr,
-        1, &t_Barrier
-    );
-
-    p_CommandHandler->EndSingleTimeCommands(t_CommandBuffer);
-}
-
 //PRIVATES
 
 #pragma region Buffer Helpers
