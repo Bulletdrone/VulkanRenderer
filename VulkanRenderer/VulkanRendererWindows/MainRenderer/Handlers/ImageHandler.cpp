@@ -90,12 +90,44 @@ void ImageHandler::CreateTextureImage(VkImage& r_Image, VkDeviceMemory& r_ImageM
         VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
     TransitionImageLayout(r_Image, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-    p_BufferHandler->CopyBufferToImage(t_StagingBuffer, r_Image, static_cast<uint32_t>(r_TexWidth), static_cast<uint32_t>(r_TexHeight));
+    CopyBufferToImage(t_StagingBuffer, r_Image, static_cast<uint32_t>(r_TexWidth), static_cast<uint32_t>(r_TexHeight));
 
     TransitionImageLayout(r_Image, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
     vkDestroyBuffer(rm_Device, t_StagingBuffer, nullptr);
     vkFreeMemory(rm_Device, t_StagingBufferMemory, nullptr);
+}
+
+void ImageHandler::CopyBufferToImage(VkBuffer a_Buffer, VkImage a_Image, uint32_t a_Width, uint32_t a_Height)
+{
+    VkCommandBuffer t_CommandBuffer = p_CommandHandler->BeginSingleTimeCommands();
+
+    VkBufferImageCopy t_Region{};
+    t_Region.bufferOffset = 0;
+    t_Region.bufferRowLength = 0;
+    t_Region.bufferImageHeight = 0;
+
+    t_Region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    t_Region.imageSubresource.mipLevel = 0;
+    t_Region.imageSubresource.baseArrayLayer = 0;
+    t_Region.imageSubresource.layerCount = 1;
+
+    t_Region.imageOffset = { 0, 0, 0 };
+    t_Region.imageExtent = {
+        a_Width,
+        a_Height,
+        1
+    };
+
+    vkCmdCopyBufferToImage(t_CommandBuffer,
+        a_Buffer,
+        a_Image,
+        VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+        1,
+        &t_Region
+    );
+
+    p_CommandHandler->EndSingleTimeCommands(t_CommandBuffer);
 }
 
 void ImageHandler::TransitionImageLayout(VkImage a_Image, VkFormat a_Format, VkImageLayout a_OldLayout, VkImageLayout a_NewLayout)

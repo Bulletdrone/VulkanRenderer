@@ -133,38 +133,6 @@ void BufferHandler::CopyBuffer(VkDeviceSize a_Size, VkBuffer& r_SrcBuffer, VkBuf
     p_CommandHandler->EndSingleTimeCommands(t_CommandBuffer);
 }
 
-void BufferHandler::CopyBufferToImage(VkBuffer a_Buffer, VkImage a_Image, uint32_t a_Width, uint32_t a_Height)
-{
-    VkCommandBuffer commandBuffer = p_CommandHandler->BeginSingleTimeCommands();
-
-    VkBufferImageCopy region{};
-    region.bufferOffset = 0;
-    region.bufferRowLength = 0;
-    region.bufferImageHeight = 0;
-
-    region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-    region.imageSubresource.mipLevel = 0;
-    region.imageSubresource.baseArrayLayer = 0;
-    region.imageSubresource.layerCount = 1;
-
-    region.imageOffset = { 0, 0, 0 };
-    region.imageExtent = {
-        a_Width,
-        a_Height,
-        1
-    };
-
-    vkCmdCopyBufferToImage(commandBuffer,
-        a_Buffer,
-        a_Image,
-        VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-        1,
-        &region
-    );
-
-    p_CommandHandler->EndSingleTimeCommands(commandBuffer);
-}
-
 #pragma endregion
 
 
