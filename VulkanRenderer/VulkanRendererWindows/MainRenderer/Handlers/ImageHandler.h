@@ -21,6 +21,7 @@ public:
 
 	VkImageView CreateImageView(VkImage a_Image, VkFormat a_Format, VkImageAspectFlags a_AspectFlags);
 	VkSampler CreateTextureSampler();
+	bool HasStencilComponent(VkFormat a_Format);
 
 private:
 

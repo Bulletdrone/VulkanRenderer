@@ -153,21 +153,42 @@ void ImageHandler::TransitionImageLayout(VkImage a_Image, VkFormat a_Format, VkI
     VkPipelineStageFlags t_SourceStage;
     VkPipelineStageFlags t_DestinationStage;
 
-    if (a_OldLayout == VK_IMAGE_LAYOUT_UNDEFINED && a_NewLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL) {
+    if (a_NewLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL) {
+        t_Barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+
+        if (HasStencilComponent(a_Format)) {
+            t_Barrier.subresourceRange.aspectMask |= VK_IMAGE_ASPECT_STENCIL_BIT;
+        }
+    }
+    else {
+        t_Barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    }
+
+    if (a_OldLayout == VK_IMAGE_LAYOUT_UNDEFINED && a_NewLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL) 
+    {
         t_Barrier.srcAccessMask = 0;
         t_Barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
 
         t_SourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
         t_DestinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
     }
-    else if (a_OldLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL && a_NewLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
+    else if (a_OldLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL && a_NewLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) 
+    {
         t_Barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
         t_Barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
 
         t_SourceStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
         t_DestinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
     }
-    else {
+    else if (a_OldLayout == VK_IMAGE_LAYOUT_UNDEFINED && a_NewLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL) 
+    {
+        t_Barrier.srcAccessMask = 0;
+        t_Barrier.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+
+        t_SourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+        t_DestinationStage = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+    } else 
+    {
         throw std::invalid_argument("unsupported layout transition!");
     }
 
@@ -235,4 +256,9 @@ VkSampler ImageHandler::CreateTextureSampler()
 		throw std::runtime_error("failed to create texture sampler!");
 	}
 	return t_Sampler;
+}
+
+bool ImageHandler::HasStencilComponent(VkFormat a_Format)
+{
+    return a_Format == VK_FORMAT_D32_SFLOAT_S8_UINT || a_Format == VK_FORMAT_D24_UNORM_S8_UINT;
 }

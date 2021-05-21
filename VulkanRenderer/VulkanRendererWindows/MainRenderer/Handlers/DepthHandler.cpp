@@ -13,14 +13,26 @@ DepthHandler::DepthHandler(VkDevice& r_Device, VkPhysicalDevice& r_PhysDevice, I
 DepthHandler::~DepthHandler()
 {}
 
+void DepthHandler::CleanupDepthTest()
+{
+	vkDestroyImageView(rm_Device, m_DepthTest.depthImageView, nullptr);
+	vkDestroyImage(rm_Device, m_DepthTest.depthImage, nullptr);
+	vkFreeMemory(rm_Device, m_DepthTest.depthImageMemory, nullptr);
+}
+
 void DepthHandler::CreateDepthResources(uint32_t a_Width, uint32_t a_Height)
 {
-	VkFormat depthFormat = FindDepthFormat();
+	VkFormat t_DepthFormat = FindDepthFormat();
 
-	p_ImageHandler->CreateImage(m_DepthTest.depthImage, m_DepthTest.depthImageMemory, a_Width, a_Height, depthFormat,
+	p_ImageHandler->CreateImage(m_DepthTest.depthImage, m_DepthTest.depthImageMemory, a_Width, a_Height, t_DepthFormat,
 		VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-	m_DepthTest.depthImageView = p_ImageHandler->CreateImageView(m_DepthTest.depthImage, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT);
+	m_DepthTest.depthImageView = p_ImageHandler->CreateImageView(m_DepthTest.depthImage, t_DepthFormat, VK_IMAGE_ASPECT_DEPTH_BIT);
+
+
+	//endl.
+	p_ImageHandler->TransitionImageLayout(m_DepthTest.depthImage, t_DepthFormat, 
+		VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
 }
 
 VkFormat DepthHandler::FindSupportedFormat(const std::vector<VkFormat>& r_Candidates, VkImageTiling a_Tiling, VkFormatFeatureFlags a_Features)
@@ -52,7 +64,7 @@ VkFormat DepthHandler::FindDepthFormat()
 	);
 }
 
-bool DepthHandler::HasStencilComponent(VkFormat a_Format) 
+DepthTest& DepthHandler::GetDepthTest()
 {
-	return a_Format == VK_FORMAT_D32_SFLOAT_S8_UINT || a_Format == VK_FORMAT_D24_UNORM_S8_UINT;
+	return m_DepthTest;
 }

@@ -7,11 +7,11 @@ int main()
 
     ObjectManager* m_ObjectManager = new ObjectManager(m_Renderer);
 
-    Transform* t_Transform1 = new Transform(glm::vec3(0.7f, 0, 0), 1);
-    Transform* t_Transform2 = new Transform(glm::vec3(-0.7f, 0, 0), 1);
-    Transform* t_Transform3 = new Transform(glm::vec3(0.0f, -0.7f, 0), 1);
+    Transform* t_Transform1 = new Transform(glm::vec3(0.7f, 0, 0.1), 1);
+    Transform* t_Transform2 = new Transform(glm::vec3(-0.7f, 0, 0.2), 1);
+    Transform* t_Transform3 = new Transform(glm::vec3(0.0f, -0.7f, 0.3), 1);
     
-    Transform* t_Transform4 = new Transform(glm::vec3(0.0f, 0.7f, 0), 1);
+    Transform* t_Transform4 = new Transform(glm::vec3(0.0f, 0.7f, 0.4), 1);
 
     m_ObjectManager->CreateShape(ShapeType::Rectangle, t_Transform1);
     m_ObjectManager->CreateShape(ShapeType::Triangle, t_Transform2);

@@ -105,6 +105,17 @@ void ShaderManager::CreateGraphicsPipeline(const VkRenderPass& r_RenderPass)
 
 	//Empty/not used now.
 	VkPipelineDepthStencilStateCreateInfo t_DepthStencil{};
+	t_DepthStencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+	t_DepthStencil.depthTestEnable = VK_TRUE;
+	t_DepthStencil.depthWriteEnable = VK_TRUE;
+	t_DepthStencil.depthCompareOp = VK_COMPARE_OP_LESS;
+	t_DepthStencil.depthBoundsTestEnable = VK_FALSE;
+	t_DepthStencil.minDepthBounds = 0.0f; // Optional
+	t_DepthStencil.maxDepthBounds = 1.0f; // Optional
+	t_DepthStencil.stencilTestEnable = VK_FALSE;
+	t_DepthStencil.front = {}; // Optional
+	t_DepthStencil.back = {}; // Optional
+
 
 	VkPipelineColorBlendAttachmentState t_ColorBlendAttachment{};
 	t_ColorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
@@ -155,9 +166,10 @@ void ShaderManager::CreateGraphicsPipeline(const VkRenderPass& r_RenderPass)
 	t_PipelineInfo.pViewportState = &t_ViewportState;
 	t_PipelineInfo.pRasterizationState = &t_Rasterizer;
 	t_PipelineInfo.pMultisampleState = &t_Multisampling;
-	t_PipelineInfo.pDepthStencilState = nullptr; // Optional
+	t_PipelineInfo.pDepthStencilState = &t_DepthStencil; // Optional
 	t_PipelineInfo.pColorBlendState = &t_ColorBlending;
 	t_PipelineInfo.pDynamicState = nullptr; // Optional
+
 
 	t_PipelineInfo.layout = rmvk_PipelineLayout;
 

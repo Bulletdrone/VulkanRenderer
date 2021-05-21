@@ -32,8 +32,9 @@ Renderer::Renderer()
 	m_ShaderManager->CreateDescriptorSetLayout();
 	m_ShaderManager->CreateGraphicsPipeline(mvk_RenderPass);
 
-	CreateFrameBuffers();
 	CreateCommandPool();
+	CreateDepthResources();
+	CreateFrameBuffers();
 }
 
 Renderer::~Renderer()
@@ -77,7 +78,6 @@ void Renderer::SetupHandlers()
 //Call this after the creation of Vulkan.
 void Renderer::SetupRenderObjects()
 {
-	CreateDepthResources();
 	m_BufferHandler->CreateUniformBuffers(mvk_ViewProjectionBuffers, mvk_ViewProjectionBuffersMemory, mvk_SwapChainImages.size());
 	CreateDescriptorPool();
 	CreateDescriptorSets();
@@ -125,6 +125,7 @@ void Renderer::RecreateSwapChain()
 	CreateRenderPass();
 	m_ShaderManager->CreateDescriptorSetLayout();
 	m_ShaderManager->CreateGraphicsPipeline(mvk_RenderPass);
+	CreateDepthResources();
 	CreateFrameBuffers();
 
 	SetupRenderObjects();
@@ -344,50 +345,63 @@ void Renderer::CreateImageViews()
 
 void Renderer::CreateRenderPass()
 {
+	//Color Attachment.
 	VkAttachmentDescription t_ColorAttachment{};
 	t_ColorAttachment.format = mvk_SwapChainImageFormat;
 	t_ColorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
-
 	t_ColorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
 	t_ColorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-
 	t_ColorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 	t_ColorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-
 	t_ColorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 	t_ColorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
 
-	//Subpasses and Attachment
 	VkAttachmentReference t_ColorAttachmentRef{};
 	t_ColorAttachmentRef.attachment = 0;
 	t_ColorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+	//DEPTH BUFFER
+	VkAttachmentDescription t_DepthAttachment{};
+	t_DepthAttachment.format = m_DepthHandler->FindDepthFormat();
+	t_DepthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+	t_DepthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+	t_DepthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+	t_DepthAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+	t_DepthAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+	t_DepthAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	t_DepthAttachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+	VkAttachmentReference t_DepthAttachmentRef{};
+	t_DepthAttachmentRef.attachment = 1;
+	t_DepthAttachmentRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
 	VkSubpassDescription t_Subpass{};
 	t_Subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
 
 	t_Subpass.colorAttachmentCount = 1;
 	t_Subpass.pColorAttachments = &t_ColorAttachmentRef;
+	t_Subpass.pDepthStencilAttachment = &t_DepthAttachmentRef;
+
+	VkSubpassDependency t_Dependency{};
+	t_Dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
+	t_Dependency.dstSubpass = 0;
+
+	t_Dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;;
+	t_Dependency.srcAccessMask = 0;
+
+	t_Dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;;
+	t_Dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;;
 
 	//Setting the struct.
+	std::array<VkAttachmentDescription, 2> t_Attachments = { t_ColorAttachment, t_DepthAttachment };
 	VkRenderPassCreateInfo t_RenderPassInfo{};
 	t_RenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-	t_RenderPassInfo.attachmentCount = 1;
-	t_RenderPassInfo.pAttachments = &t_ColorAttachment;
+	t_RenderPassInfo.attachmentCount = static_cast<uint32_t>(t_Attachments.size());;
+	t_RenderPassInfo.pAttachments = t_Attachments.data();
 	t_RenderPassInfo.subpassCount = 1;
 	t_RenderPassInfo.pSubpasses = &t_Subpass;
-
-	VkSubpassDependency dependency{};
-	dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
-	dependency.dstSubpass = 0;
-
-	dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-	dependency.srcAccessMask = 0;
-
-	dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-	dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-
 	t_RenderPassInfo.dependencyCount = 1;
-	t_RenderPassInfo.pDependencies = &dependency;
+	t_RenderPassInfo.pDependencies = &t_Dependency;
 
 	if (vkCreateRenderPass(mvk_Device, &t_RenderPassInfo, nullptr, &mvk_RenderPass) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create render pass!");
@@ -471,16 +485,16 @@ void Renderer::CreateFrameBuffers()
 
 	for (size_t i = 0; i < mvk_SwapChainImageViews.size(); i++)
 	{
-		VkImageView attachments[] = 
-		{
-			mvk_SwapChainImageViews[i]
+		std::array<VkImageView, 2> t_Attachments = {
+		mvk_SwapChainImageViews[i],
+		m_DepthHandler->GetDepthTest().depthImageView
 		};
 
 		VkFramebufferCreateInfo t_FramebufferInfo{};
 		t_FramebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
 		t_FramebufferInfo.renderPass = mvk_RenderPass;
-		t_FramebufferInfo.attachmentCount = 1;
-		t_FramebufferInfo.pAttachments = attachments;
+		t_FramebufferInfo.attachmentCount = static_cast<uint32_t>(t_Attachments.size());
+		t_FramebufferInfo.pAttachments = t_Attachments.data();
 		t_FramebufferInfo.width = mvk_SwapChainExtent.width;
 		t_FramebufferInfo.height = mvk_SwapChainExtent.height;
 		t_FramebufferInfo.layers = 1;
@@ -508,7 +522,7 @@ void Renderer::CreateCommandPool()
 
 void Renderer::CreateDepthResources()
 {
-
+	m_DepthHandler->CreateDepthResources(mvk_SwapChainExtent.width, mvk_SwapChainExtent.height);
 }
 
 void Renderer::CreateCommandBuffers()
@@ -543,9 +557,12 @@ void Renderer::CreateCommandBuffers()
 		t_RenderPassInfo.renderArea.offset = { 0, 0 };
 		t_RenderPassInfo.renderArea.extent = mvk_SwapChainExtent;
 
-		VkClearValue t_ClearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
-		t_RenderPassInfo.clearValueCount = 1;
-		t_RenderPassInfo.pClearValues = &t_ClearColor;
+		std::array<VkClearValue, 2> t_ClearValues{};
+		t_ClearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
+		t_ClearValues[1].depthStencil = { 1.0f, 0 };
+
+		t_RenderPassInfo.clearValueCount = static_cast<uint32_t>(t_ClearValues.size());;
+		t_RenderPassInfo.pClearValues = t_ClearValues.data();
 
 		//Begin the drawing.
 		vkCmdBeginRenderPass(mvk_CommandBuffers[i], &t_RenderPassInfo, VK_SUBPASS_CONTENTS_INLINE);

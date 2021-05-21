@@ -14,7 +14,6 @@ struct DepthTest
 	VkImageView depthImageView;
 };
 
-class BufferHandler;
 class ImageHandler;
 
 class DepthHandler
@@ -23,13 +22,15 @@ public:
 	DepthHandler(VkDevice& r_Device, VkPhysicalDevice& r_PhysDevice, ImageHandler* a_ImageHandler);
 	~DepthHandler();
 
+	void CleanupDepthTest();
+
 	void CreateDepthResources(uint32_t a_Width, uint32_t a_Height);
 
+	VkFormat FindDepthFormat();
 
+	DepthTest& GetDepthTest();
 private:
 	VkFormat FindSupportedFormat(const std::vector<VkFormat>& r_Candidates, VkImageTiling a_Tiling, VkFormatFeatureFlags a_Features);
-	VkFormat FindDepthFormat();
-	bool HasStencilComponent(VkFormat a_Format);
 
 	DepthTest m_DepthTest;
 
