@@ -13,19 +13,6 @@
 #include "Handlers/ImageHandler.h"
 #include "Handlers/DepthHandler.h"
 
-#include <optional>
-
-//Special struct for the Family Queue.
-struct QueueFamilyIndices {
-	std::optional<uint32_t> graphicsFamily;
-	std::optional<uint32_t> presentFamily;
-
-	bool isComplete() {
-		return graphicsFamily.has_value() && presentFamily.has_value();
-	}
-};
-
-
 struct SwapChainSupportDetails {
 	VkSurfaceCapabilitiesKHR capabilities;
 	std::vector<VkSurfaceFormatKHR> formats;
@@ -134,10 +121,6 @@ private:
 	std::vector<VkImage> mvk_SwapChainImages;
 	std::vector<VkImageView> mvk_SwapChainImageViews;
 	std::vector<VkFramebuffer> mvk_SwapChainFrameBuffers;
-
-	//Buffer Commands
-	VkCommandPool mvk_CommandPool;
-	std::vector<VkCommandBuffer> mvk_CommandBuffers;
 
 	//The RenderPipeline.
 	VkRenderPass mvk_RenderPass;

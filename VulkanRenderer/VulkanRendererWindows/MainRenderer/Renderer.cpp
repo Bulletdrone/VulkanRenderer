@@ -49,7 +49,7 @@ Renderer::~Renderer()
 		vkDestroySemaphore(mvk_Device, mvk_ImageAvailableSemaphore[i], nullptr);
 		vkDestroyFence(mvk_Device, mvk_InFlightFences[i], nullptr);
 	}
-	vkDestroyCommandPool(mvk_Device, mvk_CommandPool, nullptr);
+	delete m_CommandHandler;
 
 	delete m_ShaderManager;
 	vkDestroyDevice(mvk_Device, nullptr);
@@ -65,7 +65,7 @@ Renderer::~Renderer()
 //Must be done after setting up the physical device.
 void Renderer::SetupHandlers()
 {
-	m_CommandHandler = new CommandHandler(mvk_Device, mvk_CommandPool, mvk_GraphicsQueue);
+	m_CommandHandler = new CommandHandler(mvk_Device, mvk_GraphicsQueue);
 	m_BufferHandler = new BufferHandler(mvk_Device, mvk_PhysicalDevice, m_CommandHandler);
 	
 	VkPhysicalDeviceProperties properties{};
@@ -92,7 +92,7 @@ void Renderer::CleanupSwapChain()
 		vkDestroyFramebuffer(mvk_Device, mvk_SwapChainFrameBuffers[i], nullptr);
 	}
 
-	vkFreeCommandBuffers(mvk_Device, mvk_CommandPool, static_cast<uint32_t>(mvk_CommandBuffers.size()), mvk_CommandBuffers.data());
+	m_CommandHandler->FreeCommandPool();
 
 	vkDestroyPipeline(mvk_Device, mvk_Pipeline, nullptr);
 	vkDestroyPipelineLayout(mvk_Device, mvk_PipelineLayout, nullptr);
@@ -508,16 +508,7 @@ void Renderer::CreateFrameBuffers()
 
 void Renderer::CreateCommandPool()
 {
-	QueueFamilyIndices t_QueueFamilyIndices = FindQueueFamilies(mvk_PhysicalDevice);
-
-	VkCommandPoolCreateInfo t_PoolInfo{};
-	t_PoolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-	t_PoolInfo.queueFamilyIndex = t_QueueFamilyIndices.graphicsFamily.value();
-	t_PoolInfo.flags = 0; // Optional
-
-	if (vkCreateCommandPool(mvk_Device, &t_PoolInfo, nullptr, &mvk_CommandPool) != VK_SUCCESS) {
-		throw std::runtime_error("failed to create command pool!");
-	}
+	m_CommandHandler->CreateCommandPools(FindQueueFamilies(mvk_PhysicalDevice));
 }
 
 void Renderer::CreateDepthResources()
@@ -675,8 +666,10 @@ void Renderer::DrawFrame(uint32_t& r_ImageIndex, float a_dt)
 	t_SubmitInfo.pWaitSemaphores = t_WaitSemaphores;
 	t_SubmitInfo.pWaitDstStageMask = waitStages;
 
-	t_SubmitInfo.commandBufferCount = 1;
-	t_SubmitInfo.pCommandBuffers = &mvk_CommandBuffers[r_ImageIndex];
+	DrawCommands& r_DrawCommands = m_CommandHandler->GetDrawCommands();
+
+	t_SubmitInfo.commandBufferCount = static_cast<uint32_t>(r_DrawCommands.CommandBuffers.size());
+	t_SubmitInfo.pCommandBuffers = r_DrawCommands.CommandBuffers.data();
 
 	VkSemaphore t_SignalSemaphores[] = { mvk_RenderFinishedSemaphore[m_CurrentFrame] };
 	t_SubmitInfo.signalSemaphoreCount = 1;
