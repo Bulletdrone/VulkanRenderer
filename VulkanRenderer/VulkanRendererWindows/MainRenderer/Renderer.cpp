@@ -28,21 +28,13 @@ Renderer::Renderer()
 	CreateImageViews();
 	CreateRenderPass();
 
-	m_ShaderManager = new ShaderManager(mvk_Device, mvk_SwapChainExtent, mvk_DescriptorSetLayout, mvk_PipelineLayout, mvk_Pipeline);
-	m_ShaderManager->CreateDescriptorSetLayout();
-	m_ShaderManager->CreateGraphicsPipeline(mvk_RenderPass);
-
-	CreateCommandPool();
-	CreateDepthResources();
-	CreateFrameBuffers();
+	m_ShaderManager = new ShaderManager(mvk_Device, mvk_SwapChainExtent);
 }
 
 Renderer::~Renderer()
 {
 	vkDeviceWaitIdle(mvk_Device);
 	CleanupSwapChain();
-
-	vkDestroyDescriptorSetLayout(mvk_Device, mvk_DescriptorSetLayout, nullptr);
 
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
 		vkDestroySemaphore(mvk_Device, mvk_RenderFinishedSemaphore[i], nullptr);
@@ -79,10 +71,7 @@ void Renderer::SetupHandlers()
 void Renderer::SetupRenderObjects()
 {
 	m_BufferHandler->CreateUniformBuffers(mvk_ViewProjectionBuffers, mvk_ViewProjectionBuffersMemory, mvk_SwapChainImages.size());
-	CreateDescriptorPool();
-	CreateDescriptorSets();
 
-	CreateCommandBuffers();
 	CreateSyncObjects();
 }
 
@@ -109,7 +98,7 @@ void Renderer::CleanupSwapChain()
 		vkDestroyBuffer(mvk_Device, mvk_ViewProjectionBuffers[i], nullptr);
 		vkFreeMemory(mvk_Device, mvk_ViewProjectionBuffersMemory[i], nullptr);
 	}
-	vkDestroyDescriptorPool(mvk_Device, mvk_DescriptorPool, nullptr);
+	
 }
 
 void Renderer::RecreateSwapChain()
@@ -123,8 +112,8 @@ void Renderer::RecreateSwapChain()
 	CreateSwapChain();
 	CreateImageViews();
 	CreateRenderPass();
-	m_ShaderManager->CreateDescriptorSetLayout();
-	m_ShaderManager->CreateGraphicsPipeline(mvk_RenderPass);
+	//Can be faulty, needs testing.
+	m_ShaderManager->RecreatePipelines(mvk_RenderPass);
 	CreateDepthResources();
 	CreateFrameBuffers();
 
@@ -408,75 +397,36 @@ void Renderer::CreateRenderPass()
 	}
 }
 
-void Renderer::CreateDescriptorPool()
+void Renderer::CreateDescriptorLayout(DescriptorData& r_Descriptor)
 {
-	std::array<VkDescriptorPoolSize, 2> t_PoolSizes{};
-	t_PoolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	t_PoolSizes[0].descriptorCount = static_cast<uint32_t>(mvk_SwapChainImages.size());
-	t_PoolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-	t_PoolSizes[1].descriptorCount = static_cast<uint32_t>(mvk_SwapChainImages.size());
-
-	VkDescriptorPoolCreateInfo t_PoolInfo{};
-	t_PoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-	t_PoolInfo.poolSizeCount = static_cast<uint32_t>(t_PoolSizes.size());
-	t_PoolInfo.pPoolSizes = t_PoolSizes.data();
-	t_PoolInfo.maxSets = static_cast<uint32_t>(mvk_SwapChainImages.size());
-
-	if (vkCreateDescriptorPool(mvk_Device, &t_PoolInfo, nullptr, &mvk_DescriptorPool) != VK_SUCCESS) 
-	{
-		throw std::runtime_error("failed to create descriptor pool!");
-	}
+	m_ShaderManager->CreateDescriptorSetLayout(r_Descriptor);
 }
 
-void Renderer::CreateDescriptorSets()
+void Renderer::CreateGraphicsPipeline(PipeLineData& r_PipelineData)
 {
-	std::vector<VkDescriptorSetLayout> t_Layouts(mvk_SwapChainImages.size(), mvk_DescriptorSetLayout);
-	
-	VkDescriptorSetAllocateInfo t_AllocInfo{};
-	t_AllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-	t_AllocInfo.descriptorPool = mvk_DescriptorPool;
-	t_AllocInfo.descriptorSetCount = static_cast<uint32_t>(mvk_SwapChainImages.size());
-	t_AllocInfo.pSetLayouts = t_Layouts.data();
-	
-	mvk_DescriptorSets.resize(mvk_SwapChainImages.size());
-	if (vkAllocateDescriptorSets(mvk_Device, &t_AllocInfo, mvk_DescriptorSets.data()) != VK_SUCCESS) 
-	{
-		throw std::runtime_error("failed to allocate descriptor sets!");
-	}
+	m_ShaderManager->CreatePipelineData(mvk_RenderPass, r_PipelineData);
+}
 
-	for (size_t i = 0; i < mvk_SwapChainImages.size(); i++) 
-	{
-		VkDescriptorBufferInfo t_BufferInfo{};
-		t_BufferInfo.buffer = mvk_ViewProjectionBuffers[i];
-		t_BufferInfo.offset = 0;
-		t_BufferInfo.range = sizeof(ViewProjection);
+void Renderer::CreateDescriptorPool(DescriptorData& r_Descriptor)
+{
+	m_ShaderManager->CreateDescriptorPool(mvk_SwapChainImageViews.size(), r_Descriptor);
+}
 
-		VkDescriptorImageInfo t_ImageInfo{};
-		t_ImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-		t_ImageInfo.imageView = p_Textures->at(0).textureImageView;
-		t_ImageInfo.sampler = p_Textures->at(0).textureSampler;
+void Renderer::CreateDescriptorSet(BaseRenderObject* p_RenderObject)
+{
+		m_ShaderManager->CreateDescriptorSet(mvk_SwapChainImageViews.size(), 
+			*p_RenderObject->GetPipeLineData()->p_DescriptorData, mvk_ViewProjectionBuffers);
+}
 
-		std::array<VkWriteDescriptorSet, 2> t_DescriptorWrites{};
-		//Uniform Info
-		t_DescriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		t_DescriptorWrites[0].dstSet = mvk_DescriptorSets[i];
-		t_DescriptorWrites[0].dstBinding = 0;
-		t_DescriptorWrites[0].dstArrayElement = 0;
-		t_DescriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-		t_DescriptorWrites[0].descriptorCount = 1;
-		t_DescriptorWrites[0].pBufferInfo = &t_BufferInfo;
-		//Image Info
-		t_DescriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		t_DescriptorWrites[1].dstSet = mvk_DescriptorSets[i];
-		t_DescriptorWrites[1].dstBinding = 1;
-		t_DescriptorWrites[1].dstArrayElement = 0;
-		t_DescriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-		t_DescriptorWrites[1].descriptorCount = 1;
-		t_DescriptorWrites[1].pImageInfo = &t_ImageInfo;
+void Renderer::CreateCommandBuffer(BaseRenderObject* a_RenderObject)
+{
+	m_CommandHandler->CreateCommand(m_CurrentFrame, FindQueueFamilies(mvk_PhysicalDevice).graphicsFamily.value(),
+		a_RenderObject, mvk_RenderPass, mvk_SwapChainFrameBuffers[m_CurrentFrame], mvk_SwapChainExtent);
+}
 
-		vkUpdateDescriptorSets(mvk_Device, static_cast<uint32_t>(t_DescriptorWrites.size()), 
-			t_DescriptorWrites.data(), 0, nullptr);
-	}
+void Renderer::FreeCommandBuffers()
+{
+	m_CommandHandler->FreeDynamicCommandBuffers(m_CurrentFrame);
 }
 
 void Renderer::CreateFrameBuffers()
@@ -515,77 +465,76 @@ void Renderer::CreateDepthResources()
 {
 	m_DepthHandler->CreateDepthResources(mvk_SwapChainExtent.width, mvk_SwapChainExtent.height);
 }
-
-void Renderer::CreateCommandBuffers()
-{
-	mvk_CommandBuffers.resize(mvk_SwapChainFrameBuffers.size());
-
-	VkCommandBufferAllocateInfo t_AllocInfo{};
-	t_AllocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-	t_AllocInfo.commandPool = mvk_CommandPool;
-	t_AllocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-	t_AllocInfo.commandBufferCount = (uint32_t)mvk_CommandBuffers.size();
-
-	if (vkAllocateCommandBuffers(mvk_Device, &t_AllocInfo, mvk_CommandBuffers.data()) != VK_SUCCESS) {
-		throw std::runtime_error("failed to allocate command buffers!");
-	}
-
-	for (size_t i = 0; i < mvk_CommandBuffers.size(); i++) {
-		VkCommandBufferBeginInfo t_BeginInfo{};
-		t_BeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-		t_BeginInfo.flags = 0; // Optional
-		t_BeginInfo.pInheritanceInfo = nullptr; // Optional
-
-		if (vkBeginCommandBuffer(mvk_CommandBuffers[i], &t_BeginInfo) != VK_SUCCESS) {
-			throw std::runtime_error("failed to begin recording command buffer!");
-		}
-
-		VkRenderPassBeginInfo t_RenderPassInfo{};
-		t_RenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-		t_RenderPassInfo.renderPass = mvk_RenderPass;
-		t_RenderPassInfo.framebuffer = mvk_SwapChainFrameBuffers[i];
-
-		t_RenderPassInfo.renderArea.offset = { 0, 0 };
-		t_RenderPassInfo.renderArea.extent = mvk_SwapChainExtent;
-
-		std::array<VkClearValue, 2> t_ClearValues{};
-		t_ClearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
-		t_ClearValues[1].depthStencil = { 1.0f, 0 };
-
-		t_RenderPassInfo.clearValueCount = static_cast<uint32_t>(t_ClearValues.size());;
-		t_RenderPassInfo.pClearValues = t_ClearValues.data();
-
-		//Begin the drawing.
-		vkCmdBeginRenderPass(mvk_CommandBuffers[i], &t_RenderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-
-		vkCmdBindPipeline(mvk_CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, mvk_Pipeline);
-		
-		//BIND THE UNIFORM BUFFER.
-		vkCmdBindDescriptorSets(mvk_CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, mvk_PipelineLayout, 0, 1, &mvk_DescriptorSets[i], 0, nullptr);
-		for (size_t j = 0; j < p_RenderObjects->size(); j++)
-		{
-			VkBuffer t_VertexBuffers[] = { p_RenderObjects->at(j)->GetVertexData()->GetBuffer() };
-			VkDeviceSize t_Offsets[] = { 0 };
-			vkCmdBindVertexBuffers(mvk_CommandBuffers[i], 0, 1, t_VertexBuffers, t_Offsets);
-
-			vkCmdBindIndexBuffer(mvk_CommandBuffers[i], p_RenderObjects->at(j)->GetIndexData()->GetBuffer(), 0, VK_INDEX_TYPE_UINT16);
-
-			//ConstantPushing, look in ShaderManager for more information.
-			vkCmdPushConstants(mvk_CommandBuffers[i], mvk_PipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(InstanceModel), &p_RenderObjects->at(j)->GetModelMatrix());
-
-			//Draw the test triangles.
-			//vkCmdDraw(mvk_CommandBuffers[i], static_cast<uint32_t>(TEMPMESH->GetVertexData()->GetElementCount()), 1, 0, 0);
-			vkCmdDrawIndexed(mvk_CommandBuffers[i], static_cast<uint32_t>(p_RenderObjects->at(j)->GetIndexData()->GetElementCount()), 1, 0, 0, 0);
-		}
-
-		vkCmdEndRenderPass(mvk_CommandBuffers[i]);
-
-		if (vkEndCommandBuffer(mvk_CommandBuffers[i]) != VK_SUCCESS) {
-			throw std::runtime_error("failed to record command buffer!");
-		}
-	}
-
-}
+//
+//void Renderer::CreateCommandBuffers()
+//{
+//	mvk_CommandBuffers.resize(mvk_SwapChainFrameBuffers.size());
+//
+//	VkCommandBufferAllocateInfo t_AllocInfo{};
+//	t_AllocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+//	t_AllocInfo.commandPool = mvk_CommandPool;
+//	t_AllocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+//	t_AllocInfo.commandBufferCount = (uint32_t)mvk_CommandBuffers.size();
+//
+//	if (vkAllocateCommandBuffers(mvk_Device, &t_AllocInfo, mvk_CommandBuffers.data()) != VK_SUCCESS) {
+//		throw std::runtime_error("failed to allocate command buffers!");
+//	}
+//
+//	for (size_t i = 0; i < mvk_CommandBuffers.size(); i++) {
+//		VkCommandBufferBeginInfo t_BeginInfo{};
+//		t_BeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+//		t_BeginInfo.flags = 0; // Optional
+//		t_BeginInfo.pInheritanceInfo = nullptr; // Optional
+//
+//		if (vkBeginCommandBuffer(mvk_CommandBuffers[i], &t_BeginInfo) != VK_SUCCESS) {
+//			throw std::runtime_error("failed to begin recording command buffer!");
+//		}
+//
+//		VkRenderPassBeginInfo t_RenderPassInfo{};
+//		t_RenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+//		t_RenderPassInfo.renderPass = mvk_RenderPass;
+//		t_RenderPassInfo.framebuffer = mvk_SwapChainFrameBuffers[i];
+//
+//		t_RenderPassInfo.renderArea.offset = { 0, 0 };
+//		t_RenderPassInfo.renderArea.extent = mvk_SwapChainExtent;
+//
+//		std::array<VkClearValue, 2> t_ClearValues{};
+//		t_ClearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
+//		t_ClearValues[1].depthStencil = { 1.0f, 0 };
+//
+//		t_RenderPassInfo.clearValueCount = static_cast<uint32_t>(t_ClearValues.size());;
+//		t_RenderPassInfo.pClearValues = t_ClearValues.data();
+//
+//		//Begin the drawing.
+//		vkCmdBeginRenderPass(mvk_CommandBuffers[i], &t_RenderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+//
+//		vkCmdBindPipeline(mvk_CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, mvk_Pipeline);
+//		
+//		//BIND THE UNIFORM BUFFER.
+//		vkCmdBindDescriptorSets(mvk_CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, mvk_PipelineLayout, 0, 1, &mvk_DescriptorSets[i], 0, nullptr);
+//		for (size_t j = 0; j < p_RenderObjects->size(); j++)
+//		{
+//			VkBuffer t_VertexBuffers[] = { p_RenderObjects->at(j)->GetVertexData()->GetBuffer() };
+//			VkDeviceSize t_Offsets[] = { 0 };
+//			vkCmdBindVertexBuffers(mvk_CommandBuffers[i], 0, 1, t_VertexBuffers, t_Offsets);
+//
+//			vkCmdBindIndexBuffer(mvk_CommandBuffers[i], p_RenderObjects->at(j)->GetIndexData()->GetBuffer(), 0, VK_INDEX_TYPE_UINT16);
+//
+//			//ConstantPushing, look in ShaderManager for more information.
+//			vkCmdPushConstants(mvk_CommandBuffers[i], mvk_PipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(InstanceModel), &p_RenderObjects->at(j)->GetModelMatrix());
+//
+//			//Draw the test triangles.
+//			//vkCmdDraw(mvk_CommandBuffers[i], static_cast<uint32_t>(TEMPMESH->GetVertexData()->GetElementCount()), 1, 0, 0);
+//			vkCmdDrawIndexed(mvk_CommandBuffers[i], static_cast<uint32_t>(p_RenderObjects->at(j)->GetIndexData()->GetElementCount()), 1, 0, 0, 0);
+//		}
+//
+//		vkCmdEndRenderPass(mvk_CommandBuffers[i]);
+//
+//		if (vkEndCommandBuffer(mvk_CommandBuffers[i]) != VK_SUCCESS) {
+//			throw std::runtime_error("failed to record command buffer!");
+//		}
+//	}
+//}
 
 void Renderer::CreateSyncObjects()
 {
@@ -657,6 +606,12 @@ void Renderer::DrawFrame(uint32_t& r_ImageIndex, float a_dt)
 	// Mark the image as now being in use by this frame
 	mvk_ImagesInFlight[r_ImageIndex] = mvk_InFlightFences[m_CurrentFrame];
 
+	m_CommandHandler->FreeDynamicCommandBuffers(m_CurrentFrame);
+	for (size_t i = 0; i < p_RenderObjects->size(); i++)
+	{
+		CreateCommandBuffer(p_RenderObjects->at(i));
+	}
+
 	VkSubmitInfo t_SubmitInfo{};
 	t_SubmitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
@@ -666,7 +621,7 @@ void Renderer::DrawFrame(uint32_t& r_ImageIndex, float a_dt)
 	t_SubmitInfo.pWaitSemaphores = t_WaitSemaphores;
 	t_SubmitInfo.pWaitDstStageMask = waitStages;
 
-	DrawCommands& r_DrawCommands = m_CommandHandler->GetDrawCommands();
+	DrawCommands& r_DrawCommands = m_CommandHandler->GetDrawCommands(m_CurrentFrame);
 
 	t_SubmitInfo.commandBufferCount = static_cast<uint32_t>(r_DrawCommands.CommandBuffers.size());
 	t_SubmitInfo.pCommandBuffers = r_DrawCommands.CommandBuffers.data();
@@ -706,7 +661,7 @@ void Renderer::DrawFrame(uint32_t& r_ImageIndex, float a_dt)
 	}
 
 	//vkQueueWaitIdle(m_VKPresentQueue);
-
+	m_PreviousFrame = m_CurrentFrame;
 	m_CurrentFrame = (m_CurrentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
 

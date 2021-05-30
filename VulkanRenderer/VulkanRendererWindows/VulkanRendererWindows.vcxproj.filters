@@ -127,5 +127,8 @@
     <ClInclude Include="MainRenderer\Handlers\DepthHandler.h">
       <Filter>MainRenderer\Handlers</Filter>
     </ClInclude>
+    <ClInclude Include="MainRenderer\Structs\PipelineData.h">
+      <Filter>MainRenderer\Structs</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

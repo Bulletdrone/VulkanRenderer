@@ -5,6 +5,8 @@
 #include <optional>
 #include <vector>
 
+#include <RenderObjects/BaseRenderObject.h>
+
 //Special struct for the Family Queue.
 struct QueueFamilyIndices {
 	std::optional<uint32_t> graphicsFamily;
@@ -17,8 +19,6 @@ struct QueueFamilyIndices {
 
 struct DrawCommands
 {
-	~DrawCommands();
-
 	VkCommandBuffer mvk_MainBuffer;
 	std::vector<VkCommandBuffer> CommandBuffers;
 };
@@ -31,8 +31,9 @@ public:
 
 	void CreateCommandPools(QueueFamilyIndices a_QueueFamilyIndices);
 	void FreeCommandPool();
+	void FreeDynamicCommandBuffers(uint32_t a_Frame);
 
-	void CreateCommand();
+	void CreateCommand(size_t a_Frame, uint32_t a_QueueFamilyIndex, BaseRenderObject* a_RenderObject, VkRenderPass& r_RenderPass, VkFramebuffer& r_SwapChainFrameBuffer, VkExtent2D& r_SwapChainExtent);
 
 	VkCommandBuffer BeginSingleTimeCommands();
 	void EndSingleTimeCommands(VkCommandBuffer a_CommandBuffer);
@@ -40,14 +41,14 @@ public:
 	VkCommandPoolCreateInfo CreateCommandPoolInfo(uint32_t a_QueueFamilyIndex, VkCommandPoolCreateFlags a_Flags);
 	VkCommandBufferAllocateInfo CreateCommandBufferInfo(VkCommandPool& r_Pool, uint32_t a_Count, VkCommandBufferLevel a_Level);
 
-	DrawCommands& GetDrawCommands() { return m_DrawCommands; }
+	DrawCommands& GetDrawCommands(size_t a_Frame) { return m_DrawCommands[a_Frame]; }
 
 private:
 	VkCommandPool mvk_CommandPool;
 
 	//Buffer Commands
 
-	DrawCommands m_DrawCommands;
+	DrawCommands m_DrawCommands[2];
 	//std::vector<VkCommandBuffer> mvk_CommandBuffers;
 
 	VkDevice& rm_Device;

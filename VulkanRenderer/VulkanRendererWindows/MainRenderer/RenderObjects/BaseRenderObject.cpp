@@ -1,7 +1,7 @@
 #include "BaseRenderObject.h"
 
-BaseRenderObject::BaseRenderObject(const size_t a_ID, Transform* a_Transform)
-	:	m_ID(a_ID)
+BaseRenderObject::BaseRenderObject(const size_t a_ID, Transform* a_Transform, PipeLineData* a_PipeLineData)
+	:	m_ID(a_ID), p_PipeLineData(a_PipeLineData)
 {
 	m_Transform = a_Transform;
 	UpdateModelMatrix();

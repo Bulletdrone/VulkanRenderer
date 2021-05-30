@@ -3,17 +3,150 @@
 
 #include <iostream>
 
-ShaderManager::ShaderManager(const VkDevice& r_VKDevice, const VkExtent2D& r_VKSwapChainExtent,
-	VkDescriptorSetLayout& r_DescriptorSetLayout, VkPipelineLayout& r_VKPipelineLayout, VkPipeline& r_VKPipeline)
-	:	rmvk_Device(r_VKDevice), rmvk_SwapChainExtent(r_VKSwapChainExtent),
-		rmvk_DescriptorSetLayout(r_DescriptorSetLayout),
-		rmvk_PipelineLayout(r_VKPipelineLayout), rmvk_Pipeline(r_VKPipeline)
+ShaderManager::ShaderManager(const VkDevice& r_VKDevice, const VkExtent2D& r_VKSwapChainExtent)
+	:	rmvk_Device(r_VKDevice), rmvk_SwapChainExtent(r_VKSwapChainExtent)
 {}
 
 ShaderManager::~ShaderManager()
-{}
+{
+	for (size_t i = 0; i < p_SavedDescriptors.size(); i++)
+	{
+		vkDestroyDescriptorSetLayout(rmvk_Device, p_SavedDescriptors[i]->descriptorLayout, nullptr);
+	}
+}
 
-void ShaderManager::CreateGraphicsPipeline(const VkRenderPass& r_RenderPass)
+void ShaderManager::CreateDescriptorSetLayout(DescriptorData& r_DescriptorData)
+{
+	VkDescriptorSetLayoutBinding t_UboLayoutBinding{};
+	t_UboLayoutBinding.binding = 0;
+	t_UboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	t_UboLayoutBinding.descriptorCount = 1;
+	t_UboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+	t_UboLayoutBinding.pImmutableSamplers = nullptr; // Optional
+
+	VkDescriptorSetLayoutBinding t_SamplerLayoutBinding{};
+	t_SamplerLayoutBinding.binding = 1;
+	t_SamplerLayoutBinding.descriptorCount = 1;
+	t_SamplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+	t_SamplerLayoutBinding.pImmutableSamplers = nullptr;
+	t_SamplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+
+	std::array<VkDescriptorSetLayoutBinding, 2> t_Bindings = { t_UboLayoutBinding, t_SamplerLayoutBinding };
+	VkDescriptorSetLayoutCreateInfo t_LayoutInfo{};
+	t_LayoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+	t_LayoutInfo.bindingCount = static_cast<uint32_t>(t_Bindings.size());
+	t_LayoutInfo.pBindings = t_Bindings.data();
+
+
+	if (vkCreateDescriptorSetLayout(rmvk_Device, &t_LayoutInfo, nullptr, &r_DescriptorData.descriptorLayout) != VK_SUCCESS) {
+		throw std::runtime_error("failed to create descriptor set layout!");
+	}
+}
+
+void ShaderManager::CreatePipelineData(const VkRenderPass& r_RenderPass, PipeLineData& r_PipeLineData)
+{
+	CreateGraphicsPipeline(r_RenderPass, r_PipeLineData);
+
+	p_SavedPipelines.push_back(&r_PipeLineData);
+}
+
+void ShaderManager::RecreatePipelines(const VkRenderPass& r_RenderPass)
+{
+	for (size_t i = 0; i < p_SavedPipelines.size(); i++)
+	{
+		CreateGraphicsPipeline(r_RenderPass, *p_SavedPipelines[i]);
+	}
+}
+
+void ShaderManager::CreateDescriptorPool(const size_t a_FrameAmount, DescriptorData& r_DescriptorData)
+{
+	std::array<VkDescriptorPoolSize, 2> t_PoolSizes{};
+	t_PoolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	t_PoolSizes[0].descriptorCount = static_cast<uint32_t>(a_FrameAmount);
+	t_PoolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+	t_PoolSizes[1].descriptorCount = static_cast<uint32_t>(a_FrameAmount);
+
+	VkDescriptorPoolCreateInfo t_PoolInfo{};
+	t_PoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+	t_PoolInfo.poolSizeCount = static_cast<uint32_t>(t_PoolSizes.size());
+	t_PoolInfo.pPoolSizes = t_PoolSizes.data();
+	t_PoolInfo.maxSets = static_cast<uint32_t>(a_FrameAmount);
+
+	if (vkCreateDescriptorPool(rmvk_Device, &t_PoolInfo, nullptr, &r_DescriptorData.descriptorPool) != VK_SUCCESS)
+	{
+		throw std::runtime_error("failed to create descriptor pool!");
+	}
+}
+
+void ShaderManager::CreateDescriptorSet(const size_t a_FrameAmount, DescriptorData& r_DescriptorData, std::vector<VkBuffer>& r_ViewProjectionBuffers)
+{
+	std::vector<VkDescriptorSetLayout> t_Layouts(a_FrameAmount, r_DescriptorData.descriptorLayout);
+
+	VkDescriptorSetAllocateInfo t_AllocInfo{};
+	t_AllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+	t_AllocInfo.descriptorPool = r_DescriptorData.descriptorPool;
+	t_AllocInfo.descriptorSetCount = 1;//static_cast<uint32_t>(a_FrameAmount);
+	t_AllocInfo.pSetLayouts = t_Layouts.data();
+
+	std::vector<VkBuffer> DescriptorSet;
+	DescriptorSet.resize(2);
+
+	if (vkAllocateDescriptorSets(rmvk_Device, &t_AllocInfo, DescriptorSet.data()) != VK_SUCCESS)
+	{
+		throw std::runtime_error("failed to allocate descriptor sets!");
+	}
+
+	for (size_t i = 0; i < a_FrameAmount; i++)
+	{
+		VkDescriptorBufferInfo t_BufferInfo{};
+		t_BufferInfo.buffer = r_ViewProjectionBuffers[i];
+		t_BufferInfo.offset = 0;
+		t_BufferInfo.range = sizeof(ViewProjection);
+
+		VkDescriptorImageInfo t_ImageInfo{};
+		t_ImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+		t_ImageInfo.imageView = r_DescriptorData.texture->textureImageView;
+		t_ImageInfo.sampler = r_DescriptorData.texture->textureSampler;
+
+		std::array<VkWriteDescriptorSet, 2> t_DescriptorWrites{};
+		//Uniform Info
+		t_DescriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		t_DescriptorWrites[0].dstSet = DescriptorSet[i];
+		t_DescriptorWrites[0].dstBinding = 0;
+		t_DescriptorWrites[0].dstArrayElement = 0;
+		t_DescriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		t_DescriptorWrites[0].descriptorCount = 1;
+		t_DescriptorWrites[0].pBufferInfo = &t_BufferInfo;
+		//Image Info
+		t_DescriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		t_DescriptorWrites[1].dstSet = DescriptorSet[i];
+		t_DescriptorWrites[1].dstBinding = 1;
+		t_DescriptorWrites[1].dstArrayElement = 0;
+		t_DescriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		t_DescriptorWrites[1].descriptorCount = 1;
+		t_DescriptorWrites[1].pImageInfo = &t_ImageInfo;
+
+		vkUpdateDescriptorSets(rmvk_Device, static_cast<uint32_t>(t_DescriptorWrites.size()),
+			t_DescriptorWrites.data(), 0, nullptr);
+
+		r_DescriptorData.descriptorSets[i].push_back(DescriptorSet[i]);
+	}
+}
+
+//void ShaderManager::RecreateDescriptors(const size_t a_FrameAmount, std::vector<VkBuffer>& r_ViewProjectionBuffers)
+//{
+//	for (size_t i = 0; i < p_SavedDescriptors.size(); i++)
+//	{
+//		vkDestroyDescriptorPool(rmvk_Device, p_SavedDescriptors[i]->descriptorPool, nullptr);
+//
+//
+//		CreateDescriptorSetLayout(*p_SavedDescriptors[i]);
+//		CreateDescriptorPool(a_FrameAmount, *p_SavedDescriptors[i]);
+//		CreateDescriptorSet(a_FrameAmount, *p_SavedDescriptors[i], r_ViewProjectionBuffers);
+//	}
+//}
+
+void ShaderManager::CreateGraphicsPipeline(const VkRenderPass& r_RenderPass, PipeLineData& r_PipeLineData)
 {
 	auto t_VertShaderCode = ResourceLoader::ReadFile("../Resources/Shaders/unlitVert.spv");
 	auto t_FragShaderCode = ResourceLoader::ReadFile("../Resources/Shaders/unlitFrag.spv");
@@ -148,11 +281,11 @@ void ShaderManager::CreateGraphicsPipeline(const VkRenderPass& r_RenderPass)
 	VkPipelineLayoutCreateInfo t_PipelineLayoutInfo{};
 	t_PipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 	t_PipelineLayoutInfo.setLayoutCount = 1; // Optional
-	t_PipelineLayoutInfo.pSetLayouts = &rmvk_DescriptorSetLayout; // Optional
+	t_PipelineLayoutInfo.pSetLayouts = &r_PipeLineData.p_DescriptorData->descriptorLayout; // Optional
 	t_PipelineLayoutInfo.pushConstantRangeCount = 1; // Optional
 	t_PipelineLayoutInfo.pPushConstantRanges = &t_InstanceModelPushConstantRange; // Optional
 
-	if (vkCreatePipelineLayout(rmvk_Device, &t_PipelineLayoutInfo, nullptr, &rmvk_PipelineLayout) != VK_SUCCESS) {
+	if (vkCreatePipelineLayout(rmvk_Device, &t_PipelineLayoutInfo, nullptr, &r_PipeLineData.pipeLineLayout) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create pipeline layout!");
 	}
 
@@ -171,7 +304,7 @@ void ShaderManager::CreateGraphicsPipeline(const VkRenderPass& r_RenderPass)
 	t_PipelineInfo.pDynamicState = nullptr; // Optional
 
 
-	t_PipelineInfo.layout = rmvk_PipelineLayout;
+	t_PipelineInfo.layout = r_PipeLineData.pipeLineLayout;
 
 	t_PipelineInfo.renderPass = r_RenderPass;
 	t_PipelineInfo.subpass = 0;
@@ -179,40 +312,12 @@ void ShaderManager::CreateGraphicsPipeline(const VkRenderPass& r_RenderPass)
 	t_PipelineInfo.basePipelineHandle = VK_NULL_HANDLE; // Optional
 	t_PipelineInfo.basePipelineIndex = -1; // Optional
 
-	if (vkCreateGraphicsPipelines(rmvk_Device, VK_NULL_HANDLE, 1, &t_PipelineInfo, nullptr, &rmvk_Pipeline) != VK_SUCCESS) {
+	if (vkCreateGraphicsPipelines(rmvk_Device, VK_NULL_HANDLE, 1, &t_PipelineInfo, nullptr, &r_PipeLineData.pipeLine) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create graphics pipeline!");
 	}
 
 	vkDestroyShaderModule(rmvk_Device, t_VertShaderModule, nullptr);
 	vkDestroyShaderModule(rmvk_Device, t_FragShaderModule, nullptr);
-}
-
-void ShaderManager::CreateDescriptorSetLayout()
-{
-	VkDescriptorSetLayoutBinding t_UboLayoutBinding{};
-	t_UboLayoutBinding.binding = 0;
-	t_UboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	t_UboLayoutBinding.descriptorCount = 1;
-	t_UboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-	t_UboLayoutBinding.pImmutableSamplers = nullptr; // Optional
-
-	VkDescriptorSetLayoutBinding t_SamplerLayoutBinding{};
-	t_SamplerLayoutBinding.binding = 1;
-	t_SamplerLayoutBinding.descriptorCount = 1;
-	t_SamplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-	t_SamplerLayoutBinding.pImmutableSamplers = nullptr;
-	t_SamplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-
-	std::array<VkDescriptorSetLayoutBinding, 2> t_Bindings = { t_UboLayoutBinding, t_SamplerLayoutBinding };
-	VkDescriptorSetLayoutCreateInfo t_LayoutInfo{};
-	t_LayoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-	t_LayoutInfo.bindingCount = static_cast<uint32_t>(t_Bindings.size());
-	t_LayoutInfo.pBindings = t_Bindings.data();
-
-
-	if (vkCreateDescriptorSetLayout(rmvk_Device, &t_LayoutInfo, nullptr, &rmvk_DescriptorSetLayout) != VK_SUCCESS) {
-		throw std::runtime_error("failed to create descriptor set layout!");
-	}
 }
 
 VkShaderModule ShaderManager::CreateShaderModule(const std::vector<char>& a_Code)

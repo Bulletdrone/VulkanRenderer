@@ -23,18 +23,86 @@ void CommandHandler::CreateCommandPools(QueueFamilyIndices a_QueueFamilyIndices)
 void CommandHandler::FreeCommandPool()
 {
     //vkFreeCommandBuffers(rm_Device, mvk_CommandPool, static_cast<uint32_t>(mvk_CommandBuffers.size()), mvk_CommandBuffers.data());
-    vkFreeCommandBuffers(rm_Device, mvk_CommandPool, 1, mvk_MainBuffer);
-
+    //vkFreeCommandBuffers(rm_Device, mvk_CommandPool, 1, &m_DrawCommands.mvk_MainBuffer);
 }
 
-void CommandHandler::CreateCommand()
+void CommandHandler::FreeDynamicCommandBuffers(uint32_t a_Frame)
 {
+    if (m_DrawCommands[a_Frame].CommandBuffers.size() > 0)
+    {
+        vkFreeCommandBuffers(rm_Device, mvk_CommandPool, static_cast<uint32_t>(m_DrawCommands[a_Frame].CommandBuffers.size()), m_DrawCommands[a_Frame].CommandBuffers.data());
+        m_DrawCommands[a_Frame].CommandBuffers.clear();
+    }
+}
+
+void CommandHandler::CreateCommand(size_t a_Frame, uint32_t a_QueueFamilyIndex, BaseRenderObject* a_RenderObject, 
+    VkRenderPass& r_RenderPass, VkFramebuffer& r_SwapChainFrameBuffer, VkExtent2D& r_SwapChainExtent)
+{
+    VkCommandBuffer t_CommandBuffer;
+    VkCommandPoolCreateInfo t_CommandPoolInfo = CreateCommandPoolInfo(a_QueueFamilyIndex, VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT);
+
     //allocate the default command buffer that we will use for rendering
     VkCommandBufferAllocateInfo t_CmdAllocInfo = CreateCommandBufferInfo(mvk_CommandPool, 1, VK_COMMAND_BUFFER_LEVEL_PRIMARY);
 
-    if (vkAllocateCommandBuffers(rm_Device, &t_CmdAllocInfo, &mvk_MainBuffer) != VK_SUCCESS) {
+    if (vkAllocateCommandBuffers(rm_Device, &t_CmdAllocInfo, &t_CommandBuffer) != VK_SUCCESS) {
         throw std::runtime_error("failed to create command pool!");
     }
+
+    VkCommandBufferBeginInfo t_BeginInfo{};
+    t_BeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    t_BeginInfo.flags = 0; // Optional
+    t_BeginInfo.pInheritanceInfo = nullptr; // Optional
+
+    if (vkBeginCommandBuffer(t_CommandBuffer, &t_BeginInfo) != VK_SUCCESS) {
+        throw std::runtime_error("failed to begin recording command buffer!");
+    }
+
+    VkRenderPassBeginInfo t_RenderPassInfo{};
+    t_RenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    t_RenderPassInfo.renderPass = r_RenderPass;
+    t_RenderPassInfo.framebuffer = r_SwapChainFrameBuffer;
+
+    t_RenderPassInfo.renderArea.offset = { 0, 0 };
+    t_RenderPassInfo.renderArea.extent = r_SwapChainExtent;
+
+    std::array<VkClearValue, 2> t_ClearValues{};
+    t_ClearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
+    t_ClearValues[1].depthStencil = { 1.0f, 0 };
+
+    t_RenderPassInfo.clearValueCount = static_cast<uint32_t>(t_ClearValues.size());;
+    t_RenderPassInfo.pClearValues = t_ClearValues.data();
+
+
+    //Begin the drawing.
+    vkCmdBeginRenderPass(t_CommandBuffer, &t_RenderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+    vkCmdBindPipeline(t_CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, a_RenderObject->GetPipeLineData()->pipeLine);
+
+    //BIND THE UNIFORM BUFFER.
+    vkCmdBindDescriptorSets(t_CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, a_RenderObject->GetPipeLineData()->pipeLineLayout, 0, 1, &a_RenderObject->GetPipeLineData()->p_DescriptorData->descriptorSets[0], 0, nullptr);
+
+
+    //Setting up object.
+    VkBuffer t_VertexBuffers[] = { a_RenderObject->GetVertexData()->GetBuffer() };
+    VkDeviceSize t_Offsets[] = { 0 };
+    vkCmdBindVertexBuffers(t_CommandBuffer, 0, 1, t_VertexBuffers, t_Offsets);
+
+    vkCmdBindIndexBuffer(t_CommandBuffer, a_RenderObject->GetIndexData()->GetBuffer(), 0, VK_INDEX_TYPE_UINT16);
+
+    //ConstantPushing, look in ShaderManager for more information.
+    vkCmdPushConstants(t_CommandBuffer, a_RenderObject->GetPipeLineData()->pipeLineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(InstanceModel), &a_RenderObject->GetModelMatrix());
+    
+    //vkCmdDraw(mvk_CommandBuffers[i], static_cast<uint32_t>(TEMPMESH->GetVertexData()->GetElementCount()), 1, 0, 0);
+    vkCmdDrawIndexed(t_CommandBuffer, static_cast<uint32_t>(a_RenderObject->GetIndexData()->GetElementCount()), 1, 0, 0, 0);
+
+    //Stop recording the buffer.
+    vkCmdEndRenderPass(t_CommandBuffer);
+
+    if (vkEndCommandBuffer(t_CommandBuffer) != VK_SUCCESS) {
+        throw std::runtime_error("failed to record command buffer!");
+    }
+
+    m_DrawCommands[a_Frame].CommandBuffers.push_back(t_CommandBuffer);
 }
 
 VkCommandBuffer CommandHandler::BeginSingleTimeCommands()

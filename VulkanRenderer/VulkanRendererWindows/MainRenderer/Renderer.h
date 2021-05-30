@@ -5,8 +5,6 @@
 #include "ShaderManager.h"
 #include "VulkanDebugger/VulkanDebug.h"
 
-#include "RenderObjects/BaseRenderObject.h"
-
 //Handlers
 #include "Handlers/BufferHandler.h"
 #include "Handlers/CommandHandler.h"
@@ -42,8 +40,14 @@ public:
 	void CreateImageViews();
 	void CreateRenderPass();
 
-	void CreateDescriptorPool();
-	void CreateDescriptorSets();
+	void CreateDescriptorLayout(DescriptorData& r_Descriptor);
+	void CreateGraphicsPipeline(PipeLineData& r_PipelineData);
+	void CreateDescriptorPool(DescriptorData& r_Descriptor);
+	void CreateDescriptorSet(BaseRenderObject* p_RenderObject);
+
+	//CommandBuffering.
+	void CreateCommandBuffer(BaseRenderObject* a_RenderObject);
+	void FreeCommandBuffers();
 
 	void CreateFrameBuffers();
 	void CreateCommandPool();
@@ -51,7 +55,6 @@ public:
 	void CreateDepthResources();
 
 	//BufferObject Creation.
-	void CreateCommandBuffers();
 	void CreateSyncObjects();
 
 	//BufferData
@@ -107,6 +110,7 @@ private:
 	std::vector<VkFence> mvk_InFlightFences;
 	std::vector<VkFence> mvk_ImagesInFlight;
 	size_t m_CurrentFrame = 0;
+	size_t m_PreviousFrame = -1;
 
 	//Primary Vulkan Data;
 	VkInstance mvk_Instance;
@@ -124,10 +128,6 @@ private:
 
 	//The RenderPipeline.
 	VkRenderPass mvk_RenderPass;
-
-	VkDescriptorSetLayout mvk_DescriptorSetLayout;
-	VkDescriptorPool mvk_DescriptorPool;
-	std::vector<VkDescriptorSet> mvk_DescriptorSets;
 
 	VkPipelineLayout mvk_PipelineLayout;
 	VkPipeline mvk_Pipeline;

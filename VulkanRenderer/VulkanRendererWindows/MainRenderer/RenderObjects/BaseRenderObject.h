@@ -1,11 +1,12 @@
 #pragma once
 #include "Components/Transform.h"
 #include "Components/RenderObjectData.h"
+#include <Structs/PipelineData.h>
 
 class BaseRenderObject
 {
 public:
-	BaseRenderObject(const size_t a_ID, Transform* a_Transform);
+	BaseRenderObject(const size_t a_ID, Transform* a_Transform, PipeLineData* a_PipeLineData);
 	~BaseRenderObject();
 
 	virtual void Update() = 0;
@@ -21,6 +22,7 @@ public:
 	//Getters
 	const glm::mat4& GetModelMatrix() const { return m_Model; }
 
+	PipeLineData* GetPipeLineData() const { return p_PipeLineData; }
 	MeshData* GetMeshData() const { return p_RenderObjectData->m_MeshData; }
 	Transform* GetTransform() const { return m_Transform; }
 
@@ -38,4 +40,6 @@ protected:
 
 	//Vertex Data with it's buffers.
 	RenderObjectData* p_RenderObjectData = nullptr;
+	//PipelineData.
+	PipeLineData* p_PipeLineData;
 };
