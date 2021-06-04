@@ -85,10 +85,10 @@ void ShaderManager::CreateDescriptorSet(const size_t a_FrameAmount, DescriptorDa
 	VkDescriptorSetAllocateInfo t_AllocInfo{};
 	t_AllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 	t_AllocInfo.descriptorPool = r_DescriptorData.descriptorPool;
-	t_AllocInfo.descriptorSetCount = 1;//static_cast<uint32_t>(a_FrameAmount);
+	t_AllocInfo.descriptorSetCount = 2;//static_cast<uint32_t>(a_FrameAmount);
 	t_AllocInfo.pSetLayouts = t_Layouts.data();
 
-	std::vector<VkBuffer> DescriptorSet;
+	std::vector<VkDescriptorSet> DescriptorSet;
 	DescriptorSet.resize(2);
 
 	if (vkAllocateDescriptorSets(rmvk_Device, &t_AllocInfo, DescriptorSet.data()) != VK_SUCCESS)

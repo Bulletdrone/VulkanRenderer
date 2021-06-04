@@ -263,17 +263,27 @@ void Renderer::CreateSwapChain()
 
 	//Setting up the SwapChain.
 	uint32_t t_ImageCount = t_SwapChainSupport.capabilities.minImageCount + 1;
+	uint32_t t_ActualImageCount = FRAMEBUFFER_AMOUNT;
 
 	if (t_SwapChainSupport.capabilities.maxImageCount > 0 && t_ImageCount > t_SwapChainSupport.capabilities.maxImageCount) 
 	{
 		t_ImageCount = t_SwapChainSupport.capabilities.maxImageCount;
+
+		//Check if the swapchai can handle at least 2 images.
+		if (t_SwapChainSupport.capabilities.maxImageCount < 2)
+		{
+			throw std::runtime_error("maxImageCount is under 2!");
+		}
+		
 	}
+
+	
 
 	VkSwapchainCreateInfoKHR t_CreateInfo{};
 	t_CreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
 	t_CreateInfo.surface = m_Window->GetSurface();
 
-	t_CreateInfo.minImageCount = t_ImageCount;
+	t_CreateInfo.minImageCount = t_ActualImageCount;
 	t_CreateInfo.imageFormat = t_SurfaceFormat.format;
 	t_CreateInfo.imageColorSpace = t_SurfaceFormat.colorSpace;
 	t_CreateInfo.imageExtent = t_Extent;
@@ -313,9 +323,9 @@ void Renderer::CreateSwapChain()
 		throw std::runtime_error("failed to create swap chain!");
 	}
 
-	vkGetSwapchainImagesKHR(mvk_Device, mvk_SwapChain, &t_ImageCount, nullptr);
-	mvk_SwapChainImages.resize(t_ImageCount);
-	vkGetSwapchainImagesKHR(mvk_Device, mvk_SwapChain, &t_ImageCount, mvk_SwapChainImages.data());
+	vkGetSwapchainImagesKHR(mvk_Device, mvk_SwapChain, &t_ActualImageCount, nullptr);
+	mvk_SwapChainImages.resize(t_ActualImageCount);
+	vkGetSwapchainImagesKHR(mvk_Device, mvk_SwapChain, &t_ActualImageCount, mvk_SwapChainImages.data());
 
 	//Setting the Local variables
 	mvk_SwapChainImageFormat = t_SurfaceFormat.format;

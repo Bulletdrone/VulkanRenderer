@@ -79,7 +79,7 @@ void CommandHandler::CreateCommand(size_t a_Frame, uint32_t a_QueueFamilyIndex, 
     vkCmdBindPipeline(t_CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, a_RenderObject->GetPipeLineData()->pipeLine);
 
     //BIND THE UNIFORM BUFFER.
-    vkCmdBindDescriptorSets(t_CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, a_RenderObject->GetPipeLineData()->pipeLineLayout, 0, 1, &a_RenderObject->GetPipeLineData()->p_DescriptorData->descriptorSets[0], 0, nullptr);
+    vkCmdBindDescriptorSets(t_CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, a_RenderObject->GetPipeLineData()->pipeLineLayout, 0, 1, &a_RenderObject->GetPipeLineData()->p_DescriptorData->descriptorSets[a_Frame].at(0), 0, nullptr);
 
 
     //Setting up object.
