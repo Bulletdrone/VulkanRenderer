@@ -34,10 +34,7 @@ void ObjectManager::SetupStartObjects()
 {
 	p_Renderer->SetupRenderObjects();
 	p_Renderer->CreateDescriptorPool(m_DescriptorData[0]);
-	for (size_t i = 0; i < m_RenderObjects.size(); i++)
-	{
-		p_Renderer->CreateDescriptorSet(m_RenderObjects[i]);
-	}
+	p_Renderer->CreateDescriptorSet(m_DescriptorData[0]);
 }
 
 void ObjectManager::UpdateObjects(float a_Dt)

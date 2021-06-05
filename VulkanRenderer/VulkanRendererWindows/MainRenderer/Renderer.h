@@ -43,7 +43,7 @@ public:
 	void CreateDescriptorLayout(DescriptorData& r_Descriptor);
 	void CreateGraphicsPipeline(PipeLineData& r_PipelineData);
 	void CreateDescriptorPool(DescriptorData& r_Descriptor);
-	void CreateDescriptorSet(BaseRenderObject* p_RenderObject);
+	void CreateDescriptorSet(DescriptorData& r_Descriptor);
 
 	//CommandBuffering.
 	void CreateCommandBuffer(BaseRenderObject* a_RenderObject);

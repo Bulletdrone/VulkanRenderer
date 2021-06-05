@@ -422,10 +422,10 @@ void Renderer::CreateDescriptorPool(DescriptorData& r_Descriptor)
 	m_ShaderManager->CreateDescriptorPool(mvk_SwapChainImageViews.size(), r_Descriptor);
 }
 
-void Renderer::CreateDescriptorSet(BaseRenderObject* p_RenderObject)
+void Renderer::CreateDescriptorSet(DescriptorData& r_Descriptor)
 {
 		m_ShaderManager->CreateDescriptorSet(mvk_SwapChainImageViews.size(), 
-			*p_RenderObject->GetPipeLineData()->p_DescriptorData, mvk_ViewProjectionBuffers);
+			r_Descriptor, mvk_ViewProjectionBuffers);
 }
 
 void Renderer::CreateCommandBuffer(BaseRenderObject* a_RenderObject)
