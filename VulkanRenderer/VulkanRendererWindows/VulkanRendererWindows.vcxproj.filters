@@ -130,5 +130,8 @@
     <ClInclude Include="MainRenderer\Structs\PipelineData.h">
       <Filter>MainRenderer\Structs</Filter>
     </ClInclude>
+    <ClInclude Include="MainRenderer\Structs\CommandData.h">
+      <Filter>MainRenderer\Structs</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
