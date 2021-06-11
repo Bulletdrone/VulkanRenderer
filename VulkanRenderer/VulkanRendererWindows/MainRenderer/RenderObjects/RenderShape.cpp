@@ -12,6 +12,10 @@ RenderShape::~RenderShape()
 
 void RenderShape::Update()
 {
+
+	m_Transform->Rotation.x += 0.0001f;
+
+	UpdateModelMatrix();
 }
 
 void RenderShape::Draw()

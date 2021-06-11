@@ -348,7 +348,7 @@ void Renderer::CreateRenderPass()
 	VkAttachmentDescription t_ColorAttachment{};
 	t_ColorAttachment.format = mvk_SwapChainImageFormat;
 	t_ColorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
-	t_ColorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+	t_ColorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
 	t_ColorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
 	t_ColorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 	t_ColorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
