@@ -46,7 +46,6 @@ public:
 	void CreateDescriptorSet(DescriptorData& r_Descriptor);
 
 	//CommandBuffering.
-	void CreateCommandBuffer(BaseRenderObject* a_RenderObject);
 	void FreeCommandBuffers();
 
 	void CreateFrameBuffers();
@@ -62,6 +61,7 @@ public:
 	void SetupImage(TextureData& a_TextureData, const char* a_ImagePath);
 
 	void DrawFrame(uint32_t& r_ImageIndex, float a_dt);
+	void DrawObjects(VkCommandBuffer& r_CmdBuffer);
 	void UpdateUniformBuffer(uint32_t a_CurrentImage, float a_dt);
 
 	//QueueFamily

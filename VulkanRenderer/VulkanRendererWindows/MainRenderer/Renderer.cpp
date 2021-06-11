@@ -428,12 +428,6 @@ void Renderer::CreateDescriptorSet(DescriptorData& r_Descriptor)
 			r_Descriptor, mvk_ViewProjectionBuffers);
 }
 
-void Renderer::CreateCommandBuffer(BaseRenderObject* a_RenderObject)
-{
-	m_CommandHandler->CreateCommand(m_CurrentFrame, FindQueueFamilies(mvk_PhysicalDevice).graphicsFamily.value(),
-		a_RenderObject, mvk_RenderPass, mvk_SwapChainFrameBuffers[m_CurrentFrame], mvk_SwapChainExtent);
-}
-
 void Renderer::FreeCommandBuffers()
 {
 	m_CommandHandler->FreeDynamicCommandBuffers(m_CurrentFrame);
@@ -616,11 +610,14 @@ void Renderer::DrawFrame(uint32_t& r_ImageIndex, float a_dt)
 	// Mark the image as now being in use by this frame
 	mvk_ImagesInFlight[r_ImageIndex] = mvk_InFlightFences[m_CurrentFrame];
 
-	m_CommandHandler->FreeDynamicCommandBuffers(m_CurrentFrame);
-	for (size_t i = 0; i < p_RenderObjects->size(); i++)
-	{
-		CreateCommandBuffer(p_RenderObjects->at(i));
-	}
+	//Draw the objects using a single command buffer.
+	m_CommandHandler->ClearPreviousCommand(m_CurrentFrame);
+	VkCommandBuffer& t_MainBuffer = m_CommandHandler->CreateAndBeginCommand(m_CurrentFrame, FindQueueFamilies(mvk_PhysicalDevice).graphicsFamily.value(),
+		mvk_RenderPass, mvk_SwapChainFrameBuffers[m_CurrentFrame], mvk_SwapChainExtent);
+
+	DrawObjects(t_MainBuffer);
+	m_CommandHandler->EndCommand(t_MainBuffer);
+
 
 	VkSubmitInfo t_SubmitInfo{};
 	t_SubmitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -631,10 +628,8 @@ void Renderer::DrawFrame(uint32_t& r_ImageIndex, float a_dt)
 	t_SubmitInfo.pWaitSemaphores = t_WaitSemaphores;
 	t_SubmitInfo.pWaitDstStageMask = waitStages;
 
-	DrawCommands& r_DrawCommands = m_CommandHandler->GetDrawCommands(m_CurrentFrame);
-
-	t_SubmitInfo.commandBufferCount = static_cast<uint32_t>(r_DrawCommands.CommandBuffers.size());
-	t_SubmitInfo.pCommandBuffers = r_DrawCommands.CommandBuffers.data();
+	t_SubmitInfo.commandBufferCount = 1;
+	t_SubmitInfo.pCommandBuffers = &t_MainBuffer;
 
 	VkSemaphore t_SignalSemaphores[] = { mvk_RenderFinishedSemaphore[m_CurrentFrame] };
 	t_SubmitInfo.signalSemaphoreCount = 1;
@@ -673,6 +668,51 @@ void Renderer::DrawFrame(uint32_t& r_ImageIndex, float a_dt)
 	//vkQueueWaitIdle(m_VKPresentQueue);
 	m_PreviousFrame = m_CurrentFrame;
 	m_CurrentFrame = (m_CurrentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+}
+
+void Renderer::DrawObjects(VkCommandBuffer& r_CmdBuffer)
+{
+
+	//Performance boost when getting the same data needed.
+	MeshData* t_LastMeshData = nullptr;
+	PipeLineData* t_LastPipeLineData = nullptr;
+
+	//Create this once for performance boost of not creating a mat4 everytime.
+	InstanceModel t_PushInstance;
+
+	for (int i = 0; i < p_RenderObjects->size(); i++)
+	{
+		BaseRenderObject* t_RenderObject = p_RenderObjects->at(i);
+
+		//only bind the pipeline if it doesn't match with the already bound one
+		if (t_RenderObject->GetPipeLineData() != t_LastPipeLineData) {
+
+			vkCmdBindPipeline(r_CmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, t_RenderObject->GetPipeLineData()->pipeLine);
+			t_LastPipeLineData = t_RenderObject->GetPipeLineData();
+		}
+
+		//Set Descriptor
+		vkCmdBindDescriptorSets(r_CmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, t_RenderObject->GetPipeLineData()->pipeLineLayout, 0, 1, &t_RenderObject->GetPipeLineData()->p_DescriptorData->descriptorSets[m_CurrentFrame].at(0), 0, nullptr);
+
+		//Set the Push constant data.
+		t_PushInstance.model = t_RenderObject->GetModelMatrix();
+
+		vkCmdPushConstants(r_CmdBuffer, t_RenderObject->GetPipeLineData()->pipeLineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(InstanceModel), &t_PushInstance);
+
+		//only bind the mesh if it's a different one from last bind
+		if (t_RenderObject->GetMeshData() != t_LastMeshData) {
+			//bind the mesh vertex buffer with offset 0
+			VkDeviceSize t_VertOffset = 0;
+			//Set Vertex
+			vkCmdBindVertexBuffers(r_CmdBuffer, 0, 1, &t_RenderObject->GetVertexData()->GetBuffer(), &t_VertOffset);
+
+			//Set Indices
+			vkCmdBindIndexBuffer(r_CmdBuffer, t_RenderObject->GetIndexData()->GetBuffer(), 0, VK_INDEX_TYPE_UINT16);
+
+			t_LastMeshData = t_RenderObject->GetMeshData();
+		}
+		vkCmdDrawIndexed(r_CmdBuffer, static_cast<uint32_t>(t_RenderObject->GetIndexData()->GetElementCount()), 1, 0, 0, 0);
+	}
 }
 
 void Renderer::UpdateUniformBuffer(uint32_t a_CurrentImage, float a_dt)
