@@ -133,18 +133,16 @@ void ShaderManager::CreateDescriptorSet(const size_t a_FrameAmount, DescriptorDa
 	}
 }
 
-//void ShaderManager::RecreateDescriptors(const size_t a_FrameAmount, std::vector<VkBuffer>& r_ViewProjectionBuffers)
-//{
-//	for (size_t i = 0; i < p_SavedDescriptors.size(); i++)
-//	{
-//		vkDestroyDescriptorPool(rmvk_Device, p_SavedDescriptors[i]->descriptorPool, nullptr);
-//
-//
-//		CreateDescriptorSetLayout(*p_SavedDescriptors[i]);
-//		CreateDescriptorPool(a_FrameAmount, *p_SavedDescriptors[i]);
-//		CreateDescriptorSet(a_FrameAmount, *p_SavedDescriptors[i], r_ViewProjectionBuffers);
-//	}
-//}
+void ShaderManager::RecreateDescriptors(const size_t a_FrameAmount, std::vector<VkBuffer>& r_ViewProjectionBuffers)
+{
+	for (size_t i = 0; i < p_SavedDescriptors.size(); i++)
+	{
+		vkDestroyDescriptorPool(rmvk_Device, p_SavedDescriptors[i]->descriptorPool, nullptr);
+
+		CreateDescriptorPool(a_FrameAmount, *p_SavedDescriptors[i]);
+		CreateDescriptorSet(a_FrameAmount, *p_SavedDescriptors[i], r_ViewProjectionBuffers);
+	}
+}
 
 void ShaderManager::CreateGraphicsPipeline(const VkRenderPass& r_RenderPass, PipeLineData& r_PipeLineData)
 {

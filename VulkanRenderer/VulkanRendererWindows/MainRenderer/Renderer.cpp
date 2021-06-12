@@ -119,6 +119,7 @@ void Renderer::RecreateSwapChain()
 	CreateFrameBuffers();
 
 	SetupRenderObjects();
+	m_ShaderManager->RecreateDescriptors(FRAMEBUFFER_AMOUNT, mvk_ViewProjectionBuffers);
 }
 
 void Renderer::CreateVKInstance()

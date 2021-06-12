@@ -19,16 +19,12 @@ public:
 
 	void CreateDescriptorPool(const size_t a_FrameAmount, DescriptorData& r_DescriptorData);
 	void CreateDescriptorSet(const size_t a_FrameAmount, DescriptorData& r_DescriptorData, std::vector<VkBuffer>& r_ViewProjectionBuffers);
-
-	//void RecreateDescriptors(const size_t a_FrameAmount, std::vector<VkBuffer>& r_ViewProjectionBuffers);
-
+	void RecreateDescriptors(const size_t a_FrameAmount, std::vector<VkBuffer>& r_ViewProjectionBuffers);
 
 	VkShaderModule CreateShaderModule(const std::vector<char>& code);
 
 private:
 	void CreateGraphicsPipeline(const VkRenderPass& r_RenderPass, PipeLineData& r_PipeLineData);
-	
-	
 
 	const VkDevice& rmvk_Device;
 	const VkExtent2D& rmvk_SwapChainExtent;
