@@ -2,9 +2,11 @@
 
 #include <fstream>
 
-CommandHandler::CommandHandler(VkDevice& r_Device, VkQueue& r_GraphicsQueue)
+CommandHandler::CommandHandler(VkDevice& r_Device, VkQueue& r_GraphicsQueue, size_t a_BufferAmount)
     :  rm_Device(r_Device), rm_GraphicsQueue(r_GraphicsQueue)
-{}
+{
+    mvk_MainBuffers.resize(a_BufferAmount);
+}
 
 CommandHandler::~CommandHandler()
 {
@@ -22,17 +24,7 @@ void CommandHandler::CreateCommandPools(QueueFamilyIndices a_QueueFamilyIndices)
 
 void CommandHandler::FreeCommandPool()
 {
-    //vkFreeCommandBuffers(rm_Device, mvk_CommandPool, static_cast<uint32_t>(mvk_CommandBuffers.size()), mvk_CommandBuffers.data());
-    //vkFreeCommandBuffers(rm_Device, mvk_CommandPool, 1, &m_DrawCommands.mvk_MainBuffer);
-}
-
-void CommandHandler::FreeDynamicCommandBuffers(uint32_t a_Frame)
-{
-    if (m_DrawCommands[a_Frame].CommandBuffers.size() > 0)
-    {
-        vkFreeCommandBuffers(rm_Device, mvk_CommandPool, static_cast<uint32_t>(m_DrawCommands[a_Frame].CommandBuffers.size()), m_DrawCommands[a_Frame].CommandBuffers.data());
-        m_DrawCommands[a_Frame].CommandBuffers.clear();
-    }
+    vkFreeCommandBuffers(rm_Device, mvk_CommandPool, static_cast<uint32_t>(mvk_MainBuffers.size()), mvk_MainBuffers.data());
 }
 
 void CommandHandler::ClearPreviousCommand(size_t a_Frame)

@@ -45,9 +45,6 @@ public:
 	void CreateDescriptorPool(DescriptorData& r_Descriptor);
 	void CreateDescriptorSet(DescriptorData& r_Descriptor);
 
-	//CommandBuffering.
-	void FreeCommandBuffers();
-
 	void CreateFrameBuffers();
 	void CreateCommandPool();
 
