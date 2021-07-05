@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MainRenderer\Context.cpp" />
     <ClCompile Include="MainRenderer\Handlers\BufferHandler.cpp" />
     <ClCompile Include="MainRenderer\Handlers\CommandHandler.cpp" />
     <ClCompile Include="MainRenderer\Handlers\DepthHandler.cpp" />
@@ -36,6 +37,7 @@
     <ClCompile Include="MainRenderer\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="MainRenderer\Context.h" />
     <ClInclude Include="MainRenderer\Handlers\BufferHandler.h" />
     <ClInclude Include="MainRenderer\Handlers\CommandHandler.h" />
     <ClInclude Include="MainRenderer\Handlers\DepthHandler.h" />
@@ -50,6 +52,7 @@
     <ClInclude Include="MainRenderer\RenderObjects\RenderShape.h" />
     <ClInclude Include="MainRenderer\ShaderManager.h" />
     <ClInclude Include="MainRenderer\Structs\BufferData.h" />
+    <ClInclude Include="MainRenderer\Structs\ContextData.h" />
     <ClInclude Include="MainRenderer\Structs\PipelineData.h" />
     <ClInclude Include="MainRenderer\Tools\ResourceLoader.h" />
     <ClInclude Include="MainRenderer\VulkanDebugger\VulkanDebug.h" />

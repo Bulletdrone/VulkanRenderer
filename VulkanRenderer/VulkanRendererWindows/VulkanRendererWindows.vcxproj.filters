@@ -74,6 +74,9 @@
     <ClCompile Include="MainRenderer\Handlers\DepthHandler.cpp">
       <Filter>MainRenderer\Handlers</Filter>
     </ClCompile>
+    <ClCompile Include="MainRenderer\Context.cpp">
+      <Filter>MainRenderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainRenderer\Renderer.h">
@@ -128,6 +131,12 @@
       <Filter>MainRenderer\Handlers</Filter>
     </ClInclude>
     <ClInclude Include="MainRenderer\Structs\PipelineData.h">
+      <Filter>MainRenderer\Structs</Filter>
+    </ClInclude>
+    <ClInclude Include="MainRenderer\Context.h">
+      <Filter>MainRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="MainRenderer\Structs\ContextData.h">
       <Filter>MainRenderer\Structs</Filter>
     </ClInclude>
   </ItemGroup>
