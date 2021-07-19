@@ -134,20 +134,3 @@ void BufferHandler::CopyBuffer(VkDeviceSize a_Size, VkBuffer& r_SrcBuffer, VkBuf
 }
 
 #pragma endregion
-
-
-//PRIVATE FUNCTION TO FIND MEMORYTYPE
-uint32_t BufferHandler::FindMemoryType(uint32_t a_TypeFilter, VkMemoryPropertyFlags a_Properties)
-{
-    VkPhysicalDeviceMemoryProperties memProperties;
-    vkGetPhysicalDeviceMemoryProperties(rm_PhysDevice, &memProperties);
-
-    for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++)
-    {
-        if ((a_TypeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & a_Properties) == a_Properties) {
-            return i;
-        }
-    }
-
-    throw std::runtime_error("failed to find suitable memory type!");
-}

@@ -36,7 +36,6 @@ public:
 
 public:
 	SwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice a_Device);
-	QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice a_Device);
 
 private:
 	bool IsDeviceSuitable(VkPhysicalDevice a_Device);
@@ -52,7 +51,7 @@ private:
 
 	//Constant data.
 	const std::vector<const char*> m_DeviceExtensions = {
-VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+		VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 
 	//Debug
 	bool m_bDebugEnabled;

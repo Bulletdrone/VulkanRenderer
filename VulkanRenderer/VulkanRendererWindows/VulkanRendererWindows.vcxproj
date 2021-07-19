@@ -34,6 +34,7 @@
     <ClCompile Include="MainRenderer\ShaderManager.cpp" />
     <ClCompile Include="MainRenderer\Tools\ResourceLoader.cpp" />
     <ClCompile Include="MainRenderer\VulkanDebugger\VulkanDebug.cpp" />
+    <ClCompile Include="MainRenderer\VulkanDevice.cpp" />
     <ClCompile Include="MainRenderer\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -56,6 +57,7 @@
     <ClInclude Include="MainRenderer\Structs\PipelineData.h" />
     <ClInclude Include="MainRenderer\Tools\ResourceLoader.h" />
     <ClInclude Include="MainRenderer\VulkanDebugger\VulkanDebug.h" />
+    <ClInclude Include="MainRenderer\VulkanDevice.h" />
     <ClInclude Include="MainRenderer\Window.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

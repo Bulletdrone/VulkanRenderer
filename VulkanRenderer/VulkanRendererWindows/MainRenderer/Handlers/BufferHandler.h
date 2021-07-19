@@ -22,9 +22,6 @@ public:
 		VkMemoryPropertyFlags a_Properties, VkBuffer& r_Buffer, VkDeviceMemory& r_BufferMemory);
 	void CopyBuffer(VkDeviceSize a_Size, VkBuffer& r_SrcBuffer, VkBuffer& r_DstBuffer);
 
-	uint32_t FindMemoryType(uint32_t a_TypeFilter, VkMemoryPropertyFlags a_Properties);
-
-
 private:
 	VkDevice& rm_Device;
 	VkPhysicalDevice& rm_PhysDevice;

@@ -194,40 +194,6 @@ SwapChainSupportDetails Context::QuerySwapChainSupport(VkPhysicalDevice a_Device
 	return t_Details;
 }
 
-QueueFamilyIndices Context::FindQueueFamilies(VkPhysicalDevice a_Device)
-{
-	QueueFamilyIndices t_Indices;
-
-	uint32_t t_QueueFamilyCount = 0;
-	vkGetPhysicalDeviceQueueFamilyProperties(a_Device, &t_QueueFamilyCount, nullptr);
-
-	std::vector<VkQueueFamilyProperties> t_QueueFamilies(t_QueueFamilyCount);
-	vkGetPhysicalDeviceQueueFamilyProperties(a_Device, &t_QueueFamilyCount, t_QueueFamilies.data());
-
-	int i = 0;
-	for (const auto& queueFamily : t_QueueFamilies)
-	{
-		if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
-		{
-			t_Indices.graphicsFamily = i;
-			VkBool32 t_PresentSupport = false;
-			vkGetPhysicalDeviceSurfaceSupportKHR(a_Device, i, rm_Window->GetSurface(), &t_PresentSupport);
-
-			if (t_PresentSupport)
-			{
-				t_Indices.presentFamily = i;
-			}
-		}
-		
-		if (t_Indices.isComplete())
-			break;
-
-		i++;
-	}
-
-	return t_Indices;
-}
-
 #pragma region Private Functions
 
 bool Context::IsDeviceSuitable(VkPhysicalDevice a_Device)
