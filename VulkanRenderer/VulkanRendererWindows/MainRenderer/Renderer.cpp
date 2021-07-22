@@ -21,30 +21,30 @@ Renderer::Renderer()
 
 	m_Window->SetupVKWindow(mvk_Instance);
 	PickPhysicalDevice();
-	CreateLogicalDevice();
+	//CreateLogicalDevice();
+	m_VulkanDevice.VulkanDeviceSetup(mvk_PhysicalDevice, *m_Window, DE_VulkanDebug);
 	
-	SetupHandlers();
 	CreateSwapChain();
 	CreateImageViews();
 	CreateRenderPass();
 
-	m_ShaderManager = new ShaderManager(mvk_Device, mvk_SwapChainExtent);
+	m_ShaderManager = new ShaderManager(m_VulkanDevice, mvk_SwapChainExtent);
 }
 
 Renderer::~Renderer()
 {
-	vkDeviceWaitIdle(mvk_Device);
+	vkDeviceWaitIdle(m_VulkanDevice);
 	CleanupSwapChain();
 
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-		vkDestroySemaphore(mvk_Device, mvk_RenderFinishedSemaphore[i], nullptr);
-		vkDestroySemaphore(mvk_Device, mvk_ImageAvailableSemaphore[i], nullptr);
-		vkDestroyFence(mvk_Device, mvk_InFlightFences[i], nullptr);
+		vkDestroySemaphore(m_VulkanDevice, mvk_RenderFinishedSemaphore[i], nullptr);
+		vkDestroySemaphore(m_VulkanDevice, mvk_ImageAvailableSemaphore[i], nullptr);
+		vkDestroyFence(m_VulkanDevice, mvk_InFlightFences[i], nullptr);
 	}
-	delete m_CommandHandler;
+	//delete m_CommandHandler;
 
 	delete m_ShaderManager;
-	vkDestroyDevice(mvk_Device, nullptr);
+	vkDestroyDevice(m_VulkanDevice, nullptr);
 
 	if (DE_EnableValidationLayers)
 		delete DE_VulkanDebug;
@@ -55,22 +55,19 @@ Renderer::~Renderer()
 }
 
 //Must be done after setting up the physical device.
-void Renderer::SetupHandlers()
+void VulkanDevice::SetupHandlers(VkQueue& rm_GraphicsQueue, size_t a_FrameBufferAmount)
 {
-	m_CommandHandler = new CommandHandler(mvk_Device, mvk_GraphicsQueue, FRAMEBUFFER_AMOUNT);
-	m_BufferHandler = new BufferHandler(mvk_Device, mvk_PhysicalDevice, m_CommandHandler);
-	
 	VkPhysicalDeviceProperties properties{};
-	vkGetPhysicalDeviceProperties(mvk_PhysicalDevice, &properties);
-	m_ImageHandler = new ImageHandler(mvk_Device, properties.limits.maxSamplerAnisotropy, m_BufferHandler, m_CommandHandler);
+	vkGetPhysicalDeviceProperties(m_PhysicalDevice, &properties);
+	m_ImageHandler = new ImageHandler(m_LogicalDevice, properties.limits.maxSamplerAnisotropy, m_BufferHandler, m_CommandHandler);
 
-	m_DepthHandler = new DepthHandler(mvk_Device, mvk_PhysicalDevice, m_ImageHandler);
+	m_DepthHandler = new DepthHandler(m_LogicalDevice, m_PhysicalDevice, m_ImageHandler);
 }
 
 //Call this after the creation of Vulkan.
 void Renderer::SetupRenderObjects()
 {
-	m_BufferHandler->CreateUniformBuffers(mvk_ViewProjectionBuffers, mvk_ViewProjectionBuffersMemory, mvk_SwapChainImages.size());
+	m_VulkanDevice.CreateUniformBuffers(mvk_ViewProjectionBuffers, mvk_ViewProjectionBuffersMemory, mvk_SwapChainImages.size());
 
 	CreateSyncObjects();
 }
@@ -78,25 +75,25 @@ void Renderer::SetupRenderObjects()
 void Renderer::CleanupSwapChain()
 {
 	for (size_t i = 0; i < mvk_SwapChainFrameBuffers.size(); i++) {
-		vkDestroyFramebuffer(mvk_Device, mvk_SwapChainFrameBuffers[i], nullptr);
+		vkDestroyFramebuffer(m_VulkanDevice, mvk_SwapChainFrameBuffers[i], nullptr);
 	}
 
-	m_CommandHandler->FreeCommandPool();
+	m_VulkanDevice.FreeCommandPool();
 
-	vkDestroyPipeline(mvk_Device, mvk_Pipeline, nullptr);
-	vkDestroyPipelineLayout(mvk_Device, mvk_PipelineLayout, nullptr);
-	vkDestroyRenderPass(mvk_Device, mvk_RenderPass, nullptr);
+	vkDestroyPipeline(m_VulkanDevice, mvk_Pipeline, nullptr);
+	vkDestroyPipelineLayout(m_VulkanDevice, mvk_PipelineLayout, nullptr);
+	vkDestroyRenderPass(m_VulkanDevice, mvk_RenderPass, nullptr);
 
 	for (size_t i = 0; i < mvk_SwapChainImageViews.size(); i++) {
-		vkDestroyImageView(mvk_Device, mvk_SwapChainImageViews[i], nullptr);
+		vkDestroyImageView(m_VulkanDevice, mvk_SwapChainImageViews[i], nullptr);
 	}
 
-	vkDestroySwapchainKHR(mvk_Device, mvk_SwapChain, nullptr);
+	vkDestroySwapchainKHR(m_VulkanDevice, mvk_SwapChain, nullptr);
 
 	for (size_t i = 0; i < mvk_SwapChainImages.size(); i++)
 	{
-		vkDestroyBuffer(mvk_Device, mvk_ViewProjectionBuffers[i], nullptr);
-		vkFreeMemory(mvk_Device, mvk_ViewProjectionBuffersMemory[i], nullptr);
+		vkDestroyBuffer(m_VulkanDevice, mvk_ViewProjectionBuffers[i], nullptr);
+		vkFreeMemory(m_VulkanDevice, mvk_ViewProjectionBuffersMemory[i], nullptr);
 	}
 	
 }
@@ -105,7 +102,7 @@ void Renderer::RecreateSwapChain()
 {
 	m_Window->CheckMinimized();
 
-	vkDeviceWaitIdle(mvk_Device);
+	vkDeviceWaitIdle(m_VulkanDevice);
 		
 	CleanupSwapChain();
 
@@ -245,13 +242,13 @@ void Renderer::CreateLogicalDevice()
 		t_CreateInfo.enabledLayerCount = 0;
 	}
 
-	if (vkCreateDevice(mvk_PhysicalDevice, &t_CreateInfo, nullptr, &mvk_Device) != VK_SUCCESS) 
+	if (vkCreateDevice(mvk_PhysicalDevice, &t_CreateInfo, nullptr, &m_VulkanDevice.m_LogicalDevice) != VK_SUCCESS) 
 	{
 		throw std::runtime_error("failed to create logical device!");
 	}
 
-	vkGetDeviceQueue(mvk_Device, t_Indices.graphicsFamily.value(), 0, &mvk_GraphicsQueue);
-	vkGetDeviceQueue(mvk_Device, t_Indices.presentFamily.value(), 0, &mvk_PresentQueue);
+	vkGetDeviceQueue(m_VulkanDevice, t_Indices.graphicsFamily.value(), 0, &mvk_GraphicsQueue);
+	vkGetDeviceQueue(m_VulkanDevice, t_Indices.presentFamily.value(), 0, &mvk_PresentQueue);
 }
 
 void Renderer::CreateSwapChain()
@@ -320,14 +317,14 @@ void Renderer::CreateSwapChain()
 	//If a new SwapChain gets created such as resizing the window, ignore for now.
 	t_CreateInfo.oldSwapchain = VK_NULL_HANDLE;
 
-	if (vkCreateSwapchainKHR(mvk_Device, &t_CreateInfo, nullptr, &mvk_SwapChain) != VK_SUCCESS) 
+	if (vkCreateSwapchainKHR(m_VulkanDevice, &t_CreateInfo, nullptr, &mvk_SwapChain) != VK_SUCCESS) 
 	{
 		throw std::runtime_error("failed to create swap chain!");
 	}
 
-	vkGetSwapchainImagesKHR(mvk_Device, mvk_SwapChain, &t_ActualImageCount, nullptr);
+	vkGetSwapchainImagesKHR(m_VulkanDevice, mvk_SwapChain, &t_ActualImageCount, nullptr);
 	mvk_SwapChainImages.resize(t_ActualImageCount);
-	vkGetSwapchainImagesKHR(mvk_Device, mvk_SwapChain, &t_ActualImageCount, mvk_SwapChainImages.data());
+	vkGetSwapchainImagesKHR(m_VulkanDevice, mvk_SwapChain, &t_ActualImageCount, mvk_SwapChainImages.data());
 
 	//Setting the Local variables
 	mvk_SwapChainImageFormat = t_SurfaceFormat.format;
@@ -340,7 +337,7 @@ void Renderer::CreateImageViews()
 
 	for (uint32_t i = 0; i < mvk_SwapChainImages.size(); i++) 
 	{
-		mvk_SwapChainImageViews[i] = m_ImageHandler->CreateImageView(mvk_SwapChainImages[i], mvk_SwapChainImageFormat, VK_IMAGE_ASPECT_COLOR_BIT);
+		mvk_SwapChainImageViews[i] = m_VulkanDevice.m_ImageHandler->CreateImageView(mvk_SwapChainImages[i], mvk_SwapChainImageFormat, VK_IMAGE_ASPECT_COLOR_BIT);
 	}
 }
 
@@ -363,7 +360,7 @@ void Renderer::CreateRenderPass()
 
 	//DEPTH BUFFER
 	VkAttachmentDescription t_DepthAttachment{};
-	t_DepthAttachment.format = m_DepthHandler->FindDepthFormat();
+	t_DepthAttachment.format = m_VulkanDevice.m_DepthHandler->FindDepthFormat();
 	t_DepthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
 	t_DepthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
 	t_DepthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
@@ -404,7 +401,7 @@ void Renderer::CreateRenderPass()
 	t_RenderPassInfo.dependencyCount = 1;
 	t_RenderPassInfo.pDependencies = &t_Dependency;
 
-	if (vkCreateRenderPass(mvk_Device, &t_RenderPassInfo, nullptr, &mvk_RenderPass) != VK_SUCCESS) {
+	if (vkCreateRenderPass(m_VulkanDevice, &t_RenderPassInfo, nullptr, &mvk_RenderPass) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create render pass!");
 	}
 }
@@ -438,7 +435,7 @@ void Renderer::CreateFrameBuffers()
 	{
 		std::array<VkImageView, 2> t_Attachments = {
 		mvk_SwapChainImageViews[i],
-		m_DepthHandler->GetDepthTest().depthImageView
+		m_VulkanDevice.m_DepthHandler->GetDepthTest().depthImageView
 		};
 
 		VkFramebufferCreateInfo t_FramebufferInfo{};
@@ -450,7 +447,7 @@ void Renderer::CreateFrameBuffers()
 		t_FramebufferInfo.height = mvk_SwapChainExtent.height;
 		t_FramebufferInfo.layers = 1;
 
-		if (vkCreateFramebuffer(mvk_Device, &t_FramebufferInfo, nullptr, &mvk_SwapChainFrameBuffers[i]) != VK_SUCCESS) 
+		if (vkCreateFramebuffer(m_VulkanDevice, &t_FramebufferInfo, nullptr, &mvk_SwapChainFrameBuffers[i]) != VK_SUCCESS) 
 		{
 			throw std::runtime_error("failed to create framebuffer!");
 		}
@@ -459,12 +456,12 @@ void Renderer::CreateFrameBuffers()
 
 void Renderer::CreateCommandPool()
 {
-	m_CommandHandler->CreateCommandPools(FindQueueFamilies(mvk_PhysicalDevice));
+	m_VulkanDevice.CreateCommandPools(FindQueueFamilies(mvk_PhysicalDevice));
 }
 
 void Renderer::CreateDepthResources()
 {
-	m_DepthHandler->CreateDepthResources(mvk_SwapChainExtent.width, mvk_SwapChainExtent.height);
+	m_VulkanDevice.m_DepthHandler->CreateDepthResources(mvk_SwapChainExtent.width, mvk_SwapChainExtent.height);
 }
 
 void Renderer::CreateSyncObjects()
@@ -483,9 +480,9 @@ void Renderer::CreateSyncObjects()
 
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 	{
-		if (vkCreateSemaphore(mvk_Device, &t_SemaphoreInfo, nullptr, &mvk_ImageAvailableSemaphore[i]) != VK_SUCCESS ||
-			vkCreateSemaphore(mvk_Device, &t_SemaphoreInfo, nullptr, &mvk_RenderFinishedSemaphore[i]) != VK_SUCCESS ||
-			vkCreateFence(mvk_Device, &t_FenceInfo, nullptr, &mvk_InFlightFences[i]) != VK_SUCCESS)  
+		if (vkCreateSemaphore(m_VulkanDevice, &t_SemaphoreInfo, nullptr, &mvk_ImageAvailableSemaphore[i]) != VK_SUCCESS ||
+			vkCreateSemaphore(m_VulkanDevice, &t_SemaphoreInfo, nullptr, &mvk_RenderFinishedSemaphore[i]) != VK_SUCCESS ||
+			vkCreateFence(m_VulkanDevice, &t_FenceInfo, nullptr, &mvk_InFlightFences[i]) != VK_SUCCESS)  
 		{
 			throw std::runtime_error("failed to create semaphores for a frame!");
 		}
@@ -494,8 +491,8 @@ void Renderer::CreateSyncObjects()
 
 void Renderer::SetupMesh(MeshData* a_MeshData)
 {
-	m_BufferHandler->CreateVertexBuffers(a_MeshData->GetVertexData());
-	m_BufferHandler->CreateIndexBuffers(a_MeshData->GetIndexData());
+	m_VulkanDevice.CreateVertexBuffers(a_MeshData->GetVertexData());
+	m_VulkanDevice.CreateIndexBuffers(a_MeshData->GetIndexData());
 }
 
 void Renderer::SetupImage(TextureData& a_TextureData, const char* a_ImagePath)
@@ -503,20 +500,20 @@ void Renderer::SetupImage(TextureData& a_TextureData, const char* a_ImagePath)
 	VkDeviceSize t_Size;
 	int t_Width, t_Height, t_Channels;
 
-	m_ImageHandler->CreateTextureImage(a_TextureData.textureImage, a_TextureData.textureImageMemory,
+	m_VulkanDevice.m_ImageHandler->CreateTextureImage(a_TextureData.textureImage, a_TextureData.textureImageMemory,
 		a_ImagePath, t_Size, t_Width, t_Height, t_Channels);
 
-	a_TextureData.textureImageView = m_ImageHandler->CreateImageView(a_TextureData.textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_ASPECT_COLOR_BIT);
-	a_TextureData.textureSampler = m_ImageHandler->CreateTextureSampler();
+	a_TextureData.textureImageView = m_VulkanDevice.m_ImageHandler->CreateImageView(a_TextureData.textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_ASPECT_COLOR_BIT);
+	a_TextureData.textureSampler = m_VulkanDevice.m_ImageHandler->CreateTextureSampler();
 }
 
 void Renderer::DrawFrame(uint32_t& r_ImageIndex, float a_dt)
 {
 	bool recreateSwapChain = false;
 
-	vkWaitForFences(mvk_Device, 1, &mvk_InFlightFences[m_CurrentFrame], VK_TRUE, UINT64_MAX);
+	vkWaitForFences(m_VulkanDevice, 1, &mvk_InFlightFences[m_CurrentFrame], VK_TRUE, UINT64_MAX);
 
-	VkResult t_Result = vkAcquireNextImageKHR(mvk_Device, mvk_SwapChain, UINT64_MAX, mvk_ImageAvailableSemaphore[m_CurrentFrame], VK_NULL_HANDLE, &r_ImageIndex);
+	VkResult t_Result = vkAcquireNextImageKHR(m_VulkanDevice, mvk_SwapChain, UINT64_MAX, mvk_ImageAvailableSemaphore[m_CurrentFrame], VK_NULL_HANDLE, &r_ImageIndex);
 
 	if (t_Result == VK_ERROR_OUT_OF_DATE_KHR || t_Result == VK_SUBOPTIMAL_KHR || m_Window->m_FrameBufferResized)
 	{
@@ -532,18 +529,18 @@ void Renderer::DrawFrame(uint32_t& r_ImageIndex, float a_dt)
 	// Check if a previous frame is using this image (i.e. there is its fence to wait on)
 	if (mvk_ImagesInFlight[r_ImageIndex] != VK_NULL_HANDLE) 
 	{
-		vkWaitForFences(mvk_Device, 1, &mvk_ImagesInFlight[r_ImageIndex], VK_TRUE, UINT64_MAX);
+		vkWaitForFences(m_VulkanDevice, 1, &mvk_ImagesInFlight[r_ImageIndex], VK_TRUE, UINT64_MAX);
 	}
 	// Mark the image as now being in use by this frame
 	mvk_ImagesInFlight[r_ImageIndex] = mvk_InFlightFences[m_CurrentFrame];
 
 	//Draw the objects using a single command buffer.
-	m_CommandHandler->ClearPreviousCommand(m_CurrentFrame);
-	VkCommandBuffer& t_MainBuffer = m_CommandHandler->CreateAndBeginCommand(m_CurrentFrame, FindQueueFamilies(mvk_PhysicalDevice).graphicsFamily.value(),
+	m_VulkanDevice.ClearPreviousCommand(m_CurrentFrame);
+	VkCommandBuffer& t_MainBuffer = m_VulkanDevice.CreateAndBeginCommand(m_CurrentFrame, FindQueueFamilies(mvk_PhysicalDevice).graphicsFamily.value(),
 		mvk_RenderPass, mvk_SwapChainFrameBuffers[m_CurrentFrame], mvk_SwapChainExtent);
 
 	DrawObjects(t_MainBuffer);
-	m_CommandHandler->EndCommand(t_MainBuffer);
+	m_VulkanDevice.EndCommand(t_MainBuffer);
 
 
 	VkSubmitInfo t_SubmitInfo{};
@@ -563,7 +560,7 @@ void Renderer::DrawFrame(uint32_t& r_ImageIndex, float a_dt)
 	t_SubmitInfo.pSignalSemaphores = t_SignalSemaphores;
 
 
-	vkResetFences(mvk_Device, 1, &mvk_InFlightFences[m_CurrentFrame]);
+	vkResetFences(m_VulkanDevice, 1, &mvk_InFlightFences[m_CurrentFrame]);
 	if (vkQueueSubmit(mvk_GraphicsQueue, 1, &t_SubmitInfo, mvk_InFlightFences[m_CurrentFrame]) != VK_SUCCESS)
 	{
 		throw std::runtime_error("failed to submit draw command buffer!");
@@ -599,7 +596,6 @@ void Renderer::DrawFrame(uint32_t& r_ImageIndex, float a_dt)
 
 void Renderer::DrawObjects(VkCommandBuffer& r_CmdBuffer)
 {
-
 	//Performance boost when getting the same data needed.
 	MeshData* t_LastMeshData = nullptr;
 	PipeLineData* t_LastPipeLineData = nullptr;
@@ -651,9 +647,9 @@ void Renderer::UpdateUniformBuffer(uint32_t a_CurrentImage, float a_dt)
 	ubo.proj[1][1] *= -1;
 
 	void* data;
-	vkMapMemory(mvk_Device, mvk_ViewProjectionBuffersMemory[a_CurrentImage], 0, sizeof(ubo), 0, &data);
+	vkMapMemory(m_VulkanDevice, mvk_ViewProjectionBuffersMemory[a_CurrentImage], 0, sizeof(ubo), 0, &data);
 	memcpy(data, &ubo, sizeof(ubo));
-	vkUnmapMemory(mvk_Device, mvk_ViewProjectionBuffersMemory[a_CurrentImage]);
+	vkUnmapMemory(m_VulkanDevice, mvk_ViewProjectionBuffersMemory[a_CurrentImage]);
 }
 
 QueueFamilyIndices Renderer::FindQueueFamilies(VkPhysicalDevice a_Device)

@@ -1,6 +1,5 @@
 #include "ImageHandler.h"
 
-#include "BufferHandler.h"
 #include "CommandHandler.h"
 
 #define STB_IMAGE_IMPLEMENTATION

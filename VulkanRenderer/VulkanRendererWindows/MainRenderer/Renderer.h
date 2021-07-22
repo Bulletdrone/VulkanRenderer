@@ -4,12 +4,13 @@
 
 #include "ShaderManager.h"
 #include "VulkanDebugger/VulkanDebug.h"
+#include <RenderObjects/BaseRenderObject.h>
 
 //Handlers
-#include "Handlers/BufferHandler.h"
-#include "Handlers/CommandHandler.h"
 #include "Handlers/ImageHandler.h"
 #include "Handlers/DepthHandler.h"
+
+#include "VulkanDevice.h"
 
 struct SwapChainSupportDetails {
 	VkSurfaceCapabilitiesKHR capabilities;
@@ -27,7 +28,6 @@ public:
 	~Renderer();
 
 	//Setting up that is done later.
-	void SetupHandlers();
 	void SetupRenderObjects();
 
 	void CleanupSwapChain();
@@ -74,7 +74,7 @@ public:
 
 	//Getters
 	GLFWwindow* GetWindow() const { return m_Window->GetWindow(); }
-	VkDevice& GetLogicalDevice() { return mvk_Device; }
+	VulkanDevice& GetVulkanDevice() { return m_VulkanDevice; }
 	VkPhysicalDevice& GetPhysicalDevice() { return mvk_PhysicalDevice; }
 
 	//Set the mesh vector pointer in the Renderer from the one in ObjectManager.
@@ -91,12 +91,6 @@ private:
 	//Window Data.
 	Window* m_Window;
 
-	//Handlers
-	BufferHandler* m_BufferHandler;
-	CommandHandler* m_CommandHandler;
-	ImageHandler* m_ImageHandler;
-	DepthHandler* m_DepthHandler;
-
 	//ShaderData
 	ShaderManager* m_ShaderManager;
 	std::vector<VkBuffer> mvk_ViewProjectionBuffers;
@@ -112,7 +106,7 @@ private:
 	//Primary Vulkan Data;
 	VkInstance mvk_Instance;
 	VkPhysicalDevice mvk_PhysicalDevice = VK_NULL_HANDLE;
-	VkDevice mvk_Device;
+	VulkanDevice m_VulkanDevice;
 
 	VkQueue mvk_GraphicsQueue;
 	VkQueue mvk_PresentQueue;

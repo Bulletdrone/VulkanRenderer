@@ -1,6 +1,5 @@
 #include "DepthHandler.h"
 
-#include "BufferHandler.h"
 #include "ImageHandler.h"
 #include <fstream>
 
