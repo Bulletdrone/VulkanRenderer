@@ -25,7 +25,7 @@ public:
 	~VulkanDevice();
 
 	//Send nullptr to vulkanDebug if you do not want to enable debug.
-	void VulkanDeviceSetup(VkPhysicalDevice a_PhysicalDevice, Window& a_Window, VulkanDebug* debug);
+	void VulkanDeviceSetup(VkPhysicalDevice a_PhysicalDevice, Window& a_Window, VulkanDebug* debug, size_t a_FrameBufferAmount);
 	void CreateLogicalDevice(std::vector<const char*> a_EnabledExtensions, Window& r_Window, VkQueue& r_GraphicsQueue, VkQueue& r_PresentQueue);
 
 	// Physical device representation

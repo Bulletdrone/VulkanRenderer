@@ -22,7 +22,7 @@ Renderer::Renderer()
 	m_Window->SetupVKWindow(mvk_Instance);
 	VkPhysicalDevice physicalDevice = PickPhysicalDevice();
 	//CreateLogicalDevice();
-	m_VulkanDevice.VulkanDeviceSetup(physicalDevice, *m_Window, DE_VulkanDebug);
+	m_VulkanDevice.VulkanDeviceSetup(physicalDevice, *m_Window, DE_VulkanDebug, FRAMEBUFFER_AMOUNT);
 	m_VulkanDevice.CreateLogicalDevice(std::vector<const char*>(), *m_Window, mvk_GraphicsQueue, mvk_PresentQueue);
 	
 	SetupHandlers();

@@ -59,9 +59,6 @@
     <ClCompile Include="MainRenderer\ShaderManager.cpp">
       <Filter>MainRenderer</Filter>
     </ClCompile>
-    <ClCompile Include="MainRenderer\Handlers\CommandHandler.cpp">
-      <Filter>MainRenderer\Handlers</Filter>
-    </ClCompile>
     <ClCompile Include="MainRenderer\Handlers\ImageHandler.cpp">
       <Filter>MainRenderer\Handlers</Filter>
     </ClCompile>
@@ -70,9 +67,6 @@
     </ClCompile>
     <ClCompile Include="MainRenderer\Handlers\DepthHandler.cpp">
       <Filter>MainRenderer\Handlers</Filter>
-    </ClCompile>
-    <ClCompile Include="MainRenderer\Context.cpp">
-      <Filter>MainRenderer</Filter>
     </ClCompile>
     <ClCompile Include="MainRenderer\VulkanDevice.cpp">
       <Filter>MainRenderer\Structs</Filter>
@@ -115,9 +109,6 @@
     <ClInclude Include="MainRenderer\ShaderManager.h">
       <Filter>MainRenderer</Filter>
     </ClInclude>
-    <ClInclude Include="MainRenderer\Handlers\CommandHandler.h">
-      <Filter>MainRenderer\Handlers</Filter>
-    </ClInclude>
     <ClInclude Include="MainRenderer\Handlers\ImageHandler.h">
       <Filter>MainRenderer\Handlers</Filter>
     </ClInclude>
@@ -129,9 +120,6 @@
     </ClInclude>
     <ClInclude Include="MainRenderer\Structs\PipelineData.h">
       <Filter>MainRenderer\Structs</Filter>
-    </ClInclude>
-    <ClInclude Include="MainRenderer\Context.h">
-      <Filter>MainRenderer</Filter>
     </ClInclude>
     <ClInclude Include="MainRenderer\Structs\ContextData.h">
       <Filter>MainRenderer\Structs</Filter>

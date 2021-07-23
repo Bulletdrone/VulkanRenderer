@@ -17,8 +17,10 @@ VulkanDevice::~VulkanDevice()
 	}
 }
 
-void VulkanDevice::VulkanDeviceSetup(VkPhysicalDevice a_PhysicalDevice, Window& a_Window, VulkanDebug* debug)
+void VulkanDevice::VulkanDeviceSetup(VkPhysicalDevice a_PhysicalDevice, Window& a_Window, VulkanDebug* debug, size_t a_FrameBufferAmount)
 {
+    m_DeviceCommandBuffer.resize(a_FrameBufferAmount);
+
     if (debug != nullptr)
     {
         m_EnableDebug = true;
