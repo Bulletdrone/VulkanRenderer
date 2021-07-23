@@ -3,8 +3,8 @@
 #include "ImageHandler.h"
 #include <fstream>
 
-DepthHandler::DepthHandler(VkDevice& r_Device, VkPhysicalDevice& r_PhysDevice, ImageHandler* a_ImageHandler)
-	:	rm_Device(r_Device), rm_PhysDevice(r_PhysDevice)
+DepthHandler::DepthHandler(VulkanDevice& r_VulkanDevice, ImageHandler* a_ImageHandler)
+	: rm_VulkanDevice(r_VulkanDevice)
 {
 	p_ImageHandler = a_ImageHandler;
 }
@@ -14,9 +14,9 @@ DepthHandler::~DepthHandler()
 
 void DepthHandler::CleanupDepthTest()
 {
-	vkDestroyImageView(rm_Device, m_DepthTest.depthImageView, nullptr);
-	vkDestroyImage(rm_Device, m_DepthTest.depthImage, nullptr);
-	vkFreeMemory(rm_Device, m_DepthTest.depthImageMemory, nullptr);
+	vkDestroyImageView(rm_VulkanDevice, m_DepthTest.depthImageView, nullptr);
+	vkDestroyImage(rm_VulkanDevice, m_DepthTest.depthImage, nullptr);
+	vkFreeMemory(rm_VulkanDevice, m_DepthTest.depthImageMemory, nullptr);
 }
 
 void DepthHandler::CreateDepthResources(uint32_t a_Width, uint32_t a_Height)
@@ -39,7 +39,7 @@ VkFormat DepthHandler::FindSupportedFormat(const std::vector<VkFormat>& r_Candid
 	for (VkFormat t_Format : r_Candidates) 
 	{
 		VkFormatProperties t_Props;
-		vkGetPhysicalDeviceFormatProperties(rm_PhysDevice, t_Format, &t_Props);
+		vkGetPhysicalDeviceFormatProperties(rm_VulkanDevice.m_PhysicalDevice, t_Format, &t_Props);
 
 		if (a_Tiling == VK_IMAGE_TILING_LINEAR && (t_Props.linearTilingFeatures & a_Features) == a_Features) 
 		{

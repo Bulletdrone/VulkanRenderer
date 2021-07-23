@@ -50,9 +50,9 @@ public:
 	VkCommandPool m_CommandPool = VK_NULL_HANDLE;
 	std::vector<VkCommandBuffer> m_DeviceCommandBuffer;
 
-	//Handlers
-	ImageHandler* m_ImageHandler;
-	DepthHandler* m_DepthHandler;
+	//Temp Values, likely to be placed somewhere else.
+	float AnisotropyFilteringMax = 0;
+	VkQueue* p_GraphicsQueue;
 
 	bool m_EnableDebug = false;
 	VulkanDebug* DE_VulkanDebug = nullptr;
@@ -62,7 +62,6 @@ public:
 		return m_LogicalDevice;
 	};
 
-	void SetupHandlers(VkQueue& rm_GraphicsQueue, size_t a_FrameBufferAmount);
 	uint32_t FindMemoryType(uint32_t a_TypeFilter, VkMemoryPropertyFlags a_Properties);
 
 	//CommandBuffer Functions
@@ -74,20 +73,18 @@ public:
 	void EndCommand(VkCommandBuffer& r_CommandBuffer);
 
 	VkCommandBuffer BeginSingleTimeCommands();
-	void EndSingleTimeCommands(VkCommandBuffer a_CommandBuffer, VkQueue& a_GraphicsQueue);
+	void EndSingleTimeCommands(VkCommandBuffer a_CommandBuffer);
 
 	VkCommandPoolCreateInfo CreateCommandPoolInfo(uint32_t a_QueueFamilyIndex, VkCommandPoolCreateFlags a_Flags);
 	VkCommandBufferAllocateInfo CreateCommandBufferInfo(VkCommandPool& r_Pool, uint32_t a_Count, VkCommandBufferLevel a_Level);
 
 	//Buffer Functions
-	void CreateVertexBuffers(BufferData<Vertex>* a_VertexData, VkQueue& a_GraphicsQueue);
-	void CreateIndexBuffers(BufferData<uint16_t>* a_IndexData, VkQueue& a_GraphicsQueue);
-	void CreateUniformBuffers(std::vector<VkBuffer>& r_UniformBuffers,
-		std::vector<VkDeviceMemory>& r_UniformBuffersMemory, const size_t a_SwampChainSize);
+	void CreateVertexBuffers(BufferData<Vertex>* a_VertexData);
+	void CreateIndexBuffers(BufferData<uint16_t>* a_IndexData);
+	void CreateUniformBuffers(std::vector<VkBuffer>& r_UniformBuffers, std::vector<VkDeviceMemory>& r_UniformBuffersMemory, const size_t a_SwampChainSize);
 	//Standard Buffer Creation
-	void CreateBuffer(VkDeviceSize a_Size, VkBufferUsageFlags a_Usage,
-		VkMemoryPropertyFlags a_Properties, VkBuffer& r_Buffer, VkDeviceMemory& r_BufferMemory);
-	void CopyBuffer(VkDeviceSize a_Size, VkBuffer& r_SrcBuffer, VkBuffer& r_DstBuffer, VkQueue& a_GraphicsQueue);
+	void CreateBuffer(VkDeviceSize a_Size, VkBufferUsageFlags a_Usage, VkMemoryPropertyFlags a_Properties, VkBuffer& r_Buffer, VkDeviceMemory& r_BufferMemory);
+	void CopyBuffer(VkDeviceSize a_Size, VkBuffer& r_SrcBuffer, VkBuffer& r_DstBuffer);
 
 private:
 	bool ExtentionSupported(const std::string& a_Extension);

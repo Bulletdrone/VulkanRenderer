@@ -10,8 +10,6 @@
 #include "Handlers/ImageHandler.h"
 #include "Handlers/DepthHandler.h"
 
-#include "VulkanDevice.h"
-
 struct SwapChainSupportDetails {
 	VkSurfaceCapabilitiesKHR capabilities;
 	std::vector<VkSurfaceFormatKHR> formats;
@@ -29,6 +27,7 @@ public:
 
 	//Setting up that is done later.
 	void SetupRenderObjects();
+	void SetupHandlers();
 
 	void CleanupSwapChain();
 	void RecreateSwapChain();
@@ -90,6 +89,10 @@ private:
 
 	//Window Data.
 	Window* m_Window;
+
+	//Handlers
+	ImageHandler* m_ImageHandler;
+	DepthHandler* m_DepthHandler;
 
 	//ShaderData
 	ShaderManager* m_ShaderManager;

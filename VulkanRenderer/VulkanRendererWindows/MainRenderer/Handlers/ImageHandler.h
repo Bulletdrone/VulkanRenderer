@@ -1,14 +1,11 @@
 #pragma once
 
-#include <Vulkan/vulkan.h>
-
-class CommandHandler;
-class BufferHandler;
+#include "VulkanDevice.h"
 
 class ImageHandler
 {
 public:
-	ImageHandler(VkDevice& r_Device, float a_AnisotropicMax, BufferHandler* a_BufferHandler, CommandHandler* a_CommandHandler);
+	ImageHandler(VulkanDevice& r_VulkanDevice);
 	~ImageHandler();
 
 	void CreateImage(VkImage& r_Image, VkDeviceMemory& r_ImageMemory,
@@ -25,11 +22,6 @@ public:
 
 private:
 
-	VkDevice& rm_Device;
-
-	float m_AnisotropicMax;
-
-	CommandHandler* p_CommandHandler;
-	BufferHandler* p_BufferHandler;
+	VulkanDevice& rm_VulkanDevice;
 };
 

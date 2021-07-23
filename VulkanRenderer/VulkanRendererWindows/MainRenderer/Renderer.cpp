@@ -23,6 +23,7 @@ Renderer::Renderer()
 	PickPhysicalDevice();
 	//CreateLogicalDevice();
 	m_VulkanDevice.VulkanDeviceSetup(mvk_PhysicalDevice, *m_Window, DE_VulkanDebug);
+	m_VulkanDevice.CreateLogicalDevice(std::vector<const char*>(), *m_Window, mvk_GraphicsQueue, mvk_PresentQueue);
 	
 	CreateSwapChain();
 	CreateImageViews();
@@ -55,13 +56,11 @@ Renderer::~Renderer()
 }
 
 //Must be done after setting up the physical device.
-void VulkanDevice::SetupHandlers(VkQueue& rm_GraphicsQueue, size_t a_FrameBufferAmount)
+void Renderer::SetupHandlers()
 {
-	VkPhysicalDeviceProperties properties{};
-	vkGetPhysicalDeviceProperties(m_PhysicalDevice, &properties);
-	m_ImageHandler = new ImageHandler(m_LogicalDevice, properties.limits.maxSamplerAnisotropy, m_BufferHandler, m_CommandHandler);
+	m_ImageHandler = new ImageHandler(m_VulkanDevice);
 
-	m_DepthHandler = new DepthHandler(m_LogicalDevice, m_PhysicalDevice, m_ImageHandler);
+	m_DepthHandler = new DepthHandler(m_VulkanDevice, m_ImageHandler);
 }
 
 //Call this after the creation of Vulkan.

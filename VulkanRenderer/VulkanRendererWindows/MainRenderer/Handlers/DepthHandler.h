@@ -4,8 +4,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include <Vulkan/vulkan.h>
-#include <vector>
+#include "VulkanDevice.h"
 
 struct DepthTest
 {
@@ -19,7 +18,7 @@ class ImageHandler;
 class DepthHandler
 {
 public:
-	DepthHandler(VkDevice& r_Device, VkPhysicalDevice& r_PhysDevice, ImageHandler* a_ImageHandler);
+	DepthHandler(VulkanDevice& r_VulkanDevice, ImageHandler* a_ImageHandler);
 	~DepthHandler();
 
 	void CleanupDepthTest();
@@ -34,8 +33,7 @@ private:
 
 	DepthTest m_DepthTest;
 
-	VkPhysicalDevice& rm_PhysDevice;
-	VkDevice& rm_Device;
+	VulkanDevice& rm_VulkanDevice;
 
 	//Should be reworked.
 	ImageHandler* p_ImageHandler;

@@ -1,7 +1,5 @@
 #include "ImageHandler.h"
 
-#include "CommandHandler.h"
-
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
 
@@ -9,13 +7,9 @@
 
 
 
-ImageHandler::ImageHandler(VkDevice& r_Device, float a_AnisotropicMax, BufferHandler* a_BufferHandler, CommandHandler* a_CommandHandler)
-    : rm_Device(r_Device)
-{
-    m_AnisotropicMax = a_AnisotropicMax;
-    p_BufferHandler = a_BufferHandler;
-    p_CommandHandler = a_CommandHandler;
-}
+ImageHandler::ImageHandler(VulkanDevice& r_VulkanDevice)
+    : rm_VulkanDevice(r_VulkanDevice)
+{}
 
 ImageHandler::~ImageHandler()
 {}
@@ -39,24 +33,24 @@ void ImageHandler::CreateImage(VkImage& r_Image, VkDeviceMemory& r_ImageMemory,
     imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
     imageInfo.flags = 0;
 
-    if (vkCreateImage(rm_Device, &imageInfo, nullptr, &r_Image) != VK_SUCCESS)
+    if (vkCreateImage(rm_VulkanDevice, &imageInfo, nullptr, &r_Image) != VK_SUCCESS)
     {
         throw std::runtime_error("failed to create image!");
     }
 
     VkMemoryRequirements memRequirements;
-    vkGetImageMemoryRequirements(rm_Device, r_Image, &memRequirements);
+    vkGetImageMemoryRequirements(rm_VulkanDevice, r_Image, &memRequirements);
 
     VkMemoryAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
     allocInfo.allocationSize = memRequirements.size;
-    allocInfo.memoryTypeIndex = p_BufferHandler->FindMemoryType(memRequirements.memoryTypeBits, a_Properties);
+    allocInfo.memoryTypeIndex = rm_VulkanDevice.FindMemoryType(memRequirements.memoryTypeBits, a_Properties);
 
-    if (vkAllocateMemory(rm_Device, &allocInfo, nullptr, &r_ImageMemory) != VK_SUCCESS) {
+    if (vkAllocateMemory(rm_VulkanDevice, &allocInfo, nullptr, &r_ImageMemory) != VK_SUCCESS) {
         throw std::runtime_error("failed to allocate image memory!");
     }
 
-    vkBindImageMemory(rm_Device, r_Image, r_ImageMemory, 0);
+    vkBindImageMemory(rm_VulkanDevice, r_Image, r_ImageMemory, 0);
 }
 
 void ImageHandler::CreateTextureImage(VkImage& r_Image, VkDeviceMemory& r_ImageMemory,
@@ -74,14 +68,14 @@ void ImageHandler::CreateTextureImage(VkImage& r_Image, VkDeviceMemory& r_ImageM
     VkBuffer t_StagingBuffer;
     VkDeviceMemory t_StagingBufferMemory;
 
-    p_BufferHandler->CreateBuffer(r_ImageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+    rm_VulkanDevice.CreateBuffer(r_ImageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
         t_StagingBuffer, t_StagingBufferMemory);
 
     void* data;
-    vkMapMemory(rm_Device, t_StagingBufferMemory, 0, r_ImageSize, 0, &data);
+    vkMapMemory(rm_VulkanDevice, t_StagingBufferMemory, 0, r_ImageSize, 0, &data);
     memcpy(data, t_ImagePixels, static_cast<size_t>(r_ImageSize));
-    vkUnmapMemory(rm_Device, t_StagingBufferMemory);
+    vkUnmapMemory(rm_VulkanDevice, t_StagingBufferMemory);
 
     stbi_image_free(t_ImagePixels);
 
@@ -93,13 +87,13 @@ void ImageHandler::CreateTextureImage(VkImage& r_Image, VkDeviceMemory& r_ImageM
 
     TransitionImageLayout(r_Image, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
-    vkDestroyBuffer(rm_Device, t_StagingBuffer, nullptr);
-    vkFreeMemory(rm_Device, t_StagingBufferMemory, nullptr);
+    vkDestroyBuffer(rm_VulkanDevice, t_StagingBuffer, nullptr);
+    vkFreeMemory(rm_VulkanDevice, t_StagingBufferMemory, nullptr);
 }
 
 void ImageHandler::CopyBufferToImage(VkBuffer a_Buffer, VkImage a_Image, uint32_t a_Width, uint32_t a_Height)
 {
-    VkCommandBuffer t_CommandBuffer = p_CommandHandler->BeginSingleTimeCommands();
+    VkCommandBuffer t_CommandBuffer = rm_VulkanDevice.BeginSingleTimeCommands();
 
     VkBufferImageCopy t_Region{};
     t_Region.bufferOffset = 0;
@@ -126,12 +120,12 @@ void ImageHandler::CopyBufferToImage(VkBuffer a_Buffer, VkImage a_Image, uint32_
         &t_Region
     );
 
-    p_CommandHandler->EndSingleTimeCommands(t_CommandBuffer);
+    rm_VulkanDevice.EndSingleTimeCommands(t_CommandBuffer);
 }
 
 void ImageHandler::TransitionImageLayout(VkImage a_Image, VkFormat a_Format, VkImageLayout a_OldLayout, VkImageLayout a_NewLayout)
 {
-    VkCommandBuffer t_CommandBuffer = p_CommandHandler->BeginSingleTimeCommands();
+    VkCommandBuffer t_CommandBuffer = rm_VulkanDevice.BeginSingleTimeCommands();
 
     VkImageMemoryBarrier t_Barrier{};
     t_Barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -200,7 +194,7 @@ void ImageHandler::TransitionImageLayout(VkImage a_Image, VkFormat a_Format, VkI
         1, &t_Barrier
     );
 
-    p_CommandHandler->EndSingleTimeCommands(t_CommandBuffer);
+    rm_VulkanDevice.EndSingleTimeCommands(t_CommandBuffer);
 }
 
 VkImageView ImageHandler::CreateImageView(VkImage a_Image, VkFormat a_Format, VkImageAspectFlags a_AspectFlags)
@@ -217,7 +211,7 @@ VkImageView ImageHandler::CreateImageView(VkImage a_Image, VkFormat a_Format, Vk
 	viewInfo.subresourceRange.layerCount = 1;
 
 	VkImageView t_ImageView;
-	if (vkCreateImageView(rm_Device, &viewInfo, nullptr, &t_ImageView) != VK_SUCCESS) {
+	if (vkCreateImageView(rm_VulkanDevice, &viewInfo, nullptr, &t_ImageView) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create texture image view!");
 	}
 
@@ -236,7 +230,7 @@ VkSampler ImageHandler::CreateTextureSampler()
 	t_SamplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 
 	t_SamplerInfo.anisotropyEnable = VK_TRUE;
-	t_SamplerInfo.maxAnisotropy = m_AnisotropicMax;
+	t_SamplerInfo.maxAnisotropy = rm_VulkanDevice.AnisotropyFilteringMax;
 
 	t_SamplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
 	t_SamplerInfo.unnormalizedCoordinates = VK_FALSE;
@@ -250,7 +244,7 @@ VkSampler ImageHandler::CreateTextureSampler()
 	t_SamplerInfo.maxLod = 0.0f;
 
 	VkSampler t_Sampler;
-	if (vkCreateSampler(rm_Device, &t_SamplerInfo, nullptr, &t_Sampler) != VK_SUCCESS)
+	if (vkCreateSampler(rm_VulkanDevice, &t_SamplerInfo, nullptr, &t_Sampler) != VK_SUCCESS)
 	{
 		throw std::runtime_error("failed to create texture sampler!");
 	}

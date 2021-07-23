@@ -28,6 +28,8 @@ void VulkanDevice::VulkanDeviceSetup(VkPhysicalDevice a_PhysicalDevice, Window& 
 	m_PhysicalDevice = a_PhysicalDevice;
 
 	vkGetPhysicalDeviceProperties(m_PhysicalDevice, &m_Properties);
+    //Set the Anisotropy filtering here for now, later this is a option.
+    AnisotropyFilteringMax = m_Properties.limits.maxSamplerAnisotropy;
 
 	vkGetPhysicalDeviceFeatures(m_PhysicalDevice, &m_Features);
 
@@ -66,6 +68,7 @@ void VulkanDevice::VulkanDeviceSetup(VkPhysicalDevice a_PhysicalDevice, Window& 
 
 void VulkanDevice::CreateLogicalDevice(std::vector<const char*> a_EnabledExtensions, Window& r_Window, VkQueue& r_GraphicsQueue, VkQueue& r_PresentQueue)
 {
+    p_GraphicsQueue = &r_GraphicsQueue;
     QueueFamilyIndices t_Indices = SetQueueFamilies(r_Window);
 
     std::vector<VkDeviceQueueCreateInfo> t_QueueCreateInfos;
@@ -231,7 +234,7 @@ VkCommandBuffer VulkanDevice::BeginSingleTimeCommands()
     return t_CommandBuffer;
 }
 
-void VulkanDevice::EndSingleTimeCommands(VkCommandBuffer a_CommandBuffer, VkQueue& a_GraphicsQueue)
+void VulkanDevice::EndSingleTimeCommands(VkCommandBuffer a_CommandBuffer)
 {
     vkEndCommandBuffer(a_CommandBuffer);
 
@@ -240,8 +243,8 @@ void VulkanDevice::EndSingleTimeCommands(VkCommandBuffer a_CommandBuffer, VkQueu
     t_SubmitInfo.commandBufferCount = 1;
     t_SubmitInfo.pCommandBuffers = &a_CommandBuffer;
 
-    vkQueueSubmit(a_GraphicsQueue, 1, &t_SubmitInfo, VK_NULL_HANDLE);
-    vkQueueWaitIdle(a_GraphicsQueue);
+    vkQueueSubmit(*p_GraphicsQueue, 1, &t_SubmitInfo, VK_NULL_HANDLE);
+    vkQueueWaitIdle(*p_GraphicsQueue);
 
     vkFreeCommandBuffers(m_LogicalDevice, m_CommandPool, 1, &a_CommandBuffer);
 }
@@ -273,7 +276,7 @@ VkCommandBufferAllocateInfo VulkanDevice::CreateCommandBufferInfo(VkCommandPool&
 
 #pragma region Specific Buffer Creation
 
-void VulkanDevice::CreateVertexBuffers(BufferData<Vertex>* a_VertexData, VkQueue& a_GraphicsQueue)
+void VulkanDevice::CreateVertexBuffers(BufferData<Vertex>* a_VertexData)
 {
     VkDeviceSize t_BufferSize = a_VertexData->CreateBufferSize();
 
@@ -290,13 +293,13 @@ void VulkanDevice::CreateVertexBuffers(BufferData<Vertex>* a_VertexData, VkQueue
     CreateBuffer(t_BufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
         a_VertexData->GetBuffer(), a_VertexData->GetBufferMemory());
 
-    CopyBuffer(t_BufferSize, t_StagingBuffer, a_VertexData->GetBuffer(), a_GraphicsQueue);
+    CopyBuffer(t_BufferSize, t_StagingBuffer, a_VertexData->GetBuffer());
 
     vkDestroyBuffer(m_LogicalDevice, t_StagingBuffer, nullptr);
     vkFreeMemory(m_LogicalDevice, t_StagingBufferMemory, nullptr);
 }
 
-void VulkanDevice::CreateIndexBuffers(BufferData<uint16_t>* a_IndexData, VkQueue& a_GraphicsQueue)
+void VulkanDevice::CreateIndexBuffers(BufferData<uint16_t>* a_IndexData)
 {
     VkDeviceSize t_BufferSize = a_IndexData->CreateBufferSize();
 
@@ -313,7 +316,7 @@ void VulkanDevice::CreateIndexBuffers(BufferData<uint16_t>* a_IndexData, VkQueue
     CreateBuffer(t_BufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
         a_IndexData->GetBuffer(), a_IndexData->GetBufferMemory());
 
-    CopyBuffer(t_BufferSize, t_StagingBuffer, a_IndexData->GetBuffer(), a_GraphicsQueue);
+    CopyBuffer(t_BufferSize, t_StagingBuffer, a_IndexData->GetBuffer());
 
     vkDestroyBuffer(m_LogicalDevice, t_StagingBuffer, nullptr);
     vkFreeMemory(m_LogicalDevice, t_StagingBufferMemory, nullptr);
@@ -380,7 +383,7 @@ void VulkanDevice::CreateBuffer(VkDeviceSize a_Size, VkBufferUsageFlags a_Usage,
     vkBindBufferMemory(m_LogicalDevice, r_Buffer, r_BufferMemory, 0);
 }
 
-void VulkanDevice::CopyBuffer(VkDeviceSize a_Size, VkBuffer& r_SrcBuffer, VkBuffer& r_DstBuffer, VkQueue& a_GraphicsQueue)
+void VulkanDevice::CopyBuffer(VkDeviceSize a_Size, VkBuffer& r_SrcBuffer, VkBuffer& r_DstBuffer)
 {
     VkCommandBuffer t_CommandBuffer = BeginSingleTimeCommands();
 
@@ -388,7 +391,7 @@ void VulkanDevice::CopyBuffer(VkDeviceSize a_Size, VkBuffer& r_SrcBuffer, VkBuff
     t_CopyRegion.size = a_Size;
     vkCmdCopyBuffer(t_CommandBuffer, r_SrcBuffer, r_DstBuffer, 1, &t_CopyRegion);
 
-    EndSingleTimeCommands(t_CommandBuffer, a_GraphicsQueue);
+    EndSingleTimeCommands(t_CommandBuffer);
 }
 
 #pragma endregion
