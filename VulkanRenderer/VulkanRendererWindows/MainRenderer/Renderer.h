@@ -33,8 +33,7 @@ public:
 	void RecreateSwapChain();
 
 	void CreateVKInstance();
-	void PickPhysicalDevice();
-	void CreateLogicalDevice();
+	VkPhysicalDevice PickPhysicalDevice();
 	void CreateSwapChain();
 	void CreateImageViews();
 	void CreateRenderPass();
@@ -74,7 +73,6 @@ public:
 	//Getters
 	GLFWwindow* GetWindow() const { return m_Window->GetWindow(); }
 	VulkanDevice& GetVulkanDevice() { return m_VulkanDevice; }
-	VkPhysicalDevice& GetPhysicalDevice() { return mvk_PhysicalDevice; }
 
 	//Set the mesh vector pointer in the Renderer from the one in ObjectManager.
 	void SetRenderObjectsVector(std::vector<BaseRenderObject*>* a_RenderObjects);
@@ -108,7 +106,7 @@ private:
 
 	//Primary Vulkan Data;
 	VkInstance mvk_Instance;
-	VkPhysicalDevice mvk_PhysicalDevice = VK_NULL_HANDLE;
+
 	VulkanDevice m_VulkanDevice;
 
 	VkQueue mvk_GraphicsQueue;

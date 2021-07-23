@@ -63,7 +63,7 @@ void VulkanDevice::VulkanDeviceSetup(VkPhysicalDevice a_PhysicalDevice, Window& 
     
 
     //For now explicitally add that it will present to the screen using the swapchain.
-    m_SupportedExtensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
+    //m_SupportedExtensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
 }
 
 void VulkanDevice::CreateLogicalDevice(std::vector<const char*> a_EnabledExtensions, Window& r_Window, VkQueue& r_GraphicsQueue, VkQueue& r_PresentQueue)
@@ -101,12 +101,11 @@ void VulkanDevice::CreateLogicalDevice(std::vector<const char*> a_EnabledExtensi
                 std::cerr << "Enabled device extension \"" << t_EnabledExtension << "\" is not present at device level\n";
             }
         }
-
-        t_CreateInfo.enabledExtensionCount = (uint32_t)a_EnabledExtensions.size();
-        t_CreateInfo.ppEnabledExtensionNames = a_EnabledExtensions.data();
     }
 
-    t_CreateInfo.enabledExtensionCount = static_cast<uint32_t>(m_SupportedExtensions.size());
+    a_EnabledExtensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
+
+    t_CreateInfo.enabledExtensionCount = (uint32_t)a_EnabledExtensions.size();
     t_CreateInfo.ppEnabledExtensionNames = a_EnabledExtensions.data();
 
     if (m_EnableDebug)

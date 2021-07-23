@@ -24,7 +24,7 @@ ObjectManager::~ObjectManager()
 {
 	for (size_t i = 0; i < m_RenderObjects.size(); i++)
 	{
-		m_RenderObjects[i]->GetMeshData()->DeleteBuffers(p_Renderer->GetVulkanDevice());
+		m_RenderObjects[i]->GetMeshData()->DeleteBuffers(p_Renderer->GetVulkanDevice().m_LogicalDevice);
 		delete m_RenderObjects[i];
 	}
 	m_RenderObjects.clear();

@@ -3,15 +3,15 @@
 
 #include <iostream>
 
-ShaderManager::ShaderManager(const VkDevice& r_VKDevice, const VkExtent2D& r_VKSwapChainExtent)
-	:	rmvk_Device(r_VKDevice), rmvk_SwapChainExtent(r_VKSwapChainExtent)
+ShaderManager::ShaderManager(VulkanDevice& r_VulkanDevice, const VkExtent2D& r_VKSwapChainExtent)
+	: rm_VulkanDevice(r_VulkanDevice), rmvk_SwapChainExtent(r_VKSwapChainExtent)
 {}
 
 ShaderManager::~ShaderManager()
 {
 	for (size_t i = 0; i < p_SavedDescriptors.size(); i++)
 	{
-		vkDestroyDescriptorSetLayout(rmvk_Device, p_SavedDescriptors[i]->descriptorLayout, nullptr);
+		vkDestroyDescriptorSetLayout(rm_VulkanDevice, p_SavedDescriptors[i]->descriptorLayout, nullptr);
 	}
 }
 
@@ -38,7 +38,7 @@ void ShaderManager::CreateDescriptorSetLayout(DescriptorData& r_DescriptorData)
 	t_LayoutInfo.pBindings = t_Bindings.data();
 
 
-	if (vkCreateDescriptorSetLayout(rmvk_Device, &t_LayoutInfo, nullptr, &r_DescriptorData.descriptorLayout) != VK_SUCCESS) {
+	if (vkCreateDescriptorSetLayout(rm_VulkanDevice, &t_LayoutInfo, nullptr, &r_DescriptorData.descriptorLayout) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create descriptor set layout!");
 	}
 }
@@ -72,7 +72,7 @@ void ShaderManager::CreateDescriptorPool(const size_t a_FrameAmount, DescriptorD
 	t_PoolInfo.pPoolSizes = t_PoolSizes.data();
 	t_PoolInfo.maxSets = static_cast<uint32_t>(a_FrameAmount);
 
-	if (vkCreateDescriptorPool(rmvk_Device, &t_PoolInfo, nullptr, &r_DescriptorData.descriptorPool) != VK_SUCCESS)
+	if (vkCreateDescriptorPool(rm_VulkanDevice, &t_PoolInfo, nullptr, &r_DescriptorData.descriptorPool) != VK_SUCCESS)
 	{
 		throw std::runtime_error("failed to create descriptor pool!");
 	}
@@ -91,7 +91,7 @@ void ShaderManager::CreateDescriptorSet(const size_t a_FrameAmount, DescriptorDa
 	std::vector<VkDescriptorSet> DescriptorSet;
 	DescriptorSet.resize(2);
 
-	if (vkAllocateDescriptorSets(rmvk_Device, &t_AllocInfo, DescriptorSet.data()) != VK_SUCCESS)
+	if (vkAllocateDescriptorSets(rm_VulkanDevice, &t_AllocInfo, DescriptorSet.data()) != VK_SUCCESS)
 	{
 		throw std::runtime_error("failed to allocate descriptor sets!");
 	}
@@ -126,7 +126,7 @@ void ShaderManager::CreateDescriptorSet(const size_t a_FrameAmount, DescriptorDa
 		t_DescriptorWrites[1].descriptorCount = 1;
 		t_DescriptorWrites[1].pImageInfo = &t_ImageInfo;
 
-		vkUpdateDescriptorSets(rmvk_Device, static_cast<uint32_t>(t_DescriptorWrites.size()),
+		vkUpdateDescriptorSets(rm_VulkanDevice, static_cast<uint32_t>(t_DescriptorWrites.size()),
 			t_DescriptorWrites.data(), 0, nullptr);
 
 		r_DescriptorData.descriptorSets[i].push_back(DescriptorSet[i]);
@@ -137,7 +137,7 @@ void ShaderManager::RecreateDescriptors(const size_t a_FrameAmount, std::vector<
 {
 	for (size_t i = 0; i < p_SavedDescriptors.size(); i++)
 	{
-		vkDestroyDescriptorPool(rmvk_Device, p_SavedDescriptors[i]->descriptorPool, nullptr);
+		vkDestroyDescriptorPool(rm_VulkanDevice, p_SavedDescriptors[i]->descriptorPool, nullptr);
 
 		CreateDescriptorPool(a_FrameAmount, *p_SavedDescriptors[i]);
 		CreateDescriptorSet(a_FrameAmount, *p_SavedDescriptors[i], r_ViewProjectionBuffers);
@@ -283,7 +283,7 @@ void ShaderManager::CreateGraphicsPipeline(const VkRenderPass& r_RenderPass, Pip
 	t_PipelineLayoutInfo.pushConstantRangeCount = 1; // Optional
 	t_PipelineLayoutInfo.pPushConstantRanges = &t_InstanceModelPushConstantRange; // Optional
 
-	if (vkCreatePipelineLayout(rmvk_Device, &t_PipelineLayoutInfo, nullptr, &r_PipeLineData.pipeLineLayout) != VK_SUCCESS) {
+	if (vkCreatePipelineLayout(rm_VulkanDevice, &t_PipelineLayoutInfo, nullptr, &r_PipeLineData.pipeLineLayout) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create pipeline layout!");
 	}
 
@@ -310,12 +310,12 @@ void ShaderManager::CreateGraphicsPipeline(const VkRenderPass& r_RenderPass, Pip
 	t_PipelineInfo.basePipelineHandle = VK_NULL_HANDLE; // Optional
 	t_PipelineInfo.basePipelineIndex = -1; // Optional
 
-	if (vkCreateGraphicsPipelines(rmvk_Device, VK_NULL_HANDLE, 1, &t_PipelineInfo, nullptr, &r_PipeLineData.pipeLine) != VK_SUCCESS) {
+	if (vkCreateGraphicsPipelines(rm_VulkanDevice, VK_NULL_HANDLE, 1, &t_PipelineInfo, nullptr, &r_PipeLineData.pipeLine) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create graphics pipeline!");
 	}
 
-	vkDestroyShaderModule(rmvk_Device, t_VertShaderModule, nullptr);
-	vkDestroyShaderModule(rmvk_Device, t_FragShaderModule, nullptr);
+	vkDestroyShaderModule(rm_VulkanDevice, t_VertShaderModule, nullptr);
+	vkDestroyShaderModule(rm_VulkanDevice, t_FragShaderModule, nullptr);
 }
 
 VkShaderModule ShaderManager::CreateShaderModule(const std::vector<char>& a_Code)
@@ -326,7 +326,7 @@ VkShaderModule ShaderManager::CreateShaderModule(const std::vector<char>& a_Code
 	t_CreateInfo.pCode = reinterpret_cast<const uint32_t*>(a_Code.data());
 
 	VkShaderModule t_ShaderModule;
-	if (vkCreateShaderModule(rmvk_Device, &t_CreateInfo, nullptr, &t_ShaderModule) != VK_SUCCESS) {
+	if (vkCreateShaderModule(rm_VulkanDevice, &t_CreateInfo, nullptr, &t_ShaderModule) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create shader module!");
 	}
 

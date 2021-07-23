@@ -3,13 +3,12 @@
 #include "Tools/ResourceLoader.h"
 #include "Structs/PipelineData.h"
 
-#include <Vulkan/vulkan.h>
-#include <vector>
+#include "VulkanDevice.h"
 
 class ShaderManager
 {
 public:
-	ShaderManager(const VkDevice& r_VKDevice, const VkExtent2D& r_VKSwapChainExtent);
+	ShaderManager(VulkanDevice& r_VulkanDevice, const VkExtent2D& r_VKSwapChainExtent);
 	~ShaderManager();
 
 	void CreateDescriptorSetLayout(DescriptorData& r_DescriptorData);
@@ -26,7 +25,7 @@ public:
 private:
 	void CreateGraphicsPipeline(const VkRenderPass& r_RenderPass, PipeLineData& r_PipeLineData);
 
-	const VkDevice& rmvk_Device;
+	VulkanDevice& rm_VulkanDevice;
 	const VkExtent2D& rmvk_SwapChainExtent;
 
 	std::vector<PipeLineData*> p_SavedPipelines;

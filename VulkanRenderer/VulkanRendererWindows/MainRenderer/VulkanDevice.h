@@ -29,7 +29,7 @@ public:
 	void CreateLogicalDevice(std::vector<const char*> a_EnabledExtensions, Window& r_Window, VkQueue& r_GraphicsQueue, VkQueue& r_PresentQueue);
 
 	// Physical device representation
-	VkPhysicalDevice m_PhysicalDevice;
+	VkPhysicalDevice m_PhysicalDevice = VK_NULL_HANDLE;
 	// Logical device representation (application's view of the device)
 	VkDevice m_LogicalDevice;
 	// Properties of the physical device including limits that the application can check against

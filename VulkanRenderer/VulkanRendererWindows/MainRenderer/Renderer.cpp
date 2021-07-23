@@ -20,11 +20,12 @@ Renderer::Renderer()
 		DE_VulkanDebug->SetupDebugMessanger(nullptr);
 
 	m_Window->SetupVKWindow(mvk_Instance);
-	PickPhysicalDevice();
+	VkPhysicalDevice physicalDevice = PickPhysicalDevice();
 	//CreateLogicalDevice();
-	m_VulkanDevice.VulkanDeviceSetup(mvk_PhysicalDevice, *m_Window, DE_VulkanDebug);
+	m_VulkanDevice.VulkanDeviceSetup(physicalDevice, *m_Window, DE_VulkanDebug);
 	m_VulkanDevice.CreateLogicalDevice(std::vector<const char*>(), *m_Window, mvk_GraphicsQueue, mvk_PresentQueue);
 	
+	SetupHandlers();
 	CreateSwapChain();
 	CreateImageViews();
 	CreateRenderPass();
@@ -166,8 +167,10 @@ void Renderer::CreateVKInstance()
 	}
 }
 
-void Renderer::PickPhysicalDevice()
+VkPhysicalDevice Renderer::PickPhysicalDevice()
 {
+	VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
+
 	uint32_t t_DeviceCount = 0;
 	vkEnumeratePhysicalDevices(mvk_Instance, &t_DeviceCount, nullptr);
 
@@ -188,71 +191,23 @@ void Renderer::PickPhysicalDevice()
 			vkGetPhysicalDeviceProperties(device, &t_PhysDeviceProperties);
 			if (t_PhysDeviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
 			{
-				mvk_PhysicalDevice = device;
+				physicalDevice = device;
 				break;
 			}
 		}
 	}
 
-	if (mvk_PhysicalDevice == VK_NULL_HANDLE)
+	if (physicalDevice == VK_NULL_HANDLE)
 	{
 		throw std::runtime_error("failed to find a suitable GPU!");
 	}
-}
 
-void Renderer::CreateLogicalDevice()
-{
-	QueueFamilyIndices t_Indices = FindQueueFamilies(mvk_PhysicalDevice);
-
-	std::vector<VkDeviceQueueCreateInfo> t_QueueCreateInfos;
-	std::set<uint32_t> t_UniqueQueueFamilies = { t_Indices.graphicsFamily.value(), t_Indices.presentFamily.value() };
-
-	float queuePriority = 1.0f;
-	for (uint32_t queueFamily : t_UniqueQueueFamilies) 
-	{
-		VkDeviceQueueCreateInfo queueCreateInfo{};
-		queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-		queueCreateInfo.queueFamilyIndex = queueFamily;
-		queueCreateInfo.queueCount = 1;
-		queueCreateInfo.pQueuePriorities = &queuePriority;
-		t_QueueCreateInfos.push_back(queueCreateInfo);
-	}
-
-	VkPhysicalDeviceFeatures t_DeviceFeatures{};
-	t_DeviceFeatures.samplerAnisotropy = VK_TRUE;
-
-	VkDeviceCreateInfo t_CreateInfo{};
-	t_CreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-
-	t_CreateInfo.queueCreateInfoCount = static_cast<uint32_t>(t_QueueCreateInfos.size());
-	t_CreateInfo.pQueueCreateInfos = t_QueueCreateInfos.data();
-
-	t_CreateInfo.pEnabledFeatures = &t_DeviceFeatures;
-
-	t_CreateInfo.enabledExtensionCount = static_cast<uint32_t>(m_DeviceExtensions.size());
-	t_CreateInfo.ppEnabledExtensionNames = m_DeviceExtensions.data();
-
-	if (DE_EnableValidationLayers) 
-	{
-		DE_VulkanDebug->AddDebugLayerInstanceDevice(t_CreateInfo);
-	}
-	else 
-	{
-		t_CreateInfo.enabledLayerCount = 0;
-	}
-
-	if (vkCreateDevice(mvk_PhysicalDevice, &t_CreateInfo, nullptr, &m_VulkanDevice.m_LogicalDevice) != VK_SUCCESS) 
-	{
-		throw std::runtime_error("failed to create logical device!");
-	}
-
-	vkGetDeviceQueue(m_VulkanDevice, t_Indices.graphicsFamily.value(), 0, &mvk_GraphicsQueue);
-	vkGetDeviceQueue(m_VulkanDevice, t_Indices.presentFamily.value(), 0, &mvk_PresentQueue);
+	return physicalDevice;
 }
 
 void Renderer::CreateSwapChain()
 {
-	SwapChainSupportDetails t_SwapChainSupport = QuerySwapChainSupport(mvk_PhysicalDevice);
+	SwapChainSupportDetails t_SwapChainSupport = QuerySwapChainSupport(m_VulkanDevice.m_PhysicalDevice);
 
 	//Getting the needed values from the PhysicalDevice.
 	VkSurfaceFormatKHR t_SurfaceFormat = ChooseSwapSurfaceFormat(t_SwapChainSupport.formats);
@@ -275,8 +230,6 @@ void Renderer::CreateSwapChain()
 		
 	}
 
-	
-
 	VkSwapchainCreateInfoKHR t_CreateInfo{};
 	t_CreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
 	t_CreateInfo.surface = m_Window->GetSurface();
@@ -288,7 +241,7 @@ void Renderer::CreateSwapChain()
 	t_CreateInfo.imageArrayLayers = 1;
 	t_CreateInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
-	QueueFamilyIndices t_Indices = FindQueueFamilies(mvk_PhysicalDevice);
+	QueueFamilyIndices t_Indices = FindQueueFamilies(m_VulkanDevice.m_PhysicalDevice);
 	uint32_t t_QueueFamilyIndices[] = { t_Indices.graphicsFamily.value(), t_Indices.presentFamily.value() };
 
 	if (t_Indices.graphicsFamily != t_Indices.presentFamily) 
@@ -336,7 +289,7 @@ void Renderer::CreateImageViews()
 
 	for (uint32_t i = 0; i < mvk_SwapChainImages.size(); i++) 
 	{
-		mvk_SwapChainImageViews[i] = m_VulkanDevice.m_ImageHandler->CreateImageView(mvk_SwapChainImages[i], mvk_SwapChainImageFormat, VK_IMAGE_ASPECT_COLOR_BIT);
+		mvk_SwapChainImageViews[i] = m_ImageHandler->CreateImageView(mvk_SwapChainImages[i], mvk_SwapChainImageFormat, VK_IMAGE_ASPECT_COLOR_BIT);
 	}
 }
 
@@ -359,7 +312,7 @@ void Renderer::CreateRenderPass()
 
 	//DEPTH BUFFER
 	VkAttachmentDescription t_DepthAttachment{};
-	t_DepthAttachment.format = m_VulkanDevice.m_DepthHandler->FindDepthFormat();
+	t_DepthAttachment.format = m_DepthHandler->FindDepthFormat();
 	t_DepthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
 	t_DepthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
 	t_DepthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
@@ -434,7 +387,7 @@ void Renderer::CreateFrameBuffers()
 	{
 		std::array<VkImageView, 2> t_Attachments = {
 		mvk_SwapChainImageViews[i],
-		m_VulkanDevice.m_DepthHandler->GetDepthTest().depthImageView
+		m_DepthHandler->GetDepthTest().depthImageView
 		};
 
 		VkFramebufferCreateInfo t_FramebufferInfo{};
@@ -455,12 +408,12 @@ void Renderer::CreateFrameBuffers()
 
 void Renderer::CreateCommandPool()
 {
-	m_VulkanDevice.CreateCommandPools(FindQueueFamilies(mvk_PhysicalDevice));
+	m_VulkanDevice.CreateCommandPools(FindQueueFamilies(m_VulkanDevice.m_PhysicalDevice));
 }
 
 void Renderer::CreateDepthResources()
 {
-	m_VulkanDevice.m_DepthHandler->CreateDepthResources(mvk_SwapChainExtent.width, mvk_SwapChainExtent.height);
+	m_DepthHandler->CreateDepthResources(mvk_SwapChainExtent.width, mvk_SwapChainExtent.height);
 }
 
 void Renderer::CreateSyncObjects()
@@ -499,11 +452,11 @@ void Renderer::SetupImage(TextureData& a_TextureData, const char* a_ImagePath)
 	VkDeviceSize t_Size;
 	int t_Width, t_Height, t_Channels;
 
-	m_VulkanDevice.m_ImageHandler->CreateTextureImage(a_TextureData.textureImage, a_TextureData.textureImageMemory,
+	m_ImageHandler->CreateTextureImage(a_TextureData.textureImage, a_TextureData.textureImageMemory,
 		a_ImagePath, t_Size, t_Width, t_Height, t_Channels);
 
-	a_TextureData.textureImageView = m_VulkanDevice.m_ImageHandler->CreateImageView(a_TextureData.textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_ASPECT_COLOR_BIT);
-	a_TextureData.textureSampler = m_VulkanDevice.m_ImageHandler->CreateTextureSampler();
+	a_TextureData.textureImageView = m_ImageHandler->CreateImageView(a_TextureData.textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_ASPECT_COLOR_BIT);
+	a_TextureData.textureSampler = m_ImageHandler->CreateTextureSampler();
 }
 
 void Renderer::DrawFrame(uint32_t& r_ImageIndex, float a_dt)
@@ -535,7 +488,7 @@ void Renderer::DrawFrame(uint32_t& r_ImageIndex, float a_dt)
 
 	//Draw the objects using a single command buffer.
 	m_VulkanDevice.ClearPreviousCommand(m_CurrentFrame);
-	VkCommandBuffer& t_MainBuffer = m_VulkanDevice.CreateAndBeginCommand(m_CurrentFrame, FindQueueFamilies(mvk_PhysicalDevice).graphicsFamily.value(),
+	VkCommandBuffer& t_MainBuffer = m_VulkanDevice.CreateAndBeginCommand(m_CurrentFrame, FindQueueFamilies(m_VulkanDevice.m_PhysicalDevice).graphicsFamily.value(),
 		mvk_RenderPass, mvk_SwapChainFrameBuffers[m_CurrentFrame], mvk_SwapChainExtent);
 
 	DrawObjects(t_MainBuffer);
