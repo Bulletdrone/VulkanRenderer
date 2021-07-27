@@ -121,11 +121,11 @@
     <ClInclude Include="MainRenderer\Structs\PipelineData.h">
       <Filter>MainRenderer\Structs</Filter>
     </ClInclude>
-    <ClInclude Include="MainRenderer\Structs\ContextData.h">
-      <Filter>MainRenderer\Structs</Filter>
-    </ClInclude>
     <ClInclude Include="MainRenderer\VulkanDevice.h">
       <Filter>MainRenderer\Structs</Filter>
+    </ClInclude>
+    <ClInclude Include="MainRenderer\Tools\ObjectPool.h">
+      <Filter>Tools</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

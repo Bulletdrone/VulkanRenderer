@@ -47,8 +47,8 @@
     <ClInclude Include="MainRenderer\RenderObjects\RenderShape.h" />
     <ClInclude Include="MainRenderer\ShaderManager.h" />
     <ClInclude Include="MainRenderer\Structs\BufferData.h" />
-    <ClInclude Include="MainRenderer\Structs\ContextData.h" />
     <ClInclude Include="MainRenderer\Structs\PipelineData.h" />
+    <ClInclude Include="MainRenderer\Tools\ObjectPool.h" />
     <ClInclude Include="MainRenderer\Tools\ResourceLoader.h" />
     <ClInclude Include="MainRenderer\VulkanDebugger\VulkanDebug.h" />
     <ClInclude Include="MainRenderer\VulkanDevice.h" />
