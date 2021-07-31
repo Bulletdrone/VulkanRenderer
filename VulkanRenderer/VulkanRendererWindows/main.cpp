@@ -50,6 +50,7 @@ int main()
         deltaTime = static_cast<float>(t_End - t_CurrentTime);
     }
 
+    m_Renderer->CleanupSwapChain();
     delete m_ObjectManager;
     delete m_Renderer;
 

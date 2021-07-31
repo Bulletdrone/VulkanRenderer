@@ -11,10 +11,20 @@ VulkanDevice::VulkanDevice()
 
 VulkanDevice::~VulkanDevice()
 {
-	if (m_LogicalDevice)
-	{
-		vkDestroyDevice(m_LogicalDevice, nullptr);
-	}
+
+}
+
+void VulkanDevice::CleanupDevice()
+{
+    if (m_CommandPool)
+    {
+        vkDestroyCommandPool(m_LogicalDevice, m_CommandPool, nullptr);
+    }
+
+    if (m_LogicalDevice)
+    {
+        vkDestroyDevice(m_LogicalDevice, nullptr);
+    }
 }
 
 void VulkanDevice::VulkanDeviceSetup(VkPhysicalDevice a_PhysicalDevice, Window& a_Window, VulkanDebug* debug, size_t a_FrameBufferAmount)

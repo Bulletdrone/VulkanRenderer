@@ -21,7 +21,7 @@ Renderer::Renderer()
 
 	m_Window->SetupVKWindow(mvk_Instance);
 	VkPhysicalDevice physicalDevice = PickPhysicalDevice();
-	//CreateLogicalDevice();
+
 	m_VulkanDevice.VulkanDeviceSetup(physicalDevice, *m_Window, DE_VulkanDebug, FRAMEBUFFER_AMOUNT);
 	m_VulkanDevice.CreateLogicalDevice(std::vector<const char*>(), *m_Window, mvk_GraphicsQueue, mvk_PresentQueue);
 	
@@ -35,9 +35,6 @@ Renderer::Renderer()
 
 Renderer::~Renderer()
 {
-	vkDeviceWaitIdle(m_VulkanDevice);
-	CleanupSwapChain();
-
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
 		vkDestroySemaphore(m_VulkanDevice, mvk_RenderFinishedSemaphore[i], nullptr);
 		vkDestroySemaphore(m_VulkanDevice, mvk_ImageAvailableSemaphore[i], nullptr);
@@ -46,7 +43,7 @@ Renderer::~Renderer()
 	//delete m_CommandHandler;
 
 	delete m_ShaderManager;
-	vkDestroyDevice(m_VulkanDevice, nullptr);
+	m_VulkanDevice.CleanupDevice();
 
 	if (DE_EnableValidationLayers)
 		delete DE_VulkanDebug;
@@ -74,6 +71,7 @@ void Renderer::SetupRenderObjects()
 
 void Renderer::CleanupSwapChain()
 {
+	vkDeviceWaitIdle(m_VulkanDevice);
 	for (size_t i = 0; i < mvk_SwapChainFrameBuffers.size(); i++) {
 		vkDestroyFramebuffer(m_VulkanDevice, mvk_SwapChainFrameBuffers[i], nullptr);
 	}
@@ -460,8 +458,6 @@ void Renderer::SetupImage(TextureData& a_TextureData, const char* a_ImagePath)
 
 void Renderer::DrawFrame(uint32_t& r_ImageIndex, float a_dt)
 {
-	bool recreateSwapChain = false;
-
 	vkWaitForFences(m_VulkanDevice, 1, &mvk_InFlightFences[m_CurrentFrame], VK_TRUE, UINT64_MAX);
 
 	VkResult t_Result = vkAcquireNextImageKHR(m_VulkanDevice, mvk_SwapChain, UINT64_MAX, mvk_ImageAvailableSemaphore[m_CurrentFrame], VK_NULL_HANDLE, &r_ImageIndex);

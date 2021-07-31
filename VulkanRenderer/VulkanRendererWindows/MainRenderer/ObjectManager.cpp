@@ -22,9 +22,10 @@ ObjectManager::~ObjectManager()
 {
 	for (size_t i = 0; i < m_RenderObjects.size(); i++)
 	{
-		m_RenderObjects[i]->GetMeshData()->DeleteBuffers(p_Renderer->GetVulkanDevice().m_LogicalDevice);
+		//m_RenderObjects[i]->GetMeshData()->DeleteBuffers(p_Renderer->GetVulkanDevice().m_LogicalDevice);
 		delete m_RenderObjects[i];
 	}
+	delete m_RenderFactory;
 	m_RenderObjects.clear();
 }
 
