@@ -94,6 +94,7 @@ void Renderer::CleanupSwapChain()
 		vkFreeMemory(m_VulkanDevice, mvk_ViewProjectionBuffersMemory[i], nullptr);
 	}
 	
+	m_DepthHandler->CleanupDepthTest();
 }
 
 void Renderer::RecreateSwapChain()
