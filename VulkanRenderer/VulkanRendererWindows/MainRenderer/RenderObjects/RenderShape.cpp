@@ -1,7 +1,7 @@
 #include "RenderShape.h"
 
-RenderShape::RenderShape(const size_t a_ID, Transform* a_Transform, PipeLineData* a_PipeLineData, RenderObjectData* a_RenderObjectData)
-	:	BaseRenderObject(a_ID, a_Transform, a_PipeLineData)
+RenderShape::RenderShape(const size_t a_ID, Transform* a_Transform, uint32_t a_PipelineID, RenderObjectData* a_RenderObjectData)
+	:	BaseRenderObject(a_ID, a_Transform, a_PipelineID)
 {
 	p_RenderObjectData= a_RenderObjectData;
 }

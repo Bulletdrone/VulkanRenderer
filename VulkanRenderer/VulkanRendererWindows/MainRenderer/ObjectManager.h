@@ -24,12 +24,13 @@ private:
 	std::vector<BaseRenderObject*> m_RenderObjects;
 
 	std::vector<TextureData> m_Textures;
-	std::vector<PipeLineData> m_PipeLineData;
-	std::vector<DescriptorData> m_DescriptorData;
+
+	//Data pipeline
+	uint32_t pip_SpaceImage;
+
+	//Data descriptor
+	uint32_t des_SpaceImage;
 
 	Renderer* p_Renderer;
 	RenderFactory* m_RenderFactory;
-
-	
 };
-

@@ -38,10 +38,10 @@ public:
 	void CreateImageViews();
 	void CreateRenderPass();
 
-	void CreateDescriptorLayout(DescriptorData& r_Descriptor);
-	void CreateGraphicsPipeline(PipeLineData& r_PipelineData);
-	void CreateDescriptorPool(DescriptorData& r_Descriptor);
-	void CreateDescriptorSet(DescriptorData& r_Descriptor);
+	uint32_t CreateDescriptorLayout(TextureData* a_textureData);
+	uint32_t CreateGraphicsPipeline(uint32_t a_DescID);
+	void CreateDescriptorPool(uint32_t a_DescID);
+	void CreateDescriptorSet(uint32_t a_DescID);
 
 	void CreateFrameBuffers();
 	void CreateCommandPool();

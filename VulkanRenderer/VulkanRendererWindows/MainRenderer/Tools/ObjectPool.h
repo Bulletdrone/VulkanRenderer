@@ -15,10 +15,10 @@ public:
 	@return the object on the Position. */
 	T& Get(uint32_t a_Pos);
 	/*	Get an object that needs to be filled in. Call SetFilled with the r_Pos after you filled it in.
-	@param r_Object, this value will be overwriten with an filled object is it was filled, otherwise it won't change.
+	@param r_IsFull, this value will be overwriten to see if the object was filled or not.
 	@param a_Pos, The position in the array.
-	@return If the object was filled. */
-	bool GetFilledObject(T& r_Object, uint32_t a_Pos);
+	@return the object regardless if it's filled. */
+	T& GetFilledObject(bool& r_IsFull, uint32_t a_Pos);
 	/*	Get a reference to a filled object. Returns false if the object is empty.
 		@param r_Pos, this value will be overwriten with the object array position.
 		@return An empty Object reference that needs to be filled in. */
@@ -48,7 +48,7 @@ inline ObjectPool<T>::ObjectPool(uint32_t a_Size, uint32_t a_Addition)
 		addition = 1;
 
 	arr = new T[size];
-	isEmpty = new bool[size] {true};
+	isEmpty = new bool[size];
 }
 
 template <typename T>
@@ -65,13 +65,11 @@ inline T& ObjectPool<T>::Get(uint32_t a_Pos)
 }
 
 template<typename T>
-inline bool ObjectPool<T>::GetFilledObject(T& r_Object, uint32_t a_Pos)
+inline T& ObjectPool<T>::GetFilledObject(bool& r_IsFull, uint32_t a_Pos)
 {
-	if (isEmpty(a_Pos))
-		return false;
+	r_IsFull = !isEmpty[a_Pos];
 
-	r_Object = arr[a_Pos];
-	return true;
+	return arr[a_Pos];
 }
 
 template <typename T>
@@ -79,9 +77,9 @@ inline T& ObjectPool<T>::GetEmptyObject(uint32_t& r_Position)
 {
 	for (uint32_t i = 0; i < size; i++)
 	{
-		if (isEmpty)
+		if (isEmpty[i])
 		{
-			isEmpty = false;
+			isEmpty[i] = false;
 			r_Position = i;
 			return arr[i];
 		}
@@ -97,7 +95,7 @@ inline void ObjectPool<T>::AddExtraElements(uint32_t& r_Position)
 	uint32_t newSize = size + addition;
 
 	T* newArr = new T[newSize];
-	bool newIsEmpty = new bool[newSize] {false};
+	bool* newIsEmpty = new bool[newSize] {false};
 
 	for (uint32_t i = 0; i < size; i++)
 	{

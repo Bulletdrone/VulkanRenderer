@@ -9,14 +9,12 @@ ObjectManager::ObjectManager(Renderer* a_Renderer)
 	m_RenderFactory = new RenderFactory();
 
 	m_Textures.resize(1);
-	m_PipeLineData.resize(1);
-	m_DescriptorData.resize(1);
 
-	m_PipeLineData[0].p_DescriptorData = &m_DescriptorData[0];
-	m_PipeLineData[0].p_DescriptorData->texture = &m_Textures[0];
+	//pip_SpaceImage.p_DescriptorData = &m_DescriptorData[0];
+	//pip_SpaceImage.p_DescriptorData->texture = &m_Textures[0];
 	//Load Texture
-	p_Renderer->CreateDescriptorLayout(m_DescriptorData[0]);
-	p_Renderer->CreateGraphicsPipeline(m_PipeLineData[0]);
+	des_SpaceImage = p_Renderer->CreateDescriptorLayout(&m_Textures[0]);
+	pip_SpaceImage = p_Renderer->CreateGraphicsPipeline(des_SpaceImage);
 	p_Renderer->SetupImage(m_Textures[0], "../Resources/Images/Background.png");
 }
 
@@ -33,8 +31,8 @@ ObjectManager::~ObjectManager()
 void ObjectManager::SetupStartObjects()
 {
 	p_Renderer->SetupRenderObjects();
-	p_Renderer->CreateDescriptorPool(m_DescriptorData[0]);
-	p_Renderer->CreateDescriptorSet(m_DescriptorData[0]);
+	p_Renderer->CreateDescriptorPool(des_SpaceImage);
+	p_Renderer->CreateDescriptorSet(des_SpaceImage);
 }
 
 void ObjectManager::UpdateObjects(float a_Dt)
@@ -49,12 +47,12 @@ void ObjectManager::UpdateObjects(float a_Dt)
 	p_Renderer->DrawFrame(t_ImageIndex, a_Dt);
 
 	//Update Uniform Buffer
-	p_Renderer->UpdateUniformBuffer(t_ImageIndex, a_Dt);
+	//p_Renderer->UpdateUniformBuffer(t_ImageIndex, a_Dt);
 }
 
 void ObjectManager::CreateShape(ShapeType a_ShapeType, Transform* a_Transform)
 {
-	BaseRenderObject* t_NewShape = m_RenderFactory->CreateRenderObject(GetNextRenderID(), a_ShapeType, a_Transform, &m_PipeLineData.at(0));
+	BaseRenderObject* t_NewShape = m_RenderFactory->CreateRenderObject(GetNextRenderID(), a_ShapeType, a_Transform, pip_SpaceImage);
 	m_RenderObjects.push_back(t_NewShape);
 	
 	p_Renderer->SetupMesh(t_NewShape->GetMeshData());

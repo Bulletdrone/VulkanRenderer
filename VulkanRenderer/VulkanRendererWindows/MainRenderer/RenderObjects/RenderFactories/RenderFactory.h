@@ -14,7 +14,7 @@ public:
 	RenderFactory();
 	~RenderFactory();
 
-	BaseRenderObject* CreateRenderObject(const size_t a_RenderID, ShapeType a_ShapeType, Transform* a_Transform, PipeLineData* a_PipeLineData);
+	BaseRenderObject* CreateRenderObject(const size_t a_RenderID, ShapeType a_ShapeType, Transform* a_Transform, uint32_t a_PipelineID);
 
 
 	void ClearSceneObjects();

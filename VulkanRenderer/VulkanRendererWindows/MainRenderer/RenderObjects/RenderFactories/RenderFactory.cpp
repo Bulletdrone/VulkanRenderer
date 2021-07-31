@@ -15,9 +15,9 @@ RenderFactory::~RenderFactory()
 	ClearSceneObjects();
 }
 
-BaseRenderObject* RenderFactory::CreateRenderObject(const size_t a_RenderID, ShapeType a_ShapeType, Transform* a_Transform, PipeLineData* a_PipeLineData)
+BaseRenderObject* RenderFactory::CreateRenderObject(const size_t a_RenderID, ShapeType a_ShapeType, Transform* a_Transform, uint32_t a_PipelineID)
 {
-	return new RenderShape(a_RenderID, a_Transform, a_PipeLineData, m_RenderObjectsData[static_cast<size_t>(a_ShapeType)]);
+	return new RenderShape(a_RenderID, a_Transform, a_PipelineID, m_RenderObjectsData[static_cast<size_t>(a_ShapeType)]);
 }
 
 //Clear all the current loaded objects.

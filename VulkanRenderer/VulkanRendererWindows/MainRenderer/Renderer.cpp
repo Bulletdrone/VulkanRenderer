@@ -78,7 +78,7 @@ void Renderer::CleanupSwapChain()
 		vkDestroyFramebuffer(m_VulkanDevice, mvk_SwapChainFrameBuffers[i], nullptr);
 	}
 
-	m_VulkanDevice.FreeCommandPool();
+	//m_VulkanDevice.FreeCommandPool();
 
 	vkDestroyPipeline(m_VulkanDevice, mvk_Pipeline, nullptr);
 	vkDestroyPipelineLayout(m_VulkanDevice, mvk_PipelineLayout, nullptr);
@@ -358,25 +358,24 @@ void Renderer::CreateRenderPass()
 	}
 }
 
-void Renderer::CreateDescriptorLayout(DescriptorData& r_Descriptor)
+uint32_t Renderer::CreateDescriptorLayout(TextureData* a_textureData)
 {
-	m_ShaderManager->CreateDescriptorSetLayout(r_Descriptor);
+	return m_ShaderManager->CreateDescriptorSetLayout(a_textureData);
 }
 
-void Renderer::CreateGraphicsPipeline(PipeLineData& r_PipelineData)
+uint32_t Renderer::CreateGraphicsPipeline(uint32_t a_DescID)
 {
-	m_ShaderManager->CreatePipelineData(mvk_RenderPass, r_PipelineData);
+	return m_ShaderManager->CreatePipelineData(mvk_RenderPass, a_DescID);
 }
 
-void Renderer::CreateDescriptorPool(DescriptorData& r_Descriptor)
+void Renderer::CreateDescriptorPool(uint32_t a_DescID)
 {
-	m_ShaderManager->CreateDescriptorPool(mvk_SwapChainImageViews.size(), r_Descriptor);
+	m_ShaderManager->CreateDescriptorPool(mvk_SwapChainImageViews.size(), a_DescID);
 }
 
-void Renderer::CreateDescriptorSet(DescriptorData& r_Descriptor)
+void Renderer::CreateDescriptorSet(uint32_t a_DescID)
 {
-		m_ShaderManager->CreateDescriptorSet(mvk_SwapChainImageViews.size(), 
-			r_Descriptor, mvk_ViewProjectionBuffers);
+		m_ShaderManager->CreateDescriptorSet(mvk_SwapChainImageViews.size(), a_DescID, mvk_ViewProjectionBuffers);
 }
 
 void Renderer::CreateFrameBuffers()
@@ -467,6 +466,8 @@ void Renderer::DrawFrame(uint32_t& r_ImageIndex, float a_dt)
 
 	VkResult t_Result = vkAcquireNextImageKHR(m_VulkanDevice, mvk_SwapChain, UINT64_MAX, mvk_ImageAvailableSemaphore[m_CurrentFrame], VK_NULL_HANDLE, &r_ImageIndex);
 
+	UpdateUniformBuffer(r_ImageIndex, a_dt);
+
 	if (t_Result == VK_ERROR_OUT_OF_DATE_KHR || t_Result == VK_SUBOPTIMAL_KHR || m_Window->m_FrameBufferResized)
 	{
 		m_Window->m_FrameBufferResized = false;
@@ -488,6 +489,7 @@ void Renderer::DrawFrame(uint32_t& r_ImageIndex, float a_dt)
 
 	//Draw the objects using a single command buffer.
 	m_VulkanDevice.ClearPreviousCommand(m_CurrentFrame);
+
 	VkCommandBuffer& t_MainBuffer = m_VulkanDevice.CreateAndBeginCommand(m_CurrentFrame, FindQueueFamilies(m_VulkanDevice.m_PhysicalDevice).graphicsFamily.value(),
 		mvk_RenderPass, mvk_SwapChainFrameBuffers[m_CurrentFrame], mvk_SwapChainExtent);
 
@@ -550,7 +552,10 @@ void Renderer::DrawObjects(VkCommandBuffer& r_CmdBuffer)
 {
 	//Performance boost when getting the same data needed.
 	MeshData* t_LastMeshData = nullptr;
-	PipeLineData* t_LastPipeLineData = nullptr;
+
+	uint32_t t_LastPipelineID = 0;
+	PipeLineData& t_CurrentPipeLine = m_ShaderManager->PipelinePool.Get(t_LastPipelineID);
+	vkCmdBindPipeline(r_CmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, t_CurrentPipeLine.pipeLine);
 
 	//Create this once for performance boost of not creating a mat4 everytime.
 	InstanceModel t_PushInstance;
@@ -558,21 +563,23 @@ void Renderer::DrawObjects(VkCommandBuffer& r_CmdBuffer)
 	for (int i = 0; i < p_RenderObjects->size(); i++)
 	{
 		BaseRenderObject* t_RenderObject = p_RenderObjects->at(i);
+		uint32_t t_PipelineID = t_RenderObject->GetPipeLineID();
 
 		//only bind the pipeline if it doesn't match with the already bound one
-		if (t_RenderObject->GetPipeLineData() != t_LastPipeLineData) {
-
-			vkCmdBindPipeline(r_CmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, t_RenderObject->GetPipeLineData()->pipeLine);
-			t_LastPipeLineData = t_RenderObject->GetPipeLineData();
+		if (t_PipelineID != t_LastPipelineID)
+		{
+			t_CurrentPipeLine = m_ShaderManager->PipelinePool.Get(t_PipelineID);
+			t_LastPipelineID = t_PipelineID;
+			vkCmdBindPipeline(r_CmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, t_CurrentPipeLine.pipeLine);
 		}
 
 		//Set Descriptor
-		vkCmdBindDescriptorSets(r_CmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, t_RenderObject->GetPipeLineData()->pipeLineLayout, 0, 1, &t_RenderObject->GetPipeLineData()->p_DescriptorData->descriptorSets[m_CurrentFrame].at(0), 0, nullptr);
+		vkCmdBindDescriptorSets(r_CmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, t_CurrentPipeLine.pipeLineLayout, 0, 1, &t_CurrentPipeLine.p_DescriptorData->descriptorSets[m_CurrentFrame].at(0), 0, nullptr);
 
 		//Set the Push constant data.
 		t_PushInstance.model = t_RenderObject->GetModelMatrix();
 
-		vkCmdPushConstants(r_CmdBuffer, t_RenderObject->GetPipeLineData()->pipeLineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(InstanceModel), &t_PushInstance);
+		vkCmdPushConstants(r_CmdBuffer, t_CurrentPipeLine.pipeLineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(InstanceModel), &t_PushInstance);
 
 		//only bind the mesh if it's a different one from last bind
 		if (t_RenderObject->GetMeshData() != t_LastMeshData) {

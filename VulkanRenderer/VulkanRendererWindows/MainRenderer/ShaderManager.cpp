@@ -9,14 +9,24 @@ ShaderManager::ShaderManager(VulkanDevice& r_VulkanDevice, const VkExtent2D& r_V
 
 ShaderManager::~ShaderManager()
 {
-	for (size_t i = 0; i < p_SavedDescriptors.size(); i++)
+	for (uint32_t i = 0; i < DescriptorPool.Size(); i++)
 	{
-		vkDestroyDescriptorSetLayout(rm_VulkanDevice, p_SavedDescriptors[i]->descriptorLayout, nullptr);
+		bool isFull;
+		DescriptorData& descData = DescriptorPool.GetFilledObject(isFull, i);
+		if (isFull)
+			vkDestroyDescriptorSetLayout(rm_VulkanDevice, descData.descriptorLayout, nullptr);
 	}
 }
 
-void ShaderManager::CreateDescriptorSetLayout(DescriptorData& r_DescriptorData)
+uint32_t ShaderManager::CreateDescriptorSetLayout(TextureData* a_TextureData)
 {
+	//Set desciptorData's ID. (Get more advanced later on.)
+	uint32_t descriptorID;
+	DescriptorData& descriptorData = DescriptorPool.GetEmptyObject(descriptorID);
+	descriptorData.descID = descriptorID;
+
+	descriptorData.texture = a_TextureData;
+
 	VkDescriptorSetLayoutBinding t_UboLayoutBinding{};
 	t_UboLayoutBinding.binding = 0;
 	t_UboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -38,27 +48,39 @@ void ShaderManager::CreateDescriptorSetLayout(DescriptorData& r_DescriptorData)
 	t_LayoutInfo.pBindings = t_Bindings.data();
 
 
-	if (vkCreateDescriptorSetLayout(rm_VulkanDevice, &t_LayoutInfo, nullptr, &r_DescriptorData.descriptorLayout) != VK_SUCCESS) {
+	if (vkCreateDescriptorSetLayout(rm_VulkanDevice, &t_LayoutInfo, nullptr, &descriptorData.descriptorLayout) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create descriptor set layout!");
 	}
+
+	return descriptorData.descID;
 }
 
-void ShaderManager::CreatePipelineData(const VkRenderPass& r_RenderPass, PipeLineData& r_PipeLineData)
+uint32_t ShaderManager::CreatePipelineData(const VkRenderPass& r_RenderPass, uint32_t a_DescriptorID)
 {
-	CreateGraphicsPipeline(r_RenderPass, r_PipeLineData);
+	uint32_t pipelineID;
 
-	p_SavedPipelines.push_back(&r_PipeLineData);
+	PipeLineData& pipeLineData = PipelinePool.GetEmptyObject(pipelineID);
+	pipeLineData.pipeID = pipelineID;
+	pipeLineData.p_DescriptorData = &DescriptorPool.Get(a_DescriptorID);
+
+	CreateGraphicsPipeline(r_RenderPass, pipeLineData);
+
+	return pipeLineData.pipeID;
 }
 
 void ShaderManager::RecreatePipelines(const VkRenderPass& r_RenderPass)
 {
-	for (size_t i = 0; i < p_SavedPipelines.size(); i++)
+	for (uint32_t i = 0; i < PipelinePool.Size(); i++)
 	{
-		CreateGraphicsPipeline(r_RenderPass, *p_SavedPipelines[i]);
+		bool isFull;
+		PipeLineData& pipeData = PipelinePool.GetFilledObject(isFull, i);
+
+		if (isFull)
+			CreateGraphicsPipeline(r_RenderPass, pipeData);
 	}
 }
 
-void ShaderManager::CreateDescriptorPool(const size_t a_FrameAmount, DescriptorData& r_DescriptorData)
+void ShaderManager::CreateDescriptorPool(const size_t a_FrameAmount, uint32_t a_DescID)
 {
 	std::array<VkDescriptorPoolSize, 2> t_PoolSizes{};
 	t_PoolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -72,19 +94,20 @@ void ShaderManager::CreateDescriptorPool(const size_t a_FrameAmount, DescriptorD
 	t_PoolInfo.pPoolSizes = t_PoolSizes.data();
 	t_PoolInfo.maxSets = static_cast<uint32_t>(a_FrameAmount);
 
-	if (vkCreateDescriptorPool(rm_VulkanDevice, &t_PoolInfo, nullptr, &r_DescriptorData.descriptorPool) != VK_SUCCESS)
+	if (vkCreateDescriptorPool(rm_VulkanDevice, &t_PoolInfo, nullptr, &DescriptorPool.Get(a_DescID).descriptorPool) != VK_SUCCESS)
 	{
 		throw std::runtime_error("failed to create descriptor pool!");
 	}
 }
 
-void ShaderManager::CreateDescriptorSet(const size_t a_FrameAmount, DescriptorData& r_DescriptorData, std::vector<VkBuffer>& r_ViewProjectionBuffers)
+void ShaderManager::CreateDescriptorSet(const size_t a_FrameAmount, uint32_t a_DescID, std::vector<VkBuffer>& r_ViewProjectionBuffers)
 {
-	std::vector<VkDescriptorSetLayout> t_Layouts(a_FrameAmount, r_DescriptorData.descriptorLayout);
+	DescriptorData& r_DescData = DescriptorPool.Get(a_DescID);
+	std::vector<VkDescriptorSetLayout> t_Layouts(a_FrameAmount, r_DescData.descriptorLayout);
 
 	VkDescriptorSetAllocateInfo t_AllocInfo{};
 	t_AllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-	t_AllocInfo.descriptorPool = r_DescriptorData.descriptorPool;
+	t_AllocInfo.descriptorPool = r_DescData.descriptorPool;
 	t_AllocInfo.descriptorSetCount = 2;//static_cast<uint32_t>(a_FrameAmount);
 	t_AllocInfo.pSetLayouts = t_Layouts.data();
 
@@ -105,8 +128,8 @@ void ShaderManager::CreateDescriptorSet(const size_t a_FrameAmount, DescriptorDa
 
 		VkDescriptorImageInfo t_ImageInfo{};
 		t_ImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-		t_ImageInfo.imageView = r_DescriptorData.texture->textureImageView;
-		t_ImageInfo.sampler = r_DescriptorData.texture->textureSampler;
+		t_ImageInfo.imageView = r_DescData.texture->textureImageView;
+		t_ImageInfo.sampler = r_DescData.texture->textureSampler;
 
 		std::array<VkWriteDescriptorSet, 2> t_DescriptorWrites{};
 		//Uniform Info
@@ -129,18 +152,29 @@ void ShaderManager::CreateDescriptorSet(const size_t a_FrameAmount, DescriptorDa
 		vkUpdateDescriptorSets(rm_VulkanDevice, static_cast<uint32_t>(t_DescriptorWrites.size()),
 			t_DescriptorWrites.data(), 0, nullptr);
 
-		r_DescriptorData.descriptorSets[i].push_back(DescriptorSet[i]);
+		r_DescData.descriptorSets[i].push_back(DescriptorSet[i]);
 	}
 }
 
 void ShaderManager::RecreateDescriptors(const size_t a_FrameAmount, std::vector<VkBuffer>& r_ViewProjectionBuffers)
 {
-	for (size_t i = 0; i < p_SavedDescriptors.size(); i++)
+	for (size_t i = 0; i < DescriptorPool.Size(); i++)
 	{
-		vkDestroyDescriptorPool(rm_VulkanDevice, p_SavedDescriptors[i]->descriptorPool, nullptr);
+		bool isFull;
+		DescriptorData& descData = DescriptorPool.GetFilledObject(isFull, i);
 
-		CreateDescriptorPool(a_FrameAmount, *p_SavedDescriptors[i]);
-		CreateDescriptorSet(a_FrameAmount, *p_SavedDescriptors[i], r_ViewProjectionBuffers);
+		if (isFull)
+		{
+			vkDestroyDescriptorPool(rm_VulkanDevice, descData.descriptorPool, nullptr);
+
+			for (size_t i = 0; i < a_FrameAmount; i++)
+			{
+				descData.descriptorSets[i].clear();
+			}
+
+			CreateDescriptorPool(a_FrameAmount, i);
+			CreateDescriptorSet(a_FrameAmount, i, r_ViewProjectionBuffers);
+		}
 	}
 }
 
