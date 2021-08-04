@@ -1,4 +1,7 @@
 #pragma once
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/hash.hpp>
+
 #include <Vulkan/vulkan.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -23,6 +26,10 @@ struct Vertex
 
 	glm::vec3 color;
 	glm::vec2 texCoord;
+
+	bool operator==(const Vertex& r_Rhs) const {
+		return position == r_Rhs.position && color == r_Rhs.color && texCoord == r_Rhs.texCoord;
+	}
 
 	static VkVertexInputBindingDescription GetBindingDescription()
 	{
@@ -54,6 +61,16 @@ struct Vertex
 		attributeDescriptions[2].offset = offsetof(Vertex, texCoord);
 
 		return attributeDescriptions;
+	}
+};
+
+template<> struct std::hash<Vertex>
+{
+	size_t operator()(Vertex const& r_Rhs) const
+	{
+		return ((std::hash<glm::vec3>()(r_Rhs.position) ^
+			(std::hash<glm::vec3>()(r_Rhs.color) << 1)) >> 1) ^
+			(std::hash<glm::vec2>()(r_Rhs.texCoord) << 1);
 	}
 };
 

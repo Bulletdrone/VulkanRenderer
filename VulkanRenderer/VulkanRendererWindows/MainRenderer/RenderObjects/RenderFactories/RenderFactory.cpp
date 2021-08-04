@@ -5,7 +5,7 @@ RenderFactory::RenderFactory()
 	std::vector<ShapeType> t_Shape;
 	t_Shape.push_back(ShapeType::Triangle);
 	t_Shape.push_back(ShapeType::Rectangle);
-
+	t_Shape.push_back(ShapeType::Pavillion);
 
 	SetSceneObjects(t_Shape);
 }
@@ -46,7 +46,7 @@ void RenderFactory::SetSceneObjects(std::vector<ShapeType>& a_AvailableShapes)
 
 		//temp
 		std::vector<Vertex> t_Vertices;
-		std::vector<uint16_t> t_Indices;
+		std::vector<uint32_t> t_Indices;
 
 		switch (a_AvailableShapes[i])
 		{
@@ -76,6 +76,11 @@ void RenderFactory::SetSceneObjects(std::vector<ShapeType>& a_AvailableShapes)
 			break;
 		case ShapeType::SkyBoxRect:
 			throw;
+			break;
+		case ShapeType::Pavillion:
+			t_Mesh = ResourceLoader::LoadModel("../Resources/Models/Pavillion.obj");
+
+			m_RenderObjectsData[t_VecPos] = new RenderObjectData(t_Mesh);
 			break;
 		}
 	}

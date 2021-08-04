@@ -83,7 +83,7 @@ public:
 
 	//Buffer Functions
 	void CreateVertexBuffers(BufferData<Vertex>* a_VertexData);
-	void CreateIndexBuffers(BufferData<uint16_t>* a_IndexData);
+	void CreateIndexBuffers(BufferData<uint32_t>* a_IndexData);
 	void CreateUniformBuffers(std::vector<VkBuffer>& r_UniformBuffers, std::vector<VkDeviceMemory>& r_UniformBuffersMemory, const size_t a_SwampChainSize);
 	//Standard Buffer Creation
 	void CreateBuffer(VkDeviceSize a_Size, VkBufferUsageFlags a_Usage, VkMemoryPropertyFlags a_Properties, VkBuffer& r_Buffer, VkDeviceMemory& r_BufferMemory);

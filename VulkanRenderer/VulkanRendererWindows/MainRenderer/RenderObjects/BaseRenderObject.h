@@ -27,7 +27,7 @@ public:
 	Transform* GetTransform() const { return m_Transform; }
 
 	BufferData<Vertex>* GetVertexData() const { return p_RenderObjectData->m_MeshData->GetVertexData(); }
-	BufferData<uint16_t>* GetIndexData() const { return p_RenderObjectData->m_MeshData->GetIndexData(); }
+	BufferData<uint32_t>* GetIndexData() const { return p_RenderObjectData->m_MeshData->GetIndexData(); }
 
 protected:
 	const size_t m_ID;

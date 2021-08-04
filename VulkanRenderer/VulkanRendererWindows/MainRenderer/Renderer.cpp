@@ -586,7 +586,7 @@ void Renderer::DrawObjects(VkCommandBuffer& r_CmdBuffer)
 			vkCmdBindVertexBuffers(r_CmdBuffer, 0, 1, &t_RenderObject->GetVertexData()->GetBuffer(), &t_VertOffset);
 
 			//Set Indices
-			vkCmdBindIndexBuffer(r_CmdBuffer, t_RenderObject->GetIndexData()->GetBuffer(), 0, VK_INDEX_TYPE_UINT16);
+			vkCmdBindIndexBuffer(r_CmdBuffer, t_RenderObject->GetIndexData()->GetBuffer(), 0, VK_INDEX_TYPE_UINT32);
 
 			t_LastMeshData = t_RenderObject->GetMeshData();
 		}
@@ -597,7 +597,6 @@ void Renderer::DrawObjects(VkCommandBuffer& r_CmdBuffer)
 void Renderer::UpdateUniformBuffer(uint32_t a_CurrentImage, float a_dt)
 {
 	ViewProjection ubo{};
-	//ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 	ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 	ubo.proj = glm::perspective(glm::radians(45.0f), mvk_SwapChainExtent.width / (float)mvk_SwapChainExtent.height, 0.1f, 10.0f);
 	ubo.proj[1][1] *= -1;

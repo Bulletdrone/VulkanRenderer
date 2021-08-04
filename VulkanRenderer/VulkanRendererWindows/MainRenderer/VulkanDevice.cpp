@@ -310,7 +310,7 @@ void VulkanDevice::CreateVertexBuffers(BufferData<Vertex>* a_VertexData)
     vkFreeMemory(m_LogicalDevice, t_StagingBufferMemory, nullptr);
 }
 
-void VulkanDevice::CreateIndexBuffers(BufferData<uint16_t>* a_IndexData)
+void VulkanDevice::CreateIndexBuffers(BufferData<uint32_t>* a_IndexData)
 {
     VkDeviceSize t_BufferSize = a_IndexData->CreateBufferSize();
 

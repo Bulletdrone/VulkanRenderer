@@ -1,11 +1,13 @@
 #pragma once
 #include <RenderObjects/RenderShape.h>
+#include <Tools/ResourceLoader.h>
 
 enum class ShapeType
 {
 	Triangle,
 	Rectangle,
-	SkyBoxRect
+	SkyBoxRect,
+	Pavillion
 };
 
 class RenderFactory
@@ -24,7 +26,7 @@ public:
 
 
 private:
-	size_t m_AllShapes = 3;
+	size_t m_AllShapes = 4;
 	std::vector<RenderObjectData*> m_RenderObjectsData;
 	std::vector<size_t> m_CurrentLoadedObjectsID;
 };

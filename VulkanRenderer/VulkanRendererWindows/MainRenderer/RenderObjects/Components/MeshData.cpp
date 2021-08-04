@@ -2,10 +2,10 @@
 
 #include <iostream>
 
-MeshData::MeshData(const std::vector<Vertex> a_Vertices, const std::vector<uint16_t> a_Indices)
+MeshData::MeshData(const std::vector<Vertex> a_Vertices, const std::vector<uint32_t> a_Indices)
 {
 	m_Vertices = new BufferData<Vertex>(a_Vertices);
-	m_Indices = new BufferData<uint16_t>(a_Indices);
+	m_Indices = new BufferData<uint32_t>(a_Indices);
 }
 
 MeshData::~MeshData()
