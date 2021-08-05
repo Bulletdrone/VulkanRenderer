@@ -1,23 +1,7 @@
 #pragma once
 
 #include "MeshData.h"
-
-struct TextureData 
-{
-	void DeleteBuffers(VkDevice& r_Device)
-	{
-		vkDestroySampler(r_Device, textureSampler, nullptr);
-		vkDestroyImageView(r_Device, textureImageView, nullptr);
-
-		vkDestroyImage(r_Device, textureImage, nullptr);
-		vkFreeMemory(r_Device, textureImageMemory, nullptr);
-	}
-
-	VkImage textureImage;
-	VkDeviceMemory textureImageMemory;
-	VkImageView textureImageView;
-	VkSampler textureSampler;
-};
+#include <Structs/TextureData.h>
 
 //Pre-build renderdata that is created on startup. 
 //This will include loaded files and basic shapes.
