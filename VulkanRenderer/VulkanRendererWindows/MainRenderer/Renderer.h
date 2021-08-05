@@ -6,6 +6,9 @@
 #include "VulkanDebugger/VulkanDebug.h"
 #include <RenderObjects/BaseRenderObject.h>
 
+#include "Structs/FrameData.h"
+#include "VulkanSwapChain.h"
+
 //Handlers
 #include "Handlers/ImageHandler.h"
 #include "Handlers/DepthHandler.h"
@@ -94,13 +97,12 @@ private:
 
 	//ShaderData
 	ShaderManager* m_ShaderManager;
+
 	std::vector<VkBuffer> mvk_ViewProjectionBuffers;
 	std::vector<VkDeviceMemory> mvk_ViewProjectionBuffersMemory;
 
-	std::vector<VkSemaphore> mvk_ImageAvailableSemaphore;
-	std::vector<VkSemaphore> mvk_RenderFinishedSemaphore;
-	std::vector<VkFence> mvk_InFlightFences;
-	std::vector<VkFence> mvk_ImagesInFlight;
+	std::vector<FrameData> m_FrameData;
+
 	size_t m_CurrentFrame = 0;
 	size_t m_PreviousFrame = -1;
 
@@ -108,24 +110,16 @@ private:
 	VkInstance mvk_Instance;
 
 	VulkanDevice m_VulkanDevice;
+	VulkanSwapChain* m_VulkanSwapChain;
 
 	VkQueue mvk_GraphicsQueue;
 	VkQueue mvk_PresentQueue;
-
-	//The SwapChain for buffering images and more.
-	VkSwapchainKHR mvk_SwapChain;
-	std::vector<VkImage> mvk_SwapChainImages;
-	std::vector<VkImageView> mvk_SwapChainImageViews;
-	std::vector<VkFramebuffer> mvk_SwapChainFrameBuffers;
 
 	//The RenderPipeline.
 	VkRenderPass mvk_RenderPass;
 
 	VkPipelineLayout mvk_PipelineLayout;
 	VkPipeline mvk_Pipeline;
-
-	VkFormat mvk_SwapChainImageFormat;
-	VkExtent2D mvk_SwapChainExtent;
 
 	const std::vector<const char*> m_DeviceExtensions = {
 	VK_KHR_SWAPCHAIN_EXTENSION_NAME

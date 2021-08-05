@@ -32,6 +32,7 @@
     <ClCompile Include="MainRenderer\Tools\ResourceLoader.cpp" />
     <ClCompile Include="MainRenderer\VulkanDebugger\VulkanDebug.cpp" />
     <ClCompile Include="MainRenderer\VulkanDevice.cpp" />
+    <ClCompile Include="MainRenderer\VulkanSwapChain.cpp" />
     <ClCompile Include="MainRenderer\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -47,11 +48,14 @@
     <ClInclude Include="MainRenderer\RenderObjects\RenderShape.h" />
     <ClInclude Include="MainRenderer\ShaderManager.h" />
     <ClInclude Include="MainRenderer\Structs\BufferData.h" />
+    <ClInclude Include="MainRenderer\Structs\FrameData.h" />
     <ClInclude Include="MainRenderer\Structs\PipelineData.h" />
+    <ClInclude Include="MainRenderer\Structs\TextureData.h" />
     <ClInclude Include="MainRenderer\Tools\ObjectPool.h" />
     <ClInclude Include="MainRenderer\Tools\ResourceLoader.h" />
     <ClInclude Include="MainRenderer\VulkanDebugger\VulkanDebug.h" />
     <ClInclude Include="MainRenderer\VulkanDevice.h" />
+    <ClInclude Include="MainRenderer\VulkanSwapChain.h" />
     <ClInclude Include="MainRenderer\Window.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

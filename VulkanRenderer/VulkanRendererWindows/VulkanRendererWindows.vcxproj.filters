@@ -71,6 +71,9 @@
     <ClCompile Include="MainRenderer\VulkanDevice.cpp">
       <Filter>MainRenderer\Structs</Filter>
     </ClCompile>
+    <ClCompile Include="MainRenderer\VulkanSwapChain.cpp">
+      <Filter>MainRenderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainRenderer\Renderer.h">
@@ -126,6 +129,15 @@
     </ClInclude>
     <ClInclude Include="MainRenderer\Tools\ObjectPool.h">
       <Filter>Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="MainRenderer\Structs\TextureData.h">
+      <Filter>MainRenderer\Structs</Filter>
+    </ClInclude>
+    <ClInclude Include="MainRenderer\Structs\FrameData.h">
+      <Filter>MainRenderer\Structs</Filter>
+    </ClInclude>
+    <ClInclude Include="MainRenderer\VulkanSwapChain.h">
+      <Filter>MainRenderer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
