@@ -74,6 +74,12 @@
     <ClCompile Include="MainRenderer\VulkanDevice.cpp">
       <Filter>MainRenderer</Filter>
     </ClCompile>
+    <ClCompile Include="MainRenderer\RenderObjects\CameraObject.cpp">
+      <Filter>RenderObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="MainRenderer\RenderObjects\SceneObject.cpp">
+      <Filter>RenderObjects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainRenderer\Renderer.h">
@@ -138,6 +144,12 @@
     </ClInclude>
     <ClInclude Include="MainRenderer\VulkanDevice.h">
       <Filter>MainRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="MainRenderer\RenderObjects\CameraObject.h">
+      <Filter>RenderObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="MainRenderer\RenderObjects\SceneObject.h">
+      <Filter>RenderObjects</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

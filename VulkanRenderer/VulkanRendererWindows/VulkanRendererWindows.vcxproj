@@ -25,9 +25,11 @@
     <ClCompile Include="MainRenderer\ObjectManager.cpp" />
     <ClCompile Include="MainRenderer\Renderer.cpp" />
     <ClCompile Include="MainRenderer\RenderObjects\BaseRenderObject.cpp" />
+    <ClCompile Include="MainRenderer\RenderObjects\CameraObject.cpp" />
     <ClCompile Include="MainRenderer\RenderObjects\Components\MeshData.cpp" />
     <ClCompile Include="MainRenderer\RenderObjects\RenderFactories\RenderFactory.cpp" />
     <ClCompile Include="MainRenderer\RenderObjects\RenderShape.cpp" />
+    <ClCompile Include="MainRenderer\RenderObjects\SceneObject.cpp" />
     <ClCompile Include="MainRenderer\ShaderManager.cpp" />
     <ClCompile Include="MainRenderer\Tools\ResourceLoader.cpp" />
     <ClCompile Include="MainRenderer\VulkanDebugger\VulkanDebug.cpp" />
@@ -41,11 +43,13 @@
     <ClInclude Include="MainRenderer\ObjectManager.h" />
     <ClInclude Include="MainRenderer\Renderer.h" />
     <ClInclude Include="MainRenderer\RenderObjects\BaseRenderObject.h" />
+    <ClInclude Include="MainRenderer\RenderObjects\CameraObject.h" />
     <ClInclude Include="MainRenderer\RenderObjects\Components\MeshData.h" />
     <ClInclude Include="MainRenderer\RenderObjects\Components\RenderObjectData.h" />
     <ClInclude Include="MainRenderer\RenderObjects\Components\Transform.h" />
     <ClInclude Include="MainRenderer\RenderObjects\RenderFactories\RenderFactory.h" />
     <ClInclude Include="MainRenderer\RenderObjects\RenderShape.h" />
+    <ClInclude Include="MainRenderer\RenderObjects\SceneObject.h" />
     <ClInclude Include="MainRenderer\ShaderManager.h" />
     <ClInclude Include="MainRenderer\Structs\BufferData.h" />
     <ClInclude Include="MainRenderer\Structs\FrameData.h" />
