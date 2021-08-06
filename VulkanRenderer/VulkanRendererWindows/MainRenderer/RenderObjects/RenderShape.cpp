@@ -11,7 +11,7 @@ RenderShape::~RenderShape()
 
 void RenderShape::Update()
 {
-	Rotation().x += 0.01f;
+	//Rotation().x += 0.01f;
 
 	UpdateModelMatrix();
 }

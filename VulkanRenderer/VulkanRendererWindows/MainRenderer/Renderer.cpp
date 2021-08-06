@@ -66,7 +66,7 @@ void Renderer::SetupHandlers()
 //Call this after the creation of Vulkan.
 void Renderer::SetupRenderObjects()
 {
-	m_VulkanDevice.CreateUniformBuffers(mvk_ViewProjectionBuffers, mvk_ViewProjectionBuffersMemory, m_FrameData.size());
+	m_VulkanDevice.CreateUniformBuffers(mvk_ViewProjectionBuffers, mvk_ViewProjectionBuffersMemory, m_FrameData.size(), sizeof(ViewProjection));
 
 	CreateSyncObjects();
 }
@@ -111,7 +111,7 @@ void Renderer::RecreateSwapChain()
 	CreateFrameBuffers();
 
 	SetupRenderObjects();
-	m_ShaderManager->RecreateDescriptors(FRAMEBUFFER_AMOUNT, mvk_ViewProjectionBuffers);
+	m_ShaderManager->RecreateDescriptors(FRAMEBUFFER_AMOUNT, mvk_ViewProjectionBuffers, sizeof(ViewProjection));
 }
 
 void Renderer::CreateVKInstance()
@@ -282,7 +282,7 @@ void Renderer::CreateDescriptorPool(uint32_t a_DescID)
 
 void Renderer::CreateDescriptorSet(uint32_t a_DescID)
 {
-		m_ShaderManager->CreateDescriptorSet(m_FrameData.size(), a_DescID, mvk_ViewProjectionBuffers);
+	m_ShaderManager->CreateDescriptorSet(m_FrameData.size(), a_DescID, mvk_ViewProjectionBuffers, sizeof(ViewProjection));
 }
 
 void Renderer::CreateFrameBuffers()
@@ -343,6 +343,11 @@ void Renderer::CreateSyncObjects()
 			throw std::runtime_error("failed to create semaphores for a frame!");
 		}
 	}
+}
+
+void Renderer::ReplaceActiveCamera(CameraObject* a_Cam)
+{
+	p_ActiveCamera = a_Cam;
 }
 
 void Renderer::SetupMesh(MeshData* a_MeshData)
@@ -504,10 +509,7 @@ void Renderer::DrawObjects(VkCommandBuffer& r_CmdBuffer)
 
 void Renderer::UpdateUniformBuffer(uint32_t a_CurrentImage, float a_dt)
 {
-	ViewProjection ubo{};
-	ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-	ubo.proj = glm::perspective(glm::radians(45.0f), m_VulkanSwapChain.SwapChainExtent.width / (float)m_VulkanSwapChain.SwapChainExtent.height, 0.1f, 10.0f);
-	ubo.proj[1][1] *= -1;
+	ViewProjection ubo = p_ActiveCamera->GetViewProjection();
 
 	void* data;
 	vkMapMemory(m_VulkanDevice, mvk_ViewProjectionBuffersMemory[a_CurrentImage], 0, sizeof(ubo), 0, &data);

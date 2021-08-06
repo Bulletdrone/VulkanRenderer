@@ -3,8 +3,8 @@
 
 struct ViewProjection
 {
-	glm::mat4 Projection;
-	glm::mat4 View;
+	alignas(16) glm::mat4 View;
+	alignas(16) glm::mat4 Projection;
 };
 
 class CameraObject : public SceneObject
@@ -27,7 +27,7 @@ protected:
 	ViewProjection m_ViewProjection;
 
 	glm::vec3 m_Direction = glm::vec3(0);
-	glm::vec3 m_ScreenOrientation = glm::vec3(0);
+	glm::vec3 m_ScreenOrientation = glm::vec3(0, 0, 1);
 
 	float m_Fov;
 	float m_AspectRatio;

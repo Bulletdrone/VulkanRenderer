@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Renderer.h"
+#include "CameraController.h"
 #include "RenderObjects/RenderFactories/RenderFactory.h"
 
 class ObjectManager
@@ -33,4 +34,6 @@ private:
 
 	Renderer* p_Renderer;
 	RenderFactory* m_RenderFactory;
+
+	CameraController m_CameraController;
 };

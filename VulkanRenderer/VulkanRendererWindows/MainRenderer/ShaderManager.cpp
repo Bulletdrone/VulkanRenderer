@@ -100,7 +100,7 @@ void ShaderManager::CreateDescriptorPool(const size_t a_FrameAmount, uint32_t a_
 	}
 }
 
-void ShaderManager::CreateDescriptorSet(const size_t a_FrameAmount, uint32_t a_DescID, std::vector<VkBuffer>& r_ViewProjectionBuffers)
+void ShaderManager::CreateDescriptorSet(const size_t a_FrameAmount, uint32_t a_DescID, std::vector<VkBuffer>& r_ViewProjectionBuffers, VkDeviceSize a_BufferSize)
 {
 	DescriptorData& r_DescData = DescriptorPool.Get(a_DescID);
 	std::vector<VkDescriptorSetLayout> t_Layouts(a_FrameAmount, r_DescData.descriptorLayout);
@@ -124,7 +124,7 @@ void ShaderManager::CreateDescriptorSet(const size_t a_FrameAmount, uint32_t a_D
 		VkDescriptorBufferInfo t_BufferInfo{};
 		t_BufferInfo.buffer = r_ViewProjectionBuffers[i];
 		t_BufferInfo.offset = 0;
-		t_BufferInfo.range = sizeof(ViewProjection);
+		t_BufferInfo.range = a_BufferSize;
 
 		VkDescriptorImageInfo t_ImageInfo{};
 		t_ImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
@@ -156,7 +156,7 @@ void ShaderManager::CreateDescriptorSet(const size_t a_FrameAmount, uint32_t a_D
 	}
 }
 
-void ShaderManager::RecreateDescriptors(const size_t a_FrameAmount, std::vector<VkBuffer>& r_ViewProjectionBuffers)
+void ShaderManager::RecreateDescriptors(const size_t a_FrameAmount, std::vector<VkBuffer>& r_ViewProjectionBuffers, VkDeviceSize a_BufferSize)
 {
 	for (size_t i = 0; i < DescriptorPool.Size(); i++)
 	{
@@ -173,7 +173,7 @@ void ShaderManager::RecreateDescriptors(const size_t a_FrameAmount, std::vector<
 			}
 
 			CreateDescriptorPool(a_FrameAmount, i);
-			CreateDescriptorSet(a_FrameAmount, i, r_ViewProjectionBuffers);
+			CreateDescriptorSet(a_FrameAmount, i, r_ViewProjectionBuffers, a_BufferSize);
 		}
 	}
 }

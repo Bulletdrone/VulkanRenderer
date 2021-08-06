@@ -4,7 +4,9 @@
 
 #include "ShaderManager.h"
 #include "VulkanDebugger/VulkanDebug.h"
+
 #include <RenderObjects/BaseRenderObject.h>
+#include <RenderObjects/CameraObject.h>
 
 #include "Structs/FrameData.h"
 #include "VulkanSwapChain.h"
@@ -46,6 +48,9 @@ public:
 	//BufferObject Creation.
 	void CreateSyncObjects();
 
+	//Set a new camera which the buffers get the viewprojection from.
+	void ReplaceActiveCamera(CameraObject* a_Cam);
+
 	//BufferData
 	void SetupMesh(MeshData* a_MeshData);
 	void SetupImage(TextureData& a_TextureData, const char* a_ImagePath);
@@ -59,6 +64,11 @@ public:
 	//Getters
 	GLFWwindow* GetWindow() const { return m_Window->GetWindow(); }
 	VulkanDevice& GetVulkanDevice() { return m_VulkanDevice; }
+
+	float GetAspectRatio() 
+	{
+		return m_VulkanSwapChain.SwapChainExtent.width / (float)m_VulkanSwapChain.SwapChainExtent.height;
+	}
 
 	//Set the mesh vector pointer in the Renderer from the one in ObjectManager.
 	void SetRenderObjectsVector(std::vector<BaseRenderObject*>* a_RenderObjects);
@@ -81,6 +91,8 @@ private:
 	//ShaderData
 	ShaderManager* m_ShaderManager;
 
+
+	CameraObject* p_ActiveCamera;
 	std::vector<VkBuffer> mvk_ViewProjectionBuffers;
 	std::vector<VkDeviceMemory> mvk_ViewProjectionBuffersMemory;
 

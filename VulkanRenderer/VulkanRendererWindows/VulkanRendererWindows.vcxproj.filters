@@ -80,6 +80,9 @@
     <ClCompile Include="MainRenderer\RenderObjects\SceneObject.cpp">
       <Filter>RenderObjects</Filter>
     </ClCompile>
+    <ClCompile Include="MainRenderer\CameraController.cpp">
+      <Filter>MainRenderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainRenderer\Renderer.h">
@@ -150,6 +153,9 @@
     </ClInclude>
     <ClInclude Include="MainRenderer\RenderObjects\SceneObject.h">
       <Filter>RenderObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="MainRenderer\CameraController.h">
+      <Filter>MainRenderer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
