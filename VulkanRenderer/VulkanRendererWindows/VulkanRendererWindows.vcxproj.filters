@@ -68,10 +68,10 @@
     <ClCompile Include="MainRenderer\Handlers\DepthHandler.cpp">
       <Filter>MainRenderer\Handlers</Filter>
     </ClCompile>
-    <ClCompile Include="MainRenderer\VulkanDevice.cpp">
-      <Filter>MainRenderer\Structs</Filter>
-    </ClCompile>
     <ClCompile Include="MainRenderer\VulkanSwapChain.cpp">
+      <Filter>MainRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="MainRenderer\VulkanDevice.cpp">
       <Filter>MainRenderer</Filter>
     </ClCompile>
   </ItemGroup>
@@ -124,9 +124,6 @@
     <ClInclude Include="MainRenderer\Structs\PipelineData.h">
       <Filter>MainRenderer\Structs</Filter>
     </ClInclude>
-    <ClInclude Include="MainRenderer\VulkanDevice.h">
-      <Filter>MainRenderer\Structs</Filter>
-    </ClInclude>
     <ClInclude Include="MainRenderer\Tools\ObjectPool.h">
       <Filter>Tools</Filter>
     </ClInclude>
@@ -137,6 +134,9 @@
       <Filter>MainRenderer\Structs</Filter>
     </ClInclude>
     <ClInclude Include="MainRenderer\VulkanSwapChain.h">
+      <Filter>MainRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="MainRenderer\VulkanDevice.h">
       <Filter>MainRenderer</Filter>
     </ClInclude>
   </ItemGroup>

@@ -48,7 +48,6 @@ public:
 	// List of extensions supported by the device
 	std::vector<std::string> m_SupportedExtensions;
 
-
 	// Default command pool for the graphics queue family index.
 	VkCommandPool m_CommandPool = VK_NULL_HANDLE;
 	std::vector<VkCommandBuffer> m_DeviceCommandBuffer;
@@ -91,5 +90,39 @@ public:
 
 private:
 	bool ExtentionSupported(const std::string& a_Extension);
-	QueueFamilyIndices SetQueueFamilies(Window& a_Window);
 };
+
+//Finding Queuefamily
+inline QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice& r_PhysicalDevice, Window& a_Window)
+{
+	QueueFamilyIndices t_Indices;
+
+	uint32_t t_QueueFamilyCount = 0;
+	vkGetPhysicalDeviceQueueFamilyProperties(r_PhysicalDevice, &t_QueueFamilyCount, nullptr);
+
+	std::vector<VkQueueFamilyProperties> t_QueueFamilies(t_QueueFamilyCount);
+	vkGetPhysicalDeviceQueueFamilyProperties(r_PhysicalDevice, &t_QueueFamilyCount, t_QueueFamilies.data());
+
+	int i = 0;
+	for (const auto& queueFamily : t_QueueFamilies)
+	{
+		if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
+		{
+			t_Indices.graphicsFamily = i;
+			VkBool32 t_PresentSupport = false;
+			vkGetPhysicalDeviceSurfaceSupportKHR(r_PhysicalDevice, i, a_Window.GetSurface(), &t_PresentSupport);
+
+			if (t_PresentSupport)
+			{
+				t_Indices.presentFamily = i;
+			}
+		}
+
+		if (t_Indices.isComplete())
+			break;
+
+		i++;
+	}
+
+	return t_Indices;
+}

@@ -9,8 +9,6 @@
 Renderer::Renderer()
 {
 	m_FrameData.resize(FRAMEBUFFER_AMOUNT);
-	m_VulkanSwapChain = new VulkanSwapChain(m_VulkanDevice, FRAMEBUFFER_AMOUNT);
-
 	//Setting up GLFW.
 	m_Window = new Window(800, 600, "VulkanTest");
 
@@ -29,11 +27,12 @@ Renderer::Renderer()
 	m_VulkanDevice.CreateLogicalDevice(std::vector<const char*>(), *m_Window, mvk_GraphicsQueue, mvk_PresentQueue);
 	
 	SetupHandlers();
-	CreateSwapChain();
-	CreateImageViews();
+	m_VulkanSwapChain.ConnectVulkanDevice(&m_VulkanDevice);
+	m_VulkanSwapChain.CreateSwapChain(*m_Window, m_FrameData.size());
+	m_VulkanSwapChain.CreateImageViews(m_ImageHandler);
 	CreateRenderPass();
 
-	m_ShaderManager = new ShaderManager(m_VulkanDevice, m_VulkanSwapChain->SwapChainExtent);
+	m_ShaderManager = new ShaderManager(m_VulkanDevice, m_VulkanSwapChain.SwapChainExtent);
 }
 
 Renderer::~Renderer()
@@ -76,7 +75,7 @@ void Renderer::CleanupSwapChain()
 {
 	vkDeviceWaitIdle(m_VulkanDevice);
 	for (size_t i = 0; i < m_FrameData.size(); i++) {
-		vkDestroyFramebuffer(m_VulkanDevice, m_VulkanSwapChain->SwapChainFrameBuffers[i], nullptr);
+		vkDestroyFramebuffer(m_VulkanDevice, m_VulkanSwapChain.SwapChainFrameBuffers[i], nullptr);
 	}
 
 	//m_VulkanDevice.FreeCommandPool();
@@ -84,12 +83,6 @@ void Renderer::CleanupSwapChain()
 	vkDestroyPipeline(m_VulkanDevice, mvk_Pipeline, nullptr);
 	vkDestroyPipelineLayout(m_VulkanDevice, mvk_PipelineLayout, nullptr);
 	vkDestroyRenderPass(m_VulkanDevice, mvk_RenderPass, nullptr);
-
-	for (size_t i = 0; i < m_FrameData.size(); i++) {
-		vkDestroyImageView(m_VulkanDevice, m_VulkanSwapChain->SwapChainImageViews[i], nullptr);
-	}
-
-	vkDestroySwapchainKHR(m_VulkanDevice, m_VulkanSwapChain->SwapChain, nullptr);
 
 	for (size_t i = 0; i < m_FrameData.size(); i++)
 	{
@@ -108,8 +101,8 @@ void Renderer::RecreateSwapChain()
 		
 	CleanupSwapChain();
 
-	CreateSwapChain();
-	CreateImageViews();
+	m_VulkanSwapChain.CreateSwapChain(*m_Window, m_FrameData.size());
+	m_VulkanSwapChain.CreateImageViews(m_ImageHandler);
 	CreateRenderPass();
 
 	//Can be faulty, needs testing.
@@ -207,100 +200,11 @@ VkPhysicalDevice Renderer::PickPhysicalDevice()
 	return physicalDevice;
 }
 
-void Renderer::CreateSwapChain()
-{
-	SwapChainSupportDetails t_SwapChainSupport = QuerySwapChainSupport(m_VulkanDevice.m_PhysicalDevice);
-
-	//Getting the needed values from the PhysicalDevice.
-	VkSurfaceFormatKHR t_SurfaceFormat = ChooseSwapSurfaceFormat(t_SwapChainSupport.formats);
-	VkPresentModeKHR t_PresentMode = ChooseSwapPresentMode(t_SwapChainSupport.presentModes);
-	VkExtent2D t_Extent = ChooseSwapExtent(t_SwapChainSupport.capabilities);
-
-	//Setting up the SwapChain.
-	uint32_t t_ImageCount = t_SwapChainSupport.capabilities.minImageCount + 1;
-	uint32_t t_ActualImageCount = m_FrameData.size();
-
-	if (t_SwapChainSupport.capabilities.maxImageCount > 0 && t_ImageCount > t_SwapChainSupport.capabilities.maxImageCount) 
-	{
-		t_ImageCount = t_SwapChainSupport.capabilities.maxImageCount;
-
-		//Check if the swapchai can handle at least 2 images.
-		if (t_SwapChainSupport.capabilities.maxImageCount < 2)
-		{
-			throw std::runtime_error("maxImageCount is under 2!");
-		}
-		
-	}
-
-	VkSwapchainCreateInfoKHR t_CreateInfo{};
-	t_CreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-	t_CreateInfo.surface = m_Window->GetSurface();
-
-	t_CreateInfo.minImageCount = t_ActualImageCount;
-	t_CreateInfo.imageFormat = t_SurfaceFormat.format;
-	t_CreateInfo.imageColorSpace = t_SurfaceFormat.colorSpace;
-	t_CreateInfo.imageExtent = t_Extent;
-	t_CreateInfo.imageArrayLayers = 1;
-	t_CreateInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-
-	QueueFamilyIndices t_Indices = FindQueueFamilies(m_VulkanDevice.m_PhysicalDevice);
-	uint32_t t_QueueFamilyIndices[] = { t_Indices.graphicsFamily.value(), t_Indices.presentFamily.value() };
-
-	if (t_Indices.graphicsFamily != t_Indices.presentFamily) 
-	{
-		t_CreateInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
-		t_CreateInfo.queueFamilyIndexCount = 2;
-		t_CreateInfo.pQueueFamilyIndices = t_QueueFamilyIndices;
-	}
-	else 
-	{
-		t_CreateInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
-		t_CreateInfo.queueFamilyIndexCount = 0; // Optional
-		t_CreateInfo.pQueueFamilyIndices = nullptr; // Optional
-	}
-
-	//Starting Transform for Objects such as a specific starting rotation, now just the standard 0 for all.
-	t_CreateInfo.preTransform = t_SwapChainSupport.capabilities.currentTransform;
-
-	//No Transparent Window.
-	t_CreateInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
-
-	t_CreateInfo.presentMode = t_PresentMode;
-	t_CreateInfo.clipped = VK_TRUE;
-
-	//If a new SwapChain gets created such as resizing the window, ignore for now.
-	t_CreateInfo.oldSwapchain = VK_NULL_HANDLE;
-
-	if (vkCreateSwapchainKHR(m_VulkanDevice, &t_CreateInfo, nullptr, &m_VulkanSwapChain->SwapChain) != VK_SUCCESS)
-	{
-		throw std::runtime_error("failed to create swap chain!");
-	}
-
-	vkGetSwapchainImagesKHR(m_VulkanDevice, m_VulkanSwapChain->SwapChain, &t_ActualImageCount, nullptr);
-	m_FrameData.resize(t_ActualImageCount);
-
-	vkGetSwapchainImagesKHR(m_VulkanDevice, m_VulkanSwapChain->SwapChain, &t_ActualImageCount, m_VulkanSwapChain->SwapChainImages.data());
-
-	//Setting the Local variables
-	m_VulkanSwapChain->SwapChainImageFormat = t_SurfaceFormat.format;
-	m_VulkanSwapChain->SwapChainExtent = t_Extent;
-}
-
-void Renderer::CreateImageViews()
-{
-	//mvk_SwapChainImageViews.resize(mvk_SwapChainImages.size());
-
-	for (uint32_t i = 0; i < m_FrameData.size(); i++) 
-	{
-		m_VulkanSwapChain->SwapChainImageViews[i] = m_ImageHandler->CreateImageView(m_VulkanSwapChain->SwapChainImages[i], m_VulkanSwapChain->SwapChainImageFormat, VK_IMAGE_ASPECT_COLOR_BIT);
-	}
-}
-
 void Renderer::CreateRenderPass()
 {
 	//Color Attachment.
 	VkAttachmentDescription t_ColorAttachment{};
-	t_ColorAttachment.format = m_VulkanSwapChain->SwapChainImageFormat;
+	t_ColorAttachment.format = m_VulkanSwapChain.SwapChainImageFormat;
 	t_ColorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
 	t_ColorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
 	t_ColorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
@@ -383,12 +287,10 @@ void Renderer::CreateDescriptorSet(uint32_t a_DescID)
 
 void Renderer::CreateFrameBuffers()
 {
-	//mvk_SwapChainFrameBuffers.resize(mvk_SwapChainImageViews.size());
-
 	for (size_t i = 0; i < m_FrameData.size(); i++)
 	{
 		std::array<VkImageView, 2> t_Attachments = {
-		m_VulkanSwapChain->SwapChainImageViews[i],
+		m_VulkanSwapChain.SwapChainImageViews[i],
 		m_DepthHandler->GetDepthTest().depthImageView
 		};
 
@@ -397,11 +299,11 @@ void Renderer::CreateFrameBuffers()
 		t_FramebufferInfo.renderPass = mvk_RenderPass;
 		t_FramebufferInfo.attachmentCount = static_cast<uint32_t>(t_Attachments.size());
 		t_FramebufferInfo.pAttachments = t_Attachments.data();
-		t_FramebufferInfo.width = m_VulkanSwapChain->SwapChainExtent.width;
-		t_FramebufferInfo.height = m_VulkanSwapChain->SwapChainExtent.height;
+		t_FramebufferInfo.width = m_VulkanSwapChain.SwapChainExtent.width;
+		t_FramebufferInfo.height = m_VulkanSwapChain.SwapChainExtent.height;
 		t_FramebufferInfo.layers = 1;
 
-		if (vkCreateFramebuffer(m_VulkanDevice, &t_FramebufferInfo, nullptr, &m_VulkanSwapChain->SwapChainFrameBuffers[i]) != VK_SUCCESS)
+		if (vkCreateFramebuffer(m_VulkanDevice, &t_FramebufferInfo, nullptr, &m_VulkanSwapChain.SwapChainFrameBuffers[i]) != VK_SUCCESS)
 		{
 			throw std::runtime_error("failed to create framebuffer!");
 		}
@@ -410,12 +312,12 @@ void Renderer::CreateFrameBuffers()
 
 void Renderer::CreateCommandPool()
 {
-	m_VulkanDevice.CreateCommandPools(FindQueueFamilies(m_VulkanDevice.m_PhysicalDevice));
+	m_VulkanDevice.CreateCommandPools(FindQueueFamilies(m_VulkanDevice.m_PhysicalDevice, *m_Window));
 }
 
 void Renderer::CreateDepthResources()
 {
-	m_DepthHandler->CreateDepthResources(m_VulkanSwapChain->SwapChainExtent.width, m_VulkanSwapChain->SwapChainExtent.height);
+	m_DepthHandler->CreateDepthResources(m_VulkanSwapChain.SwapChainExtent.width, m_VulkanSwapChain.SwapChainExtent.height);
 }
 
 void Renderer::CreateSyncObjects()
@@ -467,7 +369,7 @@ void Renderer::DrawFrame(uint32_t& r_ImageIndex, float a_dt)
 
 	vkWaitForFences(m_VulkanDevice, 1, &frameData.InFlightFence, VK_TRUE, UINT64_MAX);
 
-	VkResult t_Result = vkAcquireNextImageKHR(m_VulkanDevice, m_VulkanSwapChain->SwapChain, UINT64_MAX, frameData.ImageAvailableSemaphore, VK_NULL_HANDLE, &r_ImageIndex);
+	VkResult t_Result = vkAcquireNextImageKHR(m_VulkanDevice, m_VulkanSwapChain.SwapChain, UINT64_MAX, frameData.ImageAvailableSemaphore, VK_NULL_HANDLE, &r_ImageIndex);
 
 	UpdateUniformBuffer(r_ImageIndex, a_dt);
 
@@ -493,8 +395,8 @@ void Renderer::DrawFrame(uint32_t& r_ImageIndex, float a_dt)
 	//Draw the objects using a single command buffer.
 	m_VulkanDevice.ClearPreviousCommand(m_CurrentFrame);
 
-	VkCommandBuffer& t_MainBuffer = m_VulkanDevice.CreateAndBeginCommand(m_CurrentFrame, FindQueueFamilies(m_VulkanDevice.m_PhysicalDevice).graphicsFamily.value(),
-		mvk_RenderPass, m_VulkanSwapChain->SwapChainFrameBuffers[m_CurrentFrame], m_VulkanSwapChain->SwapChainExtent);
+	VkCommandBuffer& t_MainBuffer = m_VulkanDevice.CreateAndBeginCommand(m_CurrentFrame, FindQueueFamilies(m_VulkanDevice.m_PhysicalDevice, *m_Window).graphicsFamily.value(),
+		mvk_RenderPass, m_VulkanSwapChain.SwapChainFrameBuffers[m_CurrentFrame], m_VulkanSwapChain.SwapChainExtent);
 
 	DrawObjects(t_MainBuffer);
 	m_VulkanDevice.EndCommand(t_MainBuffer);
@@ -529,7 +431,7 @@ void Renderer::DrawFrame(uint32_t& r_ImageIndex, float a_dt)
 	t_PresentInfo.waitSemaphoreCount = 1;
 	t_PresentInfo.pWaitSemaphores = t_SignalSemaphores;
 
-	VkSwapchainKHR t_SwapChains[] = { m_VulkanSwapChain->SwapChain };
+	VkSwapchainKHR t_SwapChains[] = { m_VulkanSwapChain.SwapChain };
 	t_PresentInfo.swapchainCount = 1;
 	t_PresentInfo.pSwapchains = t_SwapChains;
 	t_PresentInfo.pImageIndices = &r_ImageIndex;
@@ -604,7 +506,7 @@ void Renderer::UpdateUniformBuffer(uint32_t a_CurrentImage, float a_dt)
 {
 	ViewProjection ubo{};
 	ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-	ubo.proj = glm::perspective(glm::radians(45.0f), m_VulkanSwapChain->SwapChainExtent.width / (float)m_VulkanSwapChain->SwapChainExtent.height, 0.1f, 10.0f);
+	ubo.proj = glm::perspective(glm::radians(45.0f), m_VulkanSwapChain.SwapChainExtent.width / (float)m_VulkanSwapChain.SwapChainExtent.height, 0.1f, 10.0f);
 	ubo.proj[1][1] *= -1;
 
 	void* data;
@@ -612,117 +514,11 @@ void Renderer::UpdateUniformBuffer(uint32_t a_CurrentImage, float a_dt)
 	memcpy(data, &ubo, sizeof(ubo));
 	vkUnmapMemory(m_VulkanDevice, mvk_ViewProjectionBuffersMemory[a_CurrentImage]);
 }
-
-QueueFamilyIndices Renderer::FindQueueFamilies(VkPhysicalDevice a_Device)
-{
-	QueueFamilyIndices t_Indices;
-
-	uint32_t t_QueueFamilyCount = 0;
-	vkGetPhysicalDeviceQueueFamilyProperties(a_Device, &t_QueueFamilyCount, nullptr);
-
-	std::vector<VkQueueFamilyProperties> t_QueueFamilies(t_QueueFamilyCount);
-	vkGetPhysicalDeviceQueueFamilyProperties(a_Device, &t_QueueFamilyCount, t_QueueFamilies.data());
-
-	int i = 0;
-	for (const auto& queueFamily : t_QueueFamilies) 
-	{
-		if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) 
-		{
-			t_Indices.graphicsFamily = i;
-			VkBool32 t_PresentSupport = false;
-			vkGetPhysicalDeviceSurfaceSupportKHR(a_Device, i, m_Window->GetSurface(), &t_PresentSupport);
-
-			if (t_PresentSupport) 
-			{
-				t_Indices.presentFamily = i;
-			}
-		}
-
-		if (t_Indices.isComplete())
-			break;
-
-		i++;
-	}
-
-	return t_Indices;
-}
-
-SwapChainSupportDetails Renderer::QuerySwapChainSupport(VkPhysicalDevice a_Device) {
-	SwapChainSupportDetails t_Details;
-
-	vkGetPhysicalDeviceSurfaceCapabilitiesKHR(a_Device, m_Window->GetSurface(), &t_Details.capabilities);
-
-	//Get Format Data
-	uint32_t formatCount;
-	vkGetPhysicalDeviceSurfaceFormatsKHR(a_Device, m_Window->GetSurface(), &formatCount, nullptr);
-
-	if (formatCount != 0) 
-	{
-		t_Details.formats.resize(formatCount);
-		vkGetPhysicalDeviceSurfaceFormatsKHR(a_Device, m_Window->GetSurface(), &formatCount, t_Details.formats.data());
-	}
-
-	//Get Present Data
-	uint32_t t_PresentModeCount;
-	vkGetPhysicalDeviceSurfacePresentModesKHR(a_Device, m_Window->GetSurface(), &t_PresentModeCount, nullptr);
-
-	if (t_PresentModeCount != 0) 
-	{
-		t_Details.presentModes.resize(t_PresentModeCount);
-		vkGetPhysicalDeviceSurfacePresentModesKHR(a_Device, m_Window->GetSurface(), &t_PresentModeCount, t_Details.presentModes.data());
-	}
-
-	return t_Details;
-}
-
-VkSurfaceFormatKHR Renderer::ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& a_AvailableFormats) 
-{
-    for (const auto& t_AvailableFormat : a_AvailableFormats)
-	{
-        if (t_AvailableFormat.format == VK_FORMAT_B8G8R8A8_SRGB && t_AvailableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
-            return t_AvailableFormat;
-        }
-    }
-
-    return a_AvailableFormats[0];
-}
-
-VkPresentModeKHR Renderer::ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& a_AvailablePresentModes)
-{
-	for (const auto& t_AvailablePresentMode : a_AvailablePresentModes) 
-	{
-		if (t_AvailablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
-			return t_AvailablePresentMode;
-		}
-	}
-
-	return VK_PRESENT_MODE_FIFO_KHR;
-}
-
-VkExtent2D Renderer::ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& a_Capabilities)
-{
-	if (a_Capabilities.currentExtent.width != UINT32_MAX) {
-		return a_Capabilities.currentExtent;
-	}
-	else {
-		int t_Width, t_Height;
-		glfwGetFramebufferSize(m_Window->GetWindow(), &t_Width, &t_Height);
-
-		VkExtent2D t_ActualExtent = {
-			static_cast<uint32_t>(t_Width),
-			static_cast<uint32_t>(t_Height)
-		};
-
-		t_ActualExtent.width = std::clamp(t_ActualExtent.width, a_Capabilities.minImageExtent.width, a_Capabilities.maxImageExtent.width);
-		t_ActualExtent.height = std::clamp(t_ActualExtent.height, a_Capabilities.minImageExtent.height, a_Capabilities.maxImageExtent.height);
-		return t_ActualExtent;
-	}
-}
 	
 bool Renderer::IsDeviceSuitable(VkPhysicalDevice a_Device)
 {
 	//Queues are supported.
-	QueueFamilyIndices t_Indices = FindQueueFamilies(a_Device);
+	QueueFamilyIndices t_Indices = FindQueueFamilies(a_Device, *m_Window);
 
 	//Extentions from m_DeviceExtensions are supported.
 	bool t_ExtensionsSupported = CheckDeviceExtensionSupport(a_Device);
@@ -731,7 +527,7 @@ bool Renderer::IsDeviceSuitable(VkPhysicalDevice a_Device)
 	bool t_SwapChainAdequate = false;
 	if (t_ExtensionsSupported) 
 	{
-		SwapChainSupportDetails swapChainSupport = QuerySwapChainSupport(a_Device);
+		SwapChainSupportDetails swapChainSupport = QuerySwapChainSupport(a_Device, *m_Window);
 		t_SwapChainAdequate = !swapChainSupport.formats.empty() && !swapChainSupport.presentModes.empty();
 	}
 

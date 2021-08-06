@@ -13,12 +13,6 @@
 #include "Handlers/ImageHandler.h"
 #include "Handlers/DepthHandler.h"
 
-struct SwapChainSupportDetails {
-	VkSurfaceCapabilitiesKHR capabilities;
-	std::vector<VkSurfaceFormatKHR> formats;
-	std::vector<VkPresentModeKHR> presentModes;
-};
-
 constexpr uint32_t FRAMEBUFFER_AMOUNT = 2;
 constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
@@ -37,8 +31,6 @@ public:
 
 	void CreateVKInstance();
 	VkPhysicalDevice PickPhysicalDevice();
-	void CreateSwapChain();
-	void CreateImageViews();
 	void CreateRenderPass();
 
 	uint32_t CreateDescriptorLayout(TextureData* a_textureData);
@@ -61,15 +53,6 @@ public:
 	void DrawFrame(uint32_t& r_ImageIndex, float a_dt);
 	void DrawObjects(VkCommandBuffer& r_CmdBuffer);
 	void UpdateUniformBuffer(uint32_t a_CurrentImage, float a_dt);
-
-	//QueueFamily
-	QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice a_Device);
-
-	//SwapChain Setup
-	SwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice a_Device);
-	VkSurfaceFormatKHR ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& a_AvailableFormats);
-	VkPresentModeKHR ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& a_AvailablePresentModes);
-	VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& a_Capabilities);
 
 	bool CheckDeviceExtensionSupport(VkPhysicalDevice a_Device);
 
@@ -110,7 +93,7 @@ private:
 	VkInstance mvk_Instance;
 
 	VulkanDevice m_VulkanDevice;
-	VulkanSwapChain* m_VulkanSwapChain;
+	VulkanSwapChain m_VulkanSwapChain;
 
 	VkQueue mvk_GraphicsQueue;
 	VkQueue mvk_PresentQueue;

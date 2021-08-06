@@ -51,7 +51,6 @@ void VulkanDevice::VulkanDeviceSetup(VkPhysicalDevice a_PhysicalDevice, Window& 
 	vkGetPhysicalDeviceMemoryProperties(m_PhysicalDevice, &m_MemoryProperties);
 
 	//Set queue families for requested queues. 
-	SetQueueFamilies(a_Window);
     uint32_t t_QueueFamilyCount;
     vkGetPhysicalDeviceQueueFamilyProperties(m_PhysicalDevice, &t_QueueFamilyCount, nullptr);
     assert(t_QueueFamilyCount > 0);
@@ -81,7 +80,7 @@ void VulkanDevice::VulkanDeviceSetup(VkPhysicalDevice a_PhysicalDevice, Window& 
 void VulkanDevice::CreateLogicalDevice(std::vector<const char*> a_EnabledExtensions, Window& r_Window, VkQueue& r_GraphicsQueue, VkQueue& r_PresentQueue)
 {
     p_GraphicsQueue = &r_GraphicsQueue;
-    QueueFamilyIndices t_Indices = SetQueueFamilies(r_Window);
+    QueueFamilyIndices t_Indices = FindQueueFamilies(m_PhysicalDevice, r_Window);
 
     std::vector<VkDeviceQueueCreateInfo> t_QueueCreateInfos;
     std::set<uint32_t> t_UniqueQueueFamilies = { t_Indices.graphicsFamily.value(), t_Indices.presentFamily.value() };
@@ -407,42 +406,7 @@ void VulkanDevice::CopyBuffer(VkDeviceSize a_Size, VkBuffer& r_SrcBuffer, VkBuff
 
 #pragma endregion
 
-
 bool VulkanDevice::ExtentionSupported(const std::string& a_Extension)
 {
     return (std::find(m_SupportedExtensions.begin(), m_SupportedExtensions.end(), a_Extension) != m_SupportedExtensions.end());
-}
-
-QueueFamilyIndices VulkanDevice::SetQueueFamilies(Window& a_Window)
-{
-    QueueFamilyIndices t_Indices;
-
-    uint32_t t_QueueFamilyCount = 0;
-    vkGetPhysicalDeviceQueueFamilyProperties(m_PhysicalDevice, &t_QueueFamilyCount, nullptr);
-
-    std::vector<VkQueueFamilyProperties> t_QueueFamilies(t_QueueFamilyCount);
-    vkGetPhysicalDeviceQueueFamilyProperties(m_PhysicalDevice, &t_QueueFamilyCount, t_QueueFamilies.data());
-
-    int i = 0;
-    for (const auto& queueFamily : t_QueueFamilies)
-    {
-        if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
-        {
-            t_Indices.graphicsFamily = i;
-            VkBool32 t_PresentSupport = false;
-            vkGetPhysicalDeviceSurfaceSupportKHR(m_PhysicalDevice, i, a_Window.GetSurface(), &t_PresentSupport);
-
-            if (t_PresentSupport)
-            {
-                t_Indices.presentFamily = i;
-            }
-        }
-
-        if (t_Indices.isComplete())
-            break;
-
-        i++;
-    }
-
-    return t_Indices;
 }
