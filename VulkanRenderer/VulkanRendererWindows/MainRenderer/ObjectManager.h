@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Renderer.h"
-#include "CameraController.h"
 #include "RenderObjects/RenderFactories/RenderFactory.h"
 
 class ObjectManager
@@ -19,7 +18,6 @@ public:
 	size_t GetNextRenderID() { return m_CurrentRenderID++; }
 
 private:
-
 	size_t m_CurrentRenderID = 0;
 
 	std::vector<BaseRenderObject*> m_RenderObjects;
@@ -34,6 +32,4 @@ private:
 
 	Renderer* p_Renderer;
 	RenderFactory* m_RenderFactory;
-
-	CameraController m_CameraController;
 };

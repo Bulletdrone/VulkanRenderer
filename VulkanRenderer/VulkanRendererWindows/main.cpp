@@ -1,4 +1,5 @@
 #include "MainRenderer/ObjectManager.h"
+#include "MainRenderer/CameraController.h"
 
 int main() 
 {
@@ -11,6 +12,7 @@ int main()
     m_Renderer->CreateFrameBuffers();
 
     ObjectManager* m_ObjectManager = new ObjectManager(m_Renderer);
+    CameraController* m_CameraController = new CameraController(m_Renderer);
 
     //Transform* t_Transform1 = new Transform(glm::vec3(-7, -6, -1), 2);
     //Transform* t_Transform2 = new Transform(glm::vec3(-0.7f, 0, 0.2), 1);
@@ -45,6 +47,7 @@ int main()
         }
 
         glfwPollEvents();
+        m_CameraController->UpdateActiveCamera();
         m_ObjectManager->UpdateObjects(deltaTime);
 
         double t_End = glfwGetTime();

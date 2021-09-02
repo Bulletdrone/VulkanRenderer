@@ -1,12 +1,13 @@
 #pragma once
 #include "RenderObjects/CameraObject.h"
+#include "Renderer.h"
 
 #include <vector>
 
 class CameraController
 {
 public:
-	CameraController();
+	CameraController(Renderer* a_Renderer);
 	~CameraController();
 
 	void AddCamera(glm::vec3 a_Position, glm::vec3 a_Rotation, float a_AspectRatio, float a_NearField, float a_FarField);
@@ -27,9 +28,11 @@ public:
 
 
 private:
-	uint32_t m_ActiveCamera;
+	uint32_t m_ActiveCamera = MAXUINT32;
 	std::vector<CameraObject*> m_Cameras;
 
 	//can be changed during runtime.
 	float m_StandardFov = 45.0f;
+
+	Renderer* p_Renderer;
 };

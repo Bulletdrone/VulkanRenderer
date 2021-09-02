@@ -16,13 +16,6 @@ ObjectManager::ObjectManager(Renderer* a_Renderer)
 	des_SpaceImage = p_Renderer->CreateDescriptorLayout(&m_Textures[0]);
 	pip_SpaceImage = p_Renderer->CreateGraphicsPipeline(des_SpaceImage);
 	p_Renderer->SetupImage(m_Textures[0], "../Resources/Images/Background.png");
-
-	if (m_CameraController.CameraAvailable())
-	{
-		m_CameraController.AddCamera(glm::vec3(2, 2, 2), glm::vec3(0), p_Renderer->GetAspectRatio(), 0.1f, 10.0f);
-		p_Renderer->ReplaceActiveCamera(m_CameraController.GetActiveCamera());
-	}
-		
 }
 
 ObjectManager::~ObjectManager()
@@ -46,8 +39,6 @@ void ObjectManager::SetupStartObjects()
 void ObjectManager::UpdateObjects(float a_Dt)
 {
 	uint32_t t_ImageIndex;
-
-	m_CameraController.UpdateActiveCamera();
 
 	for (size_t i = 0; i < m_RenderObjects.size(); i++)
 	{

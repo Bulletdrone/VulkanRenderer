@@ -1,7 +1,14 @@
 #include "CameraController.h"
 
-CameraController::CameraController()
-{}
+CameraController::CameraController(Renderer* a_Renderer)
+	: p_Renderer(a_Renderer)
+{
+	if (CameraAvailable())
+	{
+		AddCamera(glm::vec3(2, 2, 2), glm::vec3(0), p_Renderer->GetAspectRatio(), 0.1f, 10.0f);
+		SwitchCamera(0);
+	}
+}
 
 CameraController::~CameraController()
 {}
@@ -20,5 +27,7 @@ bool CameraController::SwitchCamera(uint32_t a_CameraID)
 		return false;
 
 	m_ActiveCamera = a_CameraID;
+
+	p_Renderer->ReplaceActiveCamera(GetActiveCamera());
 	return true;
 }
