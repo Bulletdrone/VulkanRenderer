@@ -12,6 +12,7 @@ int main()
     m_Renderer->CreateFrameBuffers();
 
     ObjectManager* m_ObjectManager = new ObjectManager(m_Renderer);
+
     CameraController* m_CameraController = new CameraController(m_Renderer);
 
     //Transform* t_Transform1 = new Transform(glm::vec3(-7, -6, -1), 2);
@@ -44,6 +45,8 @@ int main()
 
             t_FrameCount = 0;
             t_StartTime = t_CurrentTime;
+
+            m_CameraController->SwitchNextCamera();
         }
 
         glfwPollEvents();

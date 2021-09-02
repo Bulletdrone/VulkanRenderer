@@ -18,6 +18,9 @@ public:
 	//returns true if switch was possible.
 	bool SwitchCamera(uint32_t a_CameraID);
 
+	//Go to the next Camera in the list.
+	uint32_t SwitchNextCamera();
+
 	void UpdateActiveCamera() { GetActiveCamera()->Update(); }
 
 	//Get the current active Camera.
