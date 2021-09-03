@@ -154,7 +154,7 @@ uint32_t VulkanDevice::FindMemoryType(uint32_t a_TypeFilter, VkMemoryPropertyFla
 }
 
 //Thanks to VkGuide.dev
-VkDeviceSize VulkanDevice::CorrectUniformBufferOffset(VkDeviceSize a_BufferSize)
+VkDeviceSize VulkanDevice::AllignUniformBufferSize(VkDeviceSize a_BufferSize)
 {
     VkDeviceSize minSize = m_Properties.limits.minUniformBufferOffsetAlignment;
     VkDeviceSize alignedSize = a_BufferSize;
