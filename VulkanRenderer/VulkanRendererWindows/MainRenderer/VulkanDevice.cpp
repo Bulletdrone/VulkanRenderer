@@ -153,6 +153,20 @@ uint32_t VulkanDevice::FindMemoryType(uint32_t a_TypeFilter, VkMemoryPropertyFla
 	throw std::runtime_error("failed to find suitable memory type!");
 }
 
+//Thanks to VkGuide.dev
+VkDeviceSize VulkanDevice::CorrectUniformBufferOffset(VkDeviceSize a_BufferSize)
+{
+    VkDeviceSize minSize = m_Properties.limits.minUniformBufferOffsetAlignment;
+    VkDeviceSize alignedSize = a_BufferSize;
+
+    if (minSize > 0)
+    {
+        alignedSize = (alignedSize + minSize - 1) & ~(minSize - 1);
+    }
+
+    return alignedSize;
+}
+
 #pragma region Buffer Helpers
 
 void VulkanDevice::CreateCommandPools(QueueFamilyIndices a_QueueFamilyIndices)

@@ -65,6 +65,7 @@ public:
 	};
 
 	uint32_t FindMemoryType(uint32_t a_TypeFilter, VkMemoryPropertyFlags a_Properties);
+	VkDeviceSize CorrectUniformBufferOffset(VkDeviceSize a_BufferSize);
 
 	//CommandBuffer Functions
 	void CreateCommandPools(QueueFamilyIndices a_QueueFamilyIndices);
