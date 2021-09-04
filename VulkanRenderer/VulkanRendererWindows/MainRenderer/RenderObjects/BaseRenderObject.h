@@ -38,4 +38,6 @@ protected:
 	RenderObjectData* p_RenderObjectData = nullptr;
 	//PipelineData.
 	uint32_t m_PipeLineID;
+
+	
 };
