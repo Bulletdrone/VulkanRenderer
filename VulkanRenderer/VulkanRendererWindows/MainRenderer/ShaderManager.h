@@ -18,9 +18,11 @@ public:
 	void RecreatePipelines(const VkRenderPass& r_RenderPass);
 
 	void CreateDescriptorPool(const size_t a_FrameAmount, uint32_t a_DescID);
-	void CreateDescriptorSet(const size_t a_FrameAmount, uint32_t a_DescID, std::vector<VkBuffer>& r_ViewProjectionBuffers, VkDeviceSize a_BufferSize);
-	void RecreateDescriptors(const size_t a_FrameAmount, std::vector<VkBuffer>& r_ViewProjectionBuffers, VkDeviceSize a_BufferSize);
+	void CreateDescriptorSet(const size_t a_FrameAmount, uint32_t a_DescID, std::vector<VkBuffer>& r_UniformBuffers, VkDeviceSize a_BufferSize);
+	void RecreateDescriptors(const size_t a_FrameAmount, std::vector<VkBuffer>& r_UniformBuffers, VkDeviceSize a_BufferSize);
 
+	VkDescriptorBufferInfo CreateDescriptorBufferInfo(VkBuffer& r_UniformBuffer, VkDeviceSize a_Offset, VkDeviceSize a_BufferSize);
+	VkDescriptorImageInfo CreateDescriptorImageInfo(VkImageLayout a_ImageLayout, VkImageView& r_ImageView, VkSampler& r_Sampler);
 	VkShaderModule CreateShaderModule(const std::vector<char>& code);
 
 public:

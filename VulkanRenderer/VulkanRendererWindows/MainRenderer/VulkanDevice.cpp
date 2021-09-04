@@ -346,33 +346,11 @@ void VulkanDevice::CreateIndexBuffers(BufferData<uint32_t>* a_IndexData)
     vkFreeMemory(m_LogicalDevice, t_StagingBufferMemory, nullptr);
 }
 
-void VulkanDevice::CreateUniformBuffers(std::vector<VkBuffer>& r_UniformBuffers, std::vector<VkDeviceMemory>& r_UniformBuffersMemory, const size_t a_SwampChainSize, VkDeviceSize a_BufferSize)
+void VulkanDevice::CreateUniformBuffers(VkBuffer& r_UniformBuffer, VkDeviceMemory& r_UniformBufferMemory, const size_t a_SwampChainSize, VkDeviceSize a_BufferSize)
 {
-    //VkDeviceSize t_BufferSize = sizeof(ViewProjection);
-
-    r_UniformBuffers.resize(a_SwampChainSize);
-    r_UniformBuffersMemory.resize(a_SwampChainSize);
-
-    for (size_t i = 0; i < a_SwampChainSize; i++)
-    {
         CreateBuffer(a_BufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-            r_UniformBuffers[i], r_UniformBuffersMemory[i]);
-    }
-
-   // VkDeviceSize t_UniBufferSize = sizeof(ViewProjection);
-
-    //r_UniformBuffers.resize(a_SwampChainSize);
-    //r_UniformBuffersMemory.resize(a_SwampChainSize);
-
-    //for (size_t i = 0; i < a_SwampChainSize; i++)
-    //{
-    //    CreateBuffer(a_BufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-    //        r_UniformBuffers[i], r_UniformBuffersMemory[i]);
-    //}
+            r_UniformBuffer, r_UniformBufferMemory);
 }
-
-    
-
 //PRIVATES
 
 #pragma region Buffer Helpers

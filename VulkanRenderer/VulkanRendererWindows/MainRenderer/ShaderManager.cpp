@@ -100,7 +100,7 @@ void ShaderManager::CreateDescriptorPool(const size_t a_FrameAmount, uint32_t a_
 	}
 }
 
-void ShaderManager::CreateDescriptorSet(const size_t a_FrameAmount, uint32_t a_DescID, std::vector<VkBuffer>& r_ViewProjectionBuffers, VkDeviceSize a_BufferSize)
+void ShaderManager::CreateDescriptorSet(const size_t a_FrameAmount, uint32_t a_DescID, std::vector<VkBuffer>& r_UniformBuffers, VkDeviceSize a_BufferSize)
 {
 	DescriptorData& r_DescData = DescriptorPool.Get(a_DescID);
 	std::vector<VkDescriptorSetLayout> t_Layouts(a_FrameAmount, r_DescData.descriptorLayout);
@@ -121,15 +121,19 @@ void ShaderManager::CreateDescriptorSet(const size_t a_FrameAmount, uint32_t a_D
 
 	for (size_t i = 0; i < a_FrameAmount; i++)
 	{
-		VkDescriptorBufferInfo t_BufferInfo{};
-		t_BufferInfo.buffer = r_ViewProjectionBuffers[i];
-		t_BufferInfo.offset = 0;
-		t_BufferInfo.range = a_BufferSize;
+		//VkDescriptorBufferInfo t_BufferInfo{};
+		//t_BufferInfo.buffer = r_UniformBuffers[i];
+		//t_BufferInfo.offset = 0;
+		//t_BufferInfo.range = a_BufferSize;
 
-		VkDescriptorImageInfo t_ImageInfo{};
-		t_ImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-		t_ImageInfo.imageView = r_DescData.texture->textureImageView;
-		t_ImageInfo.sampler = r_DescData.texture->textureSampler;
+		VkDescriptorBufferInfo t_BufferInfo = CreateDescriptorBufferInfo(r_UniformBuffers[i], 0, a_BufferSize);
+
+		//VkDescriptorImageInfo t_ImageInfo{};
+		//t_ImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+		//t_ImageInfo.imageView = r_DescData.texture->textureImageView;
+		//t_ImageInfo.sampler = r_DescData.texture->textureSampler;
+
+		VkDescriptorImageInfo t_ImageInfo = CreateDescriptorImageInfo(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, r_DescData.texture->textureImageView, r_DescData.texture->textureSampler);
 
 		std::array<VkWriteDescriptorSet, 2> t_DescriptorWrites{};
 		//Uniform Info
@@ -156,7 +160,7 @@ void ShaderManager::CreateDescriptorSet(const size_t a_FrameAmount, uint32_t a_D
 	}
 }
 
-void ShaderManager::RecreateDescriptors(const size_t a_FrameAmount, std::vector<VkBuffer>& r_ViewProjectionBuffers, VkDeviceSize a_BufferSize)
+void ShaderManager::RecreateDescriptors(const size_t a_FrameAmount, std::vector<VkBuffer>& r_UniformBuffers, VkDeviceSize a_BufferSize)
 {
 	for (size_t i = 0; i < DescriptorPool.Size(); i++)
 	{
@@ -173,9 +177,29 @@ void ShaderManager::RecreateDescriptors(const size_t a_FrameAmount, std::vector<
 			}
 
 			CreateDescriptorPool(a_FrameAmount, i);
-			CreateDescriptorSet(a_FrameAmount, i, r_ViewProjectionBuffers, a_BufferSize);
+			CreateDescriptorSet(a_FrameAmount, i, r_UniformBuffers, a_BufferSize);
 		}
 	}
+}
+
+VkDescriptorBufferInfo ShaderManager::CreateDescriptorBufferInfo(VkBuffer& r_UniformBuffer, VkDeviceSize a_Offset, VkDeviceSize a_BufferSize)
+{
+	VkDescriptorBufferInfo t_BufferInfo{};
+	t_BufferInfo.buffer = r_UniformBuffer;
+	t_BufferInfo.offset = 0;
+	t_BufferInfo.range = a_BufferSize;
+
+	return t_BufferInfo;
+}
+
+VkDescriptorImageInfo ShaderManager::CreateDescriptorImageInfo(VkImageLayout a_ImageLayout, VkImageView& r_ImageView, VkSampler& r_Sampler)
+{
+	VkDescriptorImageInfo t_ImageInfo{};
+	t_ImageInfo.imageLayout = a_ImageLayout;
+	t_ImageInfo.imageView = r_ImageView;
+	t_ImageInfo.sampler = r_Sampler;
+
+	return t_ImageInfo;
 }
 
 void ShaderManager::CreateGraphicsPipeline(const VkRenderPass& r_RenderPass, PipeLineData& r_PipeLineData)

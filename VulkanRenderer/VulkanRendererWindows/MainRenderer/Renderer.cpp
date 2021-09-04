@@ -66,7 +66,13 @@ void Renderer::SetupHandlers()
 //Call this after the creation of Vulkan.
 void Renderer::SetupRenderObjects()
 {
-	m_VulkanDevice.CreateUniformBuffers(mvk_ViewProjectionBuffers, mvk_ViewProjectionBuffersMemory, m_FrameData.size(), sizeof(ViewProjection));
+	mvk_ViewProjectionBuffers.resize(FRAMEBUFFER_AMOUNT);
+	mvk_ViewProjectionBuffersMemory.resize(FRAMEBUFFER_AMOUNT);
+
+	for (uint32_t i = 0; i < FRAMEBUFFER_AMOUNT; i++)
+	{
+		m_VulkanDevice.CreateUniformBuffers(mvk_ViewProjectionBuffers[i], mvk_ViewProjectionBuffersMemory[i], m_FrameData.size(), sizeof(ViewProjection));
+	}
 
 	CreateSyncObjects();
 }
