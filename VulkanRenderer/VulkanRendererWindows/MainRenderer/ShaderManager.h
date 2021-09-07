@@ -6,6 +6,21 @@
 
 #include "VulkanDevice.h"
 
+struct DescriptorLayout
+{
+	VkDescriptorSetLayout descriptorSetLayout;
+	uint32_t bufferCount;
+	uint32_t imageCount;
+
+	bool SameLayout(uint32_t a_BufferCount, uint32_t a_ImageCount)
+	{
+		if (bufferCount == a_BufferCount && imageCount == a_ImageCount)
+			return true;
+
+		return false;
+	}
+};
+
 class ShaderManager
 {
 public:
@@ -28,6 +43,8 @@ public:
 public:
 	ObjectPool<PipeLineData> PipelinePool{ ObjectPool<PipeLineData>(10, 5) };
 	ObjectPool<DescriptorData> DescriptorPool{ ObjectPool<DescriptorData>(10, 5) };
+
+	std::vector<DescriptorLayout> DescriptorLayouts;
 
 private:
 	void CreateGraphicsPipeline(const VkRenderPass& r_RenderPass, PipeLineData& r_PipeLineData);

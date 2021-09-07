@@ -7,11 +7,11 @@ struct DescriptorData
 {
 	uint32_t descID;
 
-	VkDescriptorSetLayout descriptorLayout;
+	VkDescriptorSetLayout* descriptorLayout;
 	VkDescriptorPool descriptorPool;
-	std::vector<VkDescriptorSet> descriptorSets[2];
+	VkDescriptorSet descriptorSets[2];
 
-	TextureData* texture;
+	std::vector<TextureData*> texture;
 };
 
 struct PipeLineData
@@ -23,5 +23,5 @@ struct PipeLineData
 	VkPipeline pipeLine = VK_NULL_HANDLE;
 	VkPipelineLayout pipeLineLayout = VK_NULL_HANDLE;
 
-	DescriptorData* p_DescriptorData;
+	std::vector<DescriptorData*> p_DescriptorData;
 };
