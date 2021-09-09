@@ -8,3 +8,5 @@ Debug/
 VulkanMemoryAllocator/
 STB/
 ObjLoader/
+VulkanRenderer/Resources/Images/Background1.png
+VulkanRenderer/Resources/Models/Pavillion.obj
