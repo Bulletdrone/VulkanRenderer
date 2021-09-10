@@ -8,6 +8,8 @@
 
 struct DescriptorLayout
 {
+	uint32_t ID;
+
 	VkDescriptorSetLayout descriptorSetLayout;
 	uint32_t bufferCount;
 	uint32_t imageCount;
@@ -27,17 +29,20 @@ public:
 	ShaderManager(VulkanDevice& r_VulkanDevice, const VkExtent2D& r_VKSwapChainExtent);
 	~ShaderManager();
 
-	uint32_t CreateDescriptorSetLayout(TextureData* a_TextureData);
+	/*	Create a DescriptorData inside the ShaderManager, returns the ID of the location.
+	@param a_TextureDatas, The Textures that the Descriptor needs, can be 0.
+	@param a_BufferCount, the amount of uniform buffers, can be 0.
+	@param p_DescriptorPointer, an nullptr of a VkDescriptorSetLayout, returns a new or already existing layout.
+	@return the uint32_t ID of the DescriptorData location. */
+	uint32_t CreateDescriptorData(std::vector<TextureData>& a_TextureData, uint32_t a_BufferCount, VkDescriptorSetLayout* p_DescriptorPointer);
 
-	uint32_t CreatePipelineData(const VkRenderPass& r_RenderPass, uint32_t a_DescriptorID);
+	uint32_t CreatePipelineData(const VkRenderPass& r_RenderPass, std::vector<uint32_t>& a_DescriptorIDs);
 	void RecreatePipelines(const VkRenderPass& r_RenderPass);
 
 	void CreateDescriptorPool(const size_t a_FrameAmount, uint32_t a_DescID);
-	void CreateDescriptorSet(const size_t a_FrameAmount, uint32_t a_DescID, std::vector<VkBuffer>& r_UniformBuffers, VkDeviceSize a_BufferSize);
+	void CreateDescriptorSet(const size_t a_FrameAmount, uint32_t a_DescID, std::vector<VkDescriptorBufferInfo>* a_Buffers, std::vector<VkDescriptorImageInfo>* a_Images);
 	void RecreateDescriptors(const size_t a_FrameAmount, std::vector<VkBuffer>& r_UniformBuffers, VkDeviceSize a_BufferSize);
 
-	VkDescriptorBufferInfo CreateDescriptorBufferInfo(VkBuffer& r_UniformBuffer, VkDeviceSize a_Offset, VkDeviceSize a_BufferSize);
-	VkDescriptorImageInfo CreateDescriptorImageInfo(VkImageLayout a_ImageLayout, VkImageView& r_ImageView, VkSampler& r_Sampler);
 	VkShaderModule CreateShaderModule(const std::vector<char>& code);
 
 public:
@@ -48,6 +53,7 @@ public:
 
 private:
 	void CreateGraphicsPipeline(const VkRenderPass& r_RenderPass, PipeLineData& r_PipeLineData);
+	VkDescriptorSetLayout* CreateDescriptorLayout(const uint32_t a_BufferCount, const uint32_t a_ImageCount);
 
 	VulkanDevice& rm_VulkanDevice;
 	const VkExtent2D& rmvk_SwapChainExtent;

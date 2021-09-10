@@ -271,14 +271,14 @@ void Renderer::CreateRenderPass()
 	}
 }
 
-uint32_t Renderer::CreateDescriptorLayout(TextureData* a_textureData)
+uint32_t Renderer::CreateDescriptorLayout(std::vector<TextureData>& a_TextureData, uint32_t a_BufferCount, VkDescriptorSetLayout* p_DescriptorPointer)
 {
-	return m_ShaderManager->CreateDescriptorSetLayout(a_textureData);
+	return m_ShaderManager->CreateDescriptorData(a_TextureData, a_BufferCount, p_DescriptorPointer);
 }
 
-uint32_t Renderer::CreateGraphicsPipeline(uint32_t a_DescID)
+uint32_t Renderer::CreateGraphicsPipeline(std::vector<uint32_t>& a_DescriptorIDs)
 {
-	return m_ShaderManager->CreatePipelineData(mvk_RenderPass, a_DescID);
+	return m_ShaderManager->CreatePipelineData(mvk_RenderPass, a_DescriptorIDs);
 }
 
 void Renderer::CreateDescriptorPool(uint32_t a_DescID)
@@ -286,9 +286,9 @@ void Renderer::CreateDescriptorPool(uint32_t a_DescID)
 	m_ShaderManager->CreateDescriptorPool(m_FrameData.size(), a_DescID);
 }
 
-void Renderer::CreateDescriptorSet(uint32_t a_DescID)
+void Renderer::CreateDescriptorSet(uint32_t a_DescID, std::vector<VkDescriptorBufferInfo>* a_Buffers, std::vector<VkDescriptorImageInfo>* a_Images)
 {
-	m_ShaderManager->CreateDescriptorSet(m_FrameData.size(), a_DescID, mvk_ViewProjectionBuffers, sizeof(ViewProjection));
+	m_ShaderManager->CreateDescriptorSet(m_FrameData.size(), a_DescID, a_Buffers, a_Images);
 }
 
 void Renderer::CreateFrameBuffers()
@@ -489,8 +489,11 @@ void Renderer::DrawObjects(VkCommandBuffer& r_CmdBuffer)
 			vkCmdBindPipeline(r_CmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, t_CurrentPipeLine.pipeLine);
 		}
 
+		std::vector<VkDescriptorSet> descriptorSets{ t_CurrentPipeLine.p_DescriptorData[0]->descriptorSets[m_CurrentFrame],
+			t_CurrentPipeLine.p_DescriptorData[1]->descriptorSets[m_CurrentFrame] };
+
 		//Set Descriptor
-		vkCmdBindDescriptorSets(r_CmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, t_CurrentPipeLine.pipeLineLayout, 0, 1, &t_CurrentPipeLine.p_DescriptorData->descriptorSets[m_CurrentFrame].at(0), 0, nullptr);
+		vkCmdBindDescriptorSets(r_CmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, t_CurrentPipeLine.pipeLineLayout, 0, 2, descriptorSets.data(), 0, nullptr);
 
 		//Set the Push constant data.
 		t_PushInstance.model = t_RenderObject->GetModelMatrix();
@@ -522,7 +525,7 @@ void Renderer::UpdateUniformBuffer(uint32_t a_CurrentImage, float a_dt)
 	memcpy(data, &ubo, sizeof(ubo));
 	vkUnmapMemory(m_VulkanDevice, mvk_ViewProjectionBuffersMemory[a_CurrentImage]);
 }
-	
+
 bool Renderer::IsDeviceSuitable(VkPhysicalDevice a_Device)
 {
 	//Queues are supported.

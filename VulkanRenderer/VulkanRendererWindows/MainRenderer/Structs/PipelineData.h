@@ -11,7 +11,7 @@ struct DescriptorData
 	VkDescriptorPool descriptorPool;
 	VkDescriptorSet descriptorSets[2];
 
-	std::vector<TextureData*> texture;
+	std::vector<TextureData*> textures;
 };
 
 struct PipeLineData

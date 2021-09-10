@@ -157,5 +157,8 @@
     <ClInclude Include="MainRenderer\CameraController.h">
       <Filter>MainRenderer</Filter>
     </ClInclude>
+    <ClInclude Include="MainRenderer\Tools\VulkanInitializers.h">
+      <Filter>Tools</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

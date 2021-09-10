@@ -35,10 +35,10 @@ public:
 	VkPhysicalDevice PickPhysicalDevice();
 	void CreateRenderPass();
 
-	uint32_t CreateDescriptorLayout(TextureData* a_textureData);
-	uint32_t CreateGraphicsPipeline(uint32_t a_DescID);
+	uint32_t CreateDescriptorLayout(std::vector<TextureData>& a_TextureData, uint32_t a_BufferCount, VkDescriptorSetLayout* p_DescriptorPointer);
+	uint32_t CreateGraphicsPipeline(std::vector<uint32_t>& a_DescriptorIDs);
 	void CreateDescriptorPool(uint32_t a_DescID);
-	void CreateDescriptorSet(uint32_t a_DescID);
+	void CreateDescriptorSet(uint32_t a_DescID, std::vector<VkDescriptorBufferInfo>* a_Buffers, std::vector<VkDescriptorImageInfo>* a_Images);
 
 	void CreateFrameBuffers();
 	void CreateCommandPool();
@@ -65,7 +65,7 @@ public:
 	GLFWwindow* GetWindow() const { return m_Window->GetWindow(); }
 	VulkanDevice& GetVulkanDevice() { return m_VulkanDevice; }
 
-	float GetAspectRatio() 
+	float GetAspectRatio()
 	{
 		return m_VulkanSwapChain.SwapChainExtent.width / (float)m_VulkanSwapChain.SwapChainExtent.height;
 	}
@@ -73,6 +73,9 @@ public:
 	//Set the mesh vector pointer in the Renderer from the one in ObjectManager.
 	void SetRenderObjectsVector(std::vector<BaseRenderObject*>* a_RenderObjects);
 	void SetTextureDataVector(std::vector<TextureData>* a_Textures);
+
+	std::vector<VkBuffer> mvk_ViewProjectionBuffers;
+	std::vector<VkDeviceMemory> mvk_ViewProjectionBuffersMemory;
 
 private:
 	bool IsDeviceSuitable(VkPhysicalDevice a_Device);
@@ -93,8 +96,6 @@ private:
 
 
 	CameraObject* p_ActiveCamera;
-	std::vector<VkBuffer> mvk_ViewProjectionBuffers;
-	std::vector<VkDeviceMemory> mvk_ViewProjectionBuffersMemory;
 
 	std::vector<FrameData> m_FrameData;
 
