@@ -1,21 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
     <Filter Include="MainRenderer">
       <UniqueIdentifier>{3752728e-4e9c-441d-ab5c-2ba1406e233e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="VulkanDebug">
-      <UniqueIdentifier>{41425b40-895c-4d50-b6f7-c413859c8a44}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Tools">
       <UniqueIdentifier>{c0b9d07d-006c-41d9-9acc-4bcc89f50352}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="MainRenderer\Structs">
-      <UniqueIdentifier>{2146820d-b9c4-418b-87a9-36928226f43d}</UniqueIdentifier>
     </Filter>
     <Filter Include="RenderObjects">
       <UniqueIdentifier>{710ff287-2efa-465b-a31c-3dd9cd475013}</UniqueIdentifier>
@@ -29,6 +19,15 @@
     <Filter Include="MainRenderer\Handlers">
       <UniqueIdentifier>{b0619442-1d33-408c-afd4-75b096f981a0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="RenderInterfaces">
+      <UniqueIdentifier>{fcfade03-c678-45ef-b827-c617670b51c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Structs">
+      <UniqueIdentifier>{2146820d-b9c4-418b-87a9-36928226f43d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MainRenderer\VulkanDebug">
+      <UniqueIdentifier>{41425b40-895c-4d50-b6f7-c413859c8a44}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -39,13 +38,10 @@
       <Filter>MainRenderer</Filter>
     </ClCompile>
     <ClCompile Include="MainRenderer\VulkanDebugger\VulkanDebug.cpp">
-      <Filter>VulkanDebug</Filter>
+      <Filter>MainRenderer\VulkanDebug</Filter>
     </ClCompile>
     <ClCompile Include="MainRenderer\Tools\ResourceLoader.cpp">
       <Filter>Tools</Filter>
-    </ClCompile>
-    <ClCompile Include="MainRenderer\ObjectManager.cpp">
-      <Filter>MainRenderer</Filter>
     </ClCompile>
     <ClCompile Include="MainRenderer\RenderObjects\BaseRenderObject.cpp">
       <Filter>RenderObjects</Filter>
@@ -81,7 +77,16 @@
       <Filter>RenderObjects</Filter>
     </ClCompile>
     <ClCompile Include="MainRenderer\CameraController.cpp">
-      <Filter>MainRenderer</Filter>
+      <Filter>RenderInterfaces</Filter>
+    </ClCompile>
+    <ClCompile Include="MainRenderer\ObjectManager.cpp">
+      <Filter>RenderInterfaces</Filter>
+    </ClCompile>
+    <ClCompile Include="MainRenderer\SceneManager.cpp">
+      <Filter>RenderInterfaces</Filter>
+    </ClCompile>
+    <ClCompile Include="MainRenderer\Scene.cpp">
+      <Filter>RenderInterfaces</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -92,16 +97,13 @@
       <Filter>MainRenderer</Filter>
     </ClInclude>
     <ClInclude Include="MainRenderer\VulkanDebugger\VulkanDebug.h">
-      <Filter>VulkanDebug</Filter>
+      <Filter>MainRenderer\VulkanDebug</Filter>
     </ClInclude>
     <ClInclude Include="MainRenderer\Tools\ResourceLoader.h">
       <Filter>Tools</Filter>
     </ClInclude>
-    <ClInclude Include="MainRenderer\ObjectManager.h">
-      <Filter>MainRenderer</Filter>
-    </ClInclude>
     <ClInclude Include="MainRenderer\Structs\BufferData.h">
-      <Filter>MainRenderer\Structs</Filter>
+      <Filter>Structs</Filter>
     </ClInclude>
     <ClInclude Include="MainRenderer\RenderObjects\Components\Transform.h">
       <Filter>RenderObjects\Components</Filter>
@@ -131,16 +133,16 @@
       <Filter>MainRenderer\Handlers</Filter>
     </ClInclude>
     <ClInclude Include="MainRenderer\Structs\PipelineData.h">
-      <Filter>MainRenderer\Structs</Filter>
+      <Filter>Structs</Filter>
     </ClInclude>
     <ClInclude Include="MainRenderer\Tools\ObjectPool.h">
       <Filter>Tools</Filter>
     </ClInclude>
     <ClInclude Include="MainRenderer\Structs\TextureData.h">
-      <Filter>MainRenderer\Structs</Filter>
+      <Filter>Structs</Filter>
     </ClInclude>
     <ClInclude Include="MainRenderer\Structs\FrameData.h">
-      <Filter>MainRenderer\Structs</Filter>
+      <Filter>Structs</Filter>
     </ClInclude>
     <ClInclude Include="MainRenderer\VulkanSwapChain.h">
       <Filter>MainRenderer</Filter>
@@ -154,11 +156,23 @@
     <ClInclude Include="MainRenderer\RenderObjects\SceneObject.h">
       <Filter>RenderObjects</Filter>
     </ClInclude>
-    <ClInclude Include="MainRenderer\CameraController.h">
-      <Filter>MainRenderer</Filter>
-    </ClInclude>
     <ClInclude Include="MainRenderer\Tools\VulkanInitializers.h">
       <Filter>Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="MainRenderer\Structs\SceneData.h">
+      <Filter>Structs</Filter>
+    </ClInclude>
+    <ClInclude Include="MainRenderer\CameraController.h">
+      <Filter>RenderInterfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="MainRenderer\ObjectManager.h">
+      <Filter>RenderInterfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="MainRenderer\SceneManager.h">
+      <Filter>RenderInterfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="MainRenderer\Scene.h">
+      <Filter>RenderInterfaces</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

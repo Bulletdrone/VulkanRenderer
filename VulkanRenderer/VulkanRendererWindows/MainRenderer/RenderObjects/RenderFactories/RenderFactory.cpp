@@ -2,26 +2,28 @@
 
 RenderFactory::RenderFactory()
 {
-	std::vector<ShapeType> t_Shape;
-	t_Shape.push_back(ShapeType::Triangle);
-	t_Shape.push_back(ShapeType::Rectangle);
-	t_Shape.push_back(ShapeType::Pavillion);
+	//std::vector<ShapeType> t_Shape;
+	//t_Shape.push_back(ShapeType::Triangle);
+	//t_Shape.push_back(ShapeType::Rectangle);
+	//t_Shape.push_back(ShapeType::Pavillion);
+	m_RenderObjectsData.resize(m_AllShapes);
 
-	SetSceneObjects(t_Shape);
+	//SetSceneObjects(t_Shape);
 }
 
 RenderFactory::~RenderFactory()
 {
-	ClearSceneObjects();
+	ClearRenderObjects();
 }
 
-BaseRenderObject* RenderFactory::CreateRenderObject(const size_t a_RenderID, ShapeType a_ShapeType, Transform* a_Transform, uint32_t a_PipelineID)
+BaseRenderObject* RenderFactory::CreateRenderObject(bool& r_NewObject, const size_t a_RenderID, ShapeType a_ShapeType, Transform* a_Transform, uint32_t a_PipelineID)
 {
+	CheckRenderObject(a_ShapeType);
 	return new RenderShape(a_RenderID, a_Transform, a_PipelineID, m_RenderObjectsData[static_cast<size_t>(a_ShapeType)]);
 }
 
 //Clear all the current loaded objects.
-void RenderFactory::ClearSceneObjects()
+void RenderFactory::ClearRenderObjects()
 {
 	for (size_t i = 0; i < m_CurrentLoadedObjectsID.size(); i++)
 	{
@@ -31,63 +33,72 @@ void RenderFactory::ClearSceneObjects()
 	m_CurrentLoadedObjectsID.clear();
 }
 
-void RenderFactory::SetSceneObjects(std::vector<ShapeType>& a_AvailableShapes)
+bool RenderFactory::CheckRenderObject(ShapeType a_ShapeType)
 {
+	for (size_t i = 0; i < m_CurrentLoadedObjectsID.size(); i++)
+	{
+		if (m_CurrentLoadedObjectsID[i] == static_cast<uint32_t>(a_ShapeType))
+			return false;
+	}
+
+	CreateRenderObject(a_ShapeType);
+	return true;
+}
+
+void RenderFactory::ResetRenderObjects(const std::vector<uint32_t>& a_AvailableRenderObjects)
+{
+	ClearRenderObjects();
 	m_RenderObjectsData.resize(m_AllShapes);
 
-	for (size_t i = 0; i < a_AvailableShapes.size(); i++)
+	for (size_t i = 0; i < a_AvailableRenderObjects.size(); i++)
 	{
-		size_t t_VecPos = static_cast<size_t>(a_AvailableShapes[i]);
-
-		//Remember the Position of the Vector for later removal.
-		m_CurrentLoadedObjectsID.push_back(t_VecPos);
-
-		MeshData* t_Mesh;
-
-		//temp
-		std::vector<Vertex> t_Vertices;
-		std::vector<uint32_t> t_Indices;
-
-		switch (a_AvailableShapes[i])
-		{
-		case ShapeType::Triangle:
-			t_Vertices = { {{0.0f, -0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f} },
-				{{0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}},
-				{{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}},
-		};
-
-			t_Indices = { 0, 1, 2 };
-
-			t_Mesh = new MeshData(t_Vertices, t_Indices);
-
-			m_RenderObjectsData[t_VecPos] = new RenderObjectData(t_Mesh);
-			break;
-		case ShapeType::Rectangle:
-			t_Vertices = { {{-1.0f, -0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}},
-							{{1.0f, -0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f}},
-							{{1.0f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}},
-							{{-1.0f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}} };
-
-			t_Indices = { 0, 1, 2, 2, 3, 0 };
-
-			t_Mesh = new MeshData(t_Vertices, t_Indices);
-
-			m_RenderObjectsData[t_VecPos] = new RenderObjectData(t_Mesh);
-			break;
-		case ShapeType::SkyBoxRect:
-			throw;
-			break;
-		case ShapeType::Pavillion:
-			t_Mesh = ResourceLoader::LoadModel("../Resources/Models/Pavillion.obj");
-
-			m_RenderObjectsData[t_VecPos] = new RenderObjectData(t_Mesh);
-			break;
-		}
+		CreateRenderObject(static_cast<ShapeType>(a_AvailableRenderObjects[i]));
 	}
 }
 
-void RenderFactory::ResetSceneObjects(std::vector<ShapeType>& a_AvailableShapes)
+void RenderFactory::CreateRenderObject(ShapeType a_ShapeType)
 {
-	ClearSceneObjects();
-	SetSceneObjects(a_AvailableShapes);
+	MeshData* t_Mesh;
+
+	//temp
+	std::vector<Vertex> t_Vertices;
+	std::vector<uint32_t> t_Indices;
+
+	switch (a_ShapeType)
+	{
+	default:
+		t_Mesh = nullptr;
+		break;
+	case ShapeType::Triangle:
+		t_Vertices = { {{0.0f, -0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f} },
+			{{0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}},
+			{{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}},
+		};
+
+		t_Indices = { 0, 1, 2 };
+
+		t_Mesh = new MeshData(t_Vertices, t_Indices);
+		break;
+	case ShapeType::Rectangle:
+		t_Vertices = { {{-1.0f, -0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}},
+						{{1.0f, -0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f}},
+						{{1.0f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}},
+						{{-1.0f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}} };
+
+		t_Indices = { 0, 1, 2, 2, 3, 0 };
+
+		t_Mesh = new MeshData(t_Vertices, t_Indices);
+		break;
+	case ShapeType::SkyBoxRect:
+		throw;
+		break;
+	case ShapeType::Pavillion:
+		t_Mesh = ResourceLoader::LoadModel("../Resources/Models/Pavillion.obj");
+		break;
+	}
+
+	uint32_t t_VecPos = static_cast<uint32_t>(a_ShapeType);
+
+	m_RenderObjectsData[t_VecPos] = new RenderObjectData(t_Mesh);
+	m_CurrentLoadedObjectsID.push_back(t_VecPos);
 }

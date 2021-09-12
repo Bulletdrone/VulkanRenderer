@@ -1,65 +1,23 @@
-#include "MainRenderer/ObjectManager.h"
-#include "MainRenderer/CameraController.h"
+#include <SceneManager.h>
 
 int main() 
 {
-    //init's the renderer.
-    Renderer* m_Renderer = new Renderer();
+    SceneManager m_SceneManager;
 
-    //Setting up the rest.
-    m_Renderer->CreateCommandPool();
-    m_Renderer->CreateDepthResources();
-    m_Renderer->CreateFrameBuffers();
+    SceneData sceneData;
+    sceneData.sunlightDirection = glm::vec4(0, 0, 0, 0);
+    sceneData.sunlightColor = glm::vec4(0, 0, 0, 0);
 
-    ObjectManager* m_ObjectManager = new ObjectManager(m_Renderer);
+    sceneData.fogDistance = glm::vec4(0, 0, 0, 0);
+    sceneData.fogColor = glm::vec4(0, 0, 0, 0);
 
-    CameraController* m_CameraController = new CameraController(m_Renderer);
+    sceneData.ambientColor = glm::vec4(0, 0, 0, 0);
 
-    //Transform* t_Transform1 = new Transform(glm::vec3(-7, -6, -1), 2);
-    //Transform* t_Transform2 = new Transform(glm::vec3(-0.7f, 0, 0.2), 1);
-    //Transform* t_Transform3 = new Transform(glm::vec3(0.0f, -0.7f, 0.3), 1);
-    //Transform* t_Transform4 = new Transform(glm::vec3(0.0f, 0.7f, 0.4), 1);
+    m_SceneManager.NewScene("MainScene", sceneData, true);
 
-    //m_ObjectManager->CreateShape(ShapeType::Rectangle, t_Transform1);
-    //m_ObjectManager->CreateShape(ShapeType::Triangle, t_Transform2);
-    //m_ObjectManager->CreateShape(ShapeType::Triangle, t_Transform3);
-    //m_ObjectManager->CreateShape(ShapeType::Rectangle, t_Transform4);
-    
-    Transform* t_PTrans = new Transform(glm::vec3(0, 0, 0), 1);
-    m_ObjectManager->CreateShape(ShapeType::Pavillion, t_PTrans);
 
-    m_ObjectManager->SetupStartObjects();
-
-    double t_StartTime = glfwGetTime();
-    float deltaTime = 0.1f;
-    int t_FrameCount = 0;
-
-    while (!glfwWindowShouldClose(m_Renderer->GetWindow())) 
-    {
-        double t_CurrentTime = glfwGetTime();
-
-        t_FrameCount++;
-        if (t_CurrentTime - t_StartTime >= 1.0)
-        {
-            printf("%d \n", t_FrameCount);
-
-            t_FrameCount = 0;
-            t_StartTime = t_CurrentTime;
-
-            m_CameraController->SwitchNextCamera();
-        }
-
-        glfwPollEvents();
-        m_CameraController->UpdateActiveCamera();
-        m_ObjectManager->UpdateObjects(deltaTime);
-
-        double t_End = glfwGetTime();
-        deltaTime = static_cast<float>(t_End - t_CurrentTime);
-    }
-
-    m_Renderer->CleanupSwapChain();
-    delete m_ObjectManager;
-    delete m_Renderer;
+    //RendererLoop.
+    m_SceneManager.UpdateScene(0);
 
     return 0;
 }

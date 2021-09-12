@@ -12,7 +12,7 @@ public:
 	void SetupStartObjects();
 
 	void UpdateObjects(float a_Dt);
-	void CreateShape(ShapeType a_ShapeType, Transform* a_Transform);
+	void AddRenderObject(BaseRenderObject* a_NewShape);
 
 	void SetupDescriptor(uint32_t& a_DesID, uint32_t a_BufferCount, std::vector<TextureData>& a_Textures);
 
@@ -26,6 +26,8 @@ private:
 
 	std::vector<TextureData> m_Textures;
 
+
+public:
 	//Data pipeline
 	uint32_t pip_Pavillion;
 
@@ -34,5 +36,4 @@ private:
 	uint32_t des_Pavillion;
 
 	Renderer* p_Renderer;
-	RenderFactory* m_RenderFactory;
 };

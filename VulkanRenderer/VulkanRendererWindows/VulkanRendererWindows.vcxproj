@@ -31,6 +31,8 @@
     <ClCompile Include="MainRenderer\RenderObjects\RenderFactories\RenderFactory.cpp" />
     <ClCompile Include="MainRenderer\RenderObjects\RenderShape.cpp" />
     <ClCompile Include="MainRenderer\RenderObjects\SceneObject.cpp" />
+    <ClCompile Include="MainRenderer\Scene.cpp" />
+    <ClCompile Include="MainRenderer\SceneManager.cpp" />
     <ClCompile Include="MainRenderer\ShaderManager.cpp" />
     <ClCompile Include="MainRenderer\Tools\ResourceLoader.cpp" />
     <ClCompile Include="MainRenderer\VulkanDebugger\VulkanDebug.cpp" />
@@ -52,10 +54,13 @@
     <ClInclude Include="MainRenderer\RenderObjects\RenderFactories\RenderFactory.h" />
     <ClInclude Include="MainRenderer\RenderObjects\RenderShape.h" />
     <ClInclude Include="MainRenderer\RenderObjects\SceneObject.h" />
+    <ClInclude Include="MainRenderer\Scene.h" />
+    <ClInclude Include="MainRenderer\SceneManager.h" />
     <ClInclude Include="MainRenderer\ShaderManager.h" />
     <ClInclude Include="MainRenderer\Structs\BufferData.h" />
     <ClInclude Include="MainRenderer\Structs\FrameData.h" />
     <ClInclude Include="MainRenderer\Structs\PipelineData.h" />
+    <ClInclude Include="MainRenderer\Structs\SceneData.h" />
     <ClInclude Include="MainRenderer\Structs\TextureData.h" />
     <ClInclude Include="MainRenderer\Tools\ObjectPool.h" />
     <ClInclude Include="MainRenderer\Tools\ResourceLoader.h" />

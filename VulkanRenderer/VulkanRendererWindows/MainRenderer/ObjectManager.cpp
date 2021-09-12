@@ -7,8 +7,6 @@ ObjectManager::ObjectManager(Renderer* a_Renderer)
 	p_Renderer->SetRenderObjectsVector(&m_RenderObjects);
 	p_Renderer->SetTextureDataVector(&m_Textures);
 
-	m_RenderFactory = new RenderFactory();
-
 	m_Textures.resize(1);
 
 	//pip_SpaceImage.p_DescriptorData = &m_DescriptorData[0];
@@ -32,7 +30,6 @@ ObjectManager::~ObjectManager()
 		//m_RenderObjects[i]->GetMeshData()->DeleteBuffers(p_Renderer->GetVulkanDevice().m_LogicalDevice);
 		delete m_RenderObjects[i];
 	}
-	delete m_RenderFactory;
 	m_RenderObjects.clear();
 }
 
@@ -71,12 +68,9 @@ void ObjectManager::UpdateObjects(float a_Dt)
 	//p_Renderer->UpdateUniformBuffer(t_ImageIndex, a_Dt);
 }
 
-void ObjectManager::CreateShape(ShapeType a_ShapeType, Transform* a_Transform)
+void ObjectManager::AddRenderObject(BaseRenderObject* a_NewShape)
 {
-	BaseRenderObject* t_NewShape = m_RenderFactory->CreateRenderObject(GetNextRenderID(), a_ShapeType, a_Transform, pip_Pavillion);
-	m_RenderObjects.push_back(t_NewShape);
-	
-	p_Renderer->SetupMesh(t_NewShape->GetMeshData());
+	m_RenderObjects.push_back(a_NewShape);
 }
 
 void ObjectManager::SetupDescriptor(uint32_t& a_DesID, uint32_t a_BufferCount, std::vector<TextureData>& a_Textures)
