@@ -4,7 +4,7 @@ int main()
 {
     SceneManager m_SceneManager;
 
-    SceneData sceneData;
+    SceneData sceneData{};
     sceneData.sunlightDirection = glm::vec4(0, 0, 0, 0);
     sceneData.sunlightColor = glm::vec4(0, 0, 0, 0);
 

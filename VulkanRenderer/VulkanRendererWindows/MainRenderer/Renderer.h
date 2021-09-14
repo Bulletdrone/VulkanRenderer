@@ -72,7 +72,6 @@ public:
 
 	//Set the mesh vector pointer in the Renderer from the one in ObjectManager.
 	void SetRenderObjectsVector(std::vector<BaseRenderObject*>* a_RenderObjects);
-	void SetTextureDataVector(std::vector<TextureData>* a_Textures);
 
 	std::vector<VkBuffer> mvk_ViewProjectionBuffers;
 	std::vector<VkDeviceMemory> mvk_ViewProjectionBuffersMemory;
@@ -82,7 +81,6 @@ private:
 
 	//All the renderObjects in ObjectManager.
 	std::vector<BaseRenderObject*>* p_RenderObjects;
-	std::vector<TextureData>* p_Textures;
 
 	//Window Data.
 	Window* m_Window;
@@ -134,10 +132,4 @@ private:
 inline void Renderer::SetRenderObjectsVector(std::vector<BaseRenderObject*>* a_RenderObjects)
 {
 	p_RenderObjects = a_RenderObjects;
-}
-
-//SetTextureData from ObjectManager.
-inline void Renderer::SetTextureDataVector(std::vector<TextureData>* a_Textures)
-{
-	p_Textures = a_Textures;
 }

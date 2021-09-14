@@ -5,22 +5,29 @@ ObjectManager::ObjectManager(Renderer* a_Renderer)
 	: p_Renderer(a_Renderer)
 {
 	p_Renderer->SetRenderObjectsVector(&m_RenderObjects);
-	p_Renderer->SetTextureDataVector(&m_Textures);
 
-	m_Textures.resize(1);
+	m_Textures.resize(2);
 
 	//pip_SpaceImage.p_DescriptorData = &m_DescriptorData[0];
 	//pip_SpaceImage.p_DescriptorData->texture = &m_Textures[0];
 	//Load Texture
 	p_Renderer->SetupImage(m_Textures[0], "../Resources/Images/Background.png");
+	p_Renderer->SetupImage(m_Textures[1], "../Resources/Images/Background1.png");
 
 	std::vector<TextureData> t_GlobalTextures;
 	SetupDescriptor(des_Global, 1, t_GlobalTextures);
-	SetupDescriptor(des_Pavillion, 0, m_Textures);
 
-	std::vector<uint32_t> t_Descriptors{ des_Global, des_Pavillion };
+	std::vector<TextureData> pav; pav.push_back(m_Textures[0]);
+	std::vector<TextureData> tri; tri.push_back(m_Textures[1]);
+	SetupDescriptor(des_Pavillion, 0, pav);
+	SetupDescriptor(des_Triangle, 0, tri);
+
+	std::vector<uint32_t> t_DescriptorsPav{ des_Global, des_Pavillion };
 	//des_Pavillion = p_Renderer->CreateDescriptorLayout(&m_Textures. );
-	pip_Pavillion = p_Renderer->CreateGraphicsPipeline(t_Descriptors);
+	pip_Pavillion = p_Renderer->CreateGraphicsPipeline(t_DescriptorsPav);
+
+	std::vector<uint32_t> t_DescriptorsTri{ des_Global, des_Triangle };
+	pip_Triangle = p_Renderer->CreateGraphicsPipeline(t_DescriptorsTri);
 }
 
 ObjectManager::~ObjectManager()
@@ -43,14 +50,21 @@ void ObjectManager::SetupStartObjects()
 	VkDescriptorImageInfo image1 = VkInit::CreateDescriptorImageInfo(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, m_Textures[0].textureImageView, m_Textures[0].textureSampler);
 	VkDescriptorImageInfo image2 = image1;
 
+	VkDescriptorImageInfo image1Tri = VkInit::CreateDescriptorImageInfo(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, m_Textures[1].textureImageView, m_Textures[1].textureSampler);
+	VkDescriptorImageInfo image2Tri = image1Tri;
+
 	std::vector<VkDescriptorBufferInfo> buffers{ buffer1 , buffer2 };
 	std::vector<VkDescriptorImageInfo> images{ image1, image2 };
+	std::vector<VkDescriptorImageInfo> imagesTri{ image1Tri, image2Tri };
 
 	p_Renderer->CreateDescriptorPool(des_Global);
 	p_Renderer->CreateDescriptorSet(des_Global, &buffers, nullptr);
 
 	p_Renderer->CreateDescriptorPool(des_Pavillion);
 	p_Renderer->CreateDescriptorSet(des_Pavillion, nullptr, &images);
+
+	p_Renderer->CreateDescriptorPool(des_Triangle);
+	p_Renderer->CreateDescriptorSet(des_Triangle, nullptr, &imagesTri);
 }
 
 void ObjectManager::UpdateObjects(float a_Dt)

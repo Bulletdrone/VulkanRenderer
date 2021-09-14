@@ -471,8 +471,11 @@ void Renderer::DrawObjects(VkCommandBuffer& r_CmdBuffer)
 
 	uint32_t t_LastPipelineID = 0;
 	PipeLineData& t_CurrentPipeLine = m_ShaderManager->PipelinePool.Get(t_LastPipelineID);
+	
 	vkCmdBindPipeline(r_CmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, t_CurrentPipeLine.pipeLine);
 
+	vkCmdBindDescriptorSets(r_CmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, t_CurrentPipeLine.pipeLineLayout, 0, 1, &t_CurrentPipeLine.p_DescriptorData[0]->descriptorSets[m_CurrentFrame], 0, nullptr);
+	vkCmdBindDescriptorSets(r_CmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, t_CurrentPipeLine.pipeLineLayout, 1, 1, &t_CurrentPipeLine.p_DescriptorData[1]->descriptorSets[m_CurrentFrame], 0, nullptr);
 	//Create this once for performance boost of not creating a mat4 everytime.
 	InstanceModel t_PushInstance;
 
@@ -480,25 +483,6 @@ void Renderer::DrawObjects(VkCommandBuffer& r_CmdBuffer)
 	{
 		BaseRenderObject* t_RenderObject = p_RenderObjects->at(i);
 		uint32_t t_PipelineID = t_RenderObject->GetPipeLineID();
-
-		//only bind the pipeline if it doesn't match with the already bound one
-		if (t_PipelineID != t_LastPipelineID)
-		{
-			t_CurrentPipeLine = m_ShaderManager->PipelinePool.Get(t_PipelineID);
-			t_LastPipelineID = t_PipelineID;
-			vkCmdBindPipeline(r_CmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, t_CurrentPipeLine.pipeLine);
-		}
-
-		std::vector<VkDescriptorSet> descriptorSets{ t_CurrentPipeLine.p_DescriptorData[0]->descriptorSets[m_CurrentFrame],
-			t_CurrentPipeLine.p_DescriptorData[1]->descriptorSets[m_CurrentFrame] };
-
-		//Set Descriptor
-		vkCmdBindDescriptorSets(r_CmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, t_CurrentPipeLine.pipeLineLayout, 0, 2, descriptorSets.data(), 0, nullptr);
-
-		//Set the Push constant data.
-		t_PushInstance.model = t_RenderObject->GetModelMatrix();
-
-		vkCmdPushConstants(r_CmdBuffer, t_CurrentPipeLine.pipeLineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(InstanceModel), &t_PushInstance);
 
 		//only bind the mesh if it's a different one from last bind
 		if (t_RenderObject->GetMeshData() != t_LastMeshData) {
@@ -512,6 +496,27 @@ void Renderer::DrawObjects(VkCommandBuffer& r_CmdBuffer)
 
 			t_LastMeshData = t_RenderObject->GetMeshData();
 		}
+
+		//only bind the pipeline if it doesn't match with the already bound one
+		if (t_PipelineID != t_LastPipelineID)
+		{
+			PipeLineData t_NewPipe = m_ShaderManager->PipelinePool.Get(t_PipelineID);
+
+			//This commented code doesn't work, likely has to do with how CommandBuffers work.
+			//t_CurrentPipeLine = m_ShaderManager->PipelinePool.Get(t_PipelineID);
+			t_LastPipelineID = t_PipelineID;
+
+			vkCmdBindPipeline(r_CmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, t_NewPipe.pipeLine);
+			vkCmdBindDescriptorSets(r_CmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, t_NewPipe.pipeLineLayout, 1, 1, &t_NewPipe.p_DescriptorData[1]->descriptorSets[m_CurrentFrame], 0, nullptr);
+		}
+
+		//Set the Push constant data.
+		t_PushInstance.model = t_RenderObject->GetModelMatrix();
+
+		vkCmdPushConstants(r_CmdBuffer, t_CurrentPipeLine.pipeLineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(InstanceModel), &t_PushInstance);
+
+
+		//vkCmdDraw(r_CmdBuffer, static_cast<uint32_t>(t_RenderObject->GetVertexData()->GetElementCount()), 1, 0, 0);
 		vkCmdDrawIndexed(r_CmdBuffer, static_cast<uint32_t>(t_RenderObject->GetIndexData()->GetElementCount()), 1, 0, 0, 0);
 	}
 }

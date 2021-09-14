@@ -35,7 +35,7 @@ uint32_t ShaderManager::CreateDescriptorData(std::vector<TextureData>& a_Texture
 		//If true just use the existing Layout.
 		if (DescriptorLayouts[i].SameLayout(a_BufferCount, a_TextureData.size()))
 		{
-			*p_DescriptorPointer = DescriptorLayouts[i].descriptorSetLayout;
+			p_DescriptorPointer = &DescriptorLayouts[i].descriptorSetLayout;
 			descriptorData.descriptorLayout = p_DescriptorPointer;
 
 			return descriptorData.descID;

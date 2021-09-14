@@ -26,14 +26,15 @@ private:
 
 	std::vector<TextureData> m_Textures;
 
-
 public:
 	//Data pipeline
 	uint32_t pip_Pavillion;
+	uint32_t pip_Triangle;
 
 	//Data descriptor
 	uint32_t des_Global;
 	uint32_t des_Pavillion;
+	uint32_t des_Triangle;
 
 	Renderer* p_Renderer;
 };
