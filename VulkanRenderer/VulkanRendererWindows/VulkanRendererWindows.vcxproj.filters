@@ -88,6 +88,9 @@
     <ClCompile Include="MainRenderer\Scene.cpp">
       <Filter>RenderInterfaces</Filter>
     </ClCompile>
+    <ClCompile Include="MainRenderer\RenderObjects\Components\Material.cpp">
+      <Filter>RenderObjects\Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainRenderer\Renderer.h">
@@ -173,6 +176,9 @@
     </ClInclude>
     <ClInclude Include="MainRenderer\Scene.h">
       <Filter>RenderInterfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="MainRenderer\RenderObjects\Components\Material.h">
+      <Filter>RenderObjects\Components</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

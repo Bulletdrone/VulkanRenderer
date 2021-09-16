@@ -27,6 +27,7 @@
     <ClCompile Include="MainRenderer\Renderer.cpp" />
     <ClCompile Include="MainRenderer\RenderObjects\BaseRenderObject.cpp" />
     <ClCompile Include="MainRenderer\RenderObjects\CameraObject.cpp" />
+    <ClCompile Include="MainRenderer\RenderObjects\Components\Material.cpp" />
     <ClCompile Include="MainRenderer\RenderObjects\Components\MeshData.cpp" />
     <ClCompile Include="MainRenderer\RenderObjects\RenderFactories\RenderFactory.cpp" />
     <ClCompile Include="MainRenderer\RenderObjects\RenderShape.cpp" />
@@ -48,6 +49,7 @@
     <ClInclude Include="MainRenderer\Renderer.h" />
     <ClInclude Include="MainRenderer\RenderObjects\BaseRenderObject.h" />
     <ClInclude Include="MainRenderer\RenderObjects\CameraObject.h" />
+    <ClInclude Include="MainRenderer\RenderObjects\Components\Material.h" />
     <ClInclude Include="MainRenderer\RenderObjects\Components\MeshData.h" />
     <ClInclude Include="MainRenderer\RenderObjects\Components\RenderObjectData.h" />
     <ClInclude Include="MainRenderer\RenderObjects\Components\Transform.h" />
