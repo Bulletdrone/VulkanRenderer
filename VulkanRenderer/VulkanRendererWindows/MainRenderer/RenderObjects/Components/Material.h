@@ -5,18 +5,20 @@
 class Material
 {
 public:
-	Material(uint32_t a_PipelineID, uint32_t a_SecondDescriptorSetID);
-	Material(uint32_t a_PipelineID, uint32_t a_SecondDescriptorSetID, glm::vec4& a_AmbientColor);
+	Material();
 	~Material();
 
+	//Returns if it was successful.
+	bool RecreateDescriptorSet();
 
+	VkDescriptorSet& GetDescriptorSet() { return m_SecondDescriptorSet; }
 
-	uint32_t GetPipelineID() { return m_PipelineID; }
-	uint32_t GetDescriptorSetID() { return m_SecondDescriptorSetID; }
+public:
+	uint32_t PipelineID;
 
 private:
-	uint32_t m_PipelineID;
-	uint32_t m_SecondDescriptorSetID;
 
-	glm::vec4 m_AmbientColor; //w is transparency.
+	VkDescriptorSet m_SecondDescriptorSet{};
+
+	glm::vec4 m_AmbientColor = glm::vec4(0, 0, 0, 1); //w is transparency.
 };

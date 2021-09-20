@@ -75,18 +75,18 @@ void SceneManager::SetScene(uint32_t a_SceneID)
 	//Set Uniform Buffer for the SceneData.
 
 	Transform* t_PTrans = new Transform(glm::vec3(0, 0, 0), 1);
-	CreateShape(ShapeType::Pavillion, t_PTrans, m_ObjectManager->pip_Pavillion);
+	CreateShape(ShapeType::Pavillion, t_PTrans, m_ObjectManager->mat_Pavillion);
 
 	Transform* t_Transform2 = new Transform(glm::vec3(-0.7f, 0.9f, 0.2), 1);
-	CreateShape(ShapeType::Rectangle, t_Transform2, m_ObjectManager->pip_Triangle);
+	CreateShape(ShapeType::Rectangle, t_Transform2, m_ObjectManager->mat_Rectangle);
 
 	m_ObjectManager->SetupStartObjects();
 }
 
-void SceneManager::CreateShape(ShapeType a_ShapeType, Transform* a_Transform, uint32_t a_Pipeline)
+void SceneManager::CreateShape(ShapeType a_ShapeType, Transform* a_Transform, Material& a_Material)
 {
 	bool newMesh;
-	BaseRenderObject* t_NewShape = m_RenderFactory->CreateRenderObject(newMesh, m_ObjectManager->GetNextRenderID(), a_ShapeType, a_Transform, a_Pipeline);
+	BaseRenderObject* t_NewShape = m_RenderFactory->CreateRenderObject(newMesh, m_ObjectManager->GetNextRenderID(), a_ShapeType, a_Transform, a_Material);
 
 	if (newMesh) m_Renderer->SetupMesh(t_NewShape->GetMeshData());
 

@@ -17,10 +17,7 @@ public:
 	void NewScene(const char* a_SceneName, SceneData a_SceneData, bool a_SetScene);
 	void SetScene(uint32_t a_SceneID);
 
-	void CreateShape(ShapeType a_ShapeType, Transform* a_Transform, uint32_t a_Pipeline);
-
-
-
+	void CreateShape(ShapeType a_ShapeType, Transform* a_Transform, Material& a_Material);
 
 private:
 	uint32_t CurrentScene = MAXUINT32;

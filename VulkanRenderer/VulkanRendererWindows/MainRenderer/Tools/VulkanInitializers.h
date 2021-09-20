@@ -22,4 +22,18 @@ namespace VkInit
 
 		return t_ImageInfo;
 	}
+
+
+	//Layout Creation.
+	inline VkDescriptorSetLayoutBinding CreateDescriptorSetLayoutBinding(VkDescriptorType a_Type, VkShaderStageFlags a_Flags, uint32_t a_Binding)
+	{
+		VkDescriptorSetLayoutBinding t_LayoutBinding{};
+		t_LayoutBinding.binding = a_Binding;
+		t_LayoutBinding.descriptorType = a_Type;
+		t_LayoutBinding.descriptorCount = 1;
+		t_LayoutBinding.stageFlags = a_Flags;
+		t_LayoutBinding.pImmutableSamplers = nullptr; // Optional
+
+		return t_LayoutBinding;
+	}
 }

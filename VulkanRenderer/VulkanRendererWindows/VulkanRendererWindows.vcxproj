@@ -22,6 +22,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainRenderer\CameraController.cpp" />
     <ClCompile Include="MainRenderer\Handlers\DepthHandler.cpp" />
+    <ClCompile Include="MainRenderer\Handlers\DescriptorHandler.cpp" />
     <ClCompile Include="MainRenderer\Handlers\ImageHandler.cpp" />
     <ClCompile Include="MainRenderer\ObjectManager.cpp" />
     <ClCompile Include="MainRenderer\Renderer.cpp" />
@@ -44,6 +45,7 @@
   <ItemGroup>
     <ClInclude Include="MainRenderer\CameraController.h" />
     <ClInclude Include="MainRenderer\Handlers\DepthHandler.h" />
+    <ClInclude Include="MainRenderer\Handlers\DescriptorHandler.h" />
     <ClInclude Include="MainRenderer\Handlers\ImageHandler.h" />
     <ClInclude Include="MainRenderer\ObjectManager.h" />
     <ClInclude Include="MainRenderer\Renderer.h" />

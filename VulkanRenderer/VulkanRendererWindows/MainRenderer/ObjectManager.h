@@ -14,8 +14,6 @@ public:
 	void UpdateObjects(float a_Dt);
 	void AddRenderObject(BaseRenderObject* a_NewShape);
 
-	void SetupDescriptor(uint32_t& a_DesID, uint32_t a_BufferCount, std::vector<TextureData>& a_Textures);
-
 	//Increases the m_CurrentRenderID by 1 and returns it.
 	size_t GetNextRenderID() { return m_CurrentRenderID++; }
 
@@ -26,15 +24,18 @@ private:
 
 	std::vector<TextureData> m_Textures;
 
+
+	DescriptorAllocator* m_DescriptorAllocator;
+	DescriptorLayoutCache* m_DescriptorLayoutCache;
+
 public:
 	//Data pipeline
-	uint32_t pip_Pavillion;
-	uint32_t pip_Triangle;
+	Material mat_Pavillion;
+	Material mat_Rectangle;
 
 	//Data descriptor
-	uint32_t des_Global;
-	uint32_t des_Pavillion;
-	uint32_t des_Triangle;
+	VkDescriptorSetLayout layout_SingleBufferCamera;
+	VkDescriptorSetLayout layout_SingleImageObject;
 
 	Renderer* p_Renderer;
 };

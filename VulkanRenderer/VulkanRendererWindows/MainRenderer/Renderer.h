@@ -35,10 +35,7 @@ public:
 	VkPhysicalDevice PickPhysicalDevice();
 	void CreateRenderPass();
 
-	uint32_t CreateDescriptorLayout(std::vector<TextureData>& a_TextureData, uint32_t a_BufferCount, VkDescriptorSetLayout* p_DescriptorPointer);
-	uint32_t CreateGraphicsPipeline(std::vector<uint32_t>& a_DescriptorIDs);
-	void CreateDescriptorPool(uint32_t a_DescID);
-	void CreateDescriptorSet(uint32_t a_DescID, std::vector<VkDescriptorBufferInfo>* a_Buffers, std::vector<VkDescriptorImageInfo>* a_Images);
+	uint32_t CreateGraphicsPipeline(std::vector<VkDescriptorSetLayout>& a_DescriptorSetLayouts);
 
 	void CreateFrameBuffers();
 	void CreateCommandPool();
@@ -73,8 +70,10 @@ public:
 	//Set the mesh vector pointer in the Renderer from the one in ObjectManager.
 	void SetRenderObjectsVector(std::vector<BaseRenderObject*>* a_RenderObjects);
 
+
 	std::vector<VkBuffer> mvk_ViewProjectionBuffers;
 	std::vector<VkDeviceMemory> mvk_ViewProjectionBuffersMemory;
+	VkDescriptorSet GlobalSet[2];
 
 private:
 	bool IsDeviceSuitable(VkPhysicalDevice a_Device);
