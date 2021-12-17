@@ -6,6 +6,11 @@
 #include <cstdint>
 #include <algorithm>
 
+#include "ImGUI/imgui.h"
+
+#include "imGUI/imgui_impl_vulkan.h"
+
+
 Renderer::Renderer()
 {
 	m_FrameData.resize(FRAMEBUFFER_AMOUNT);
@@ -219,6 +224,7 @@ void Renderer::CreateRenderPass()
 	t_ColorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
 	t_ColorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 	t_ColorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+	//t_ColorAttachment.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
 	VkAttachmentReference t_ColorAttachmentRef{};
 	t_ColorAttachmentRef.attachment = 0;
@@ -396,6 +402,7 @@ void Renderer::DrawFrame(uint32_t& r_ImageIndex, float a_dt)
 		mvk_RenderPass, m_VulkanSwapChain.SwapChainFrameBuffers[m_CurrentFrame], m_VulkanSwapChain.SwapChainExtent);
 
 	DrawObjects(t_MainBuffer);
+	ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), t_MainBuffer);
 	m_VulkanDevice.EndCommand(t_MainBuffer);
 
 
@@ -414,6 +421,7 @@ void Renderer::DrawFrame(uint32_t& r_ImageIndex, float a_dt)
 	VkSemaphore t_SignalSemaphores[] = { frameData.RenderFinishedSemaphore };
 	t_SubmitInfo.signalSemaphoreCount = 1;
 	t_SubmitInfo.pSignalSemaphores = t_SignalSemaphores;
+
 
 
 	vkResetFences(m_VulkanDevice, 1, &frameData.InFlightFence);

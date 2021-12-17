@@ -1,5 +1,7 @@
 #include "SceneManager.h"
 
+#include "../GUISystem/ImGUI/GUI.h"
+
 SceneManager::SceneManager()
 {
 	m_Renderer = new Renderer();
@@ -11,6 +13,12 @@ SceneManager::SceneManager()
 	m_RenderFactory = new RenderFactory();
 	m_ObjectManager = new ObjectManager(m_Renderer);
 	m_CameraController = new CameraController(m_Renderer);
+
+	m_GuiSystem = new GUISystem(m_Renderer->GetWindow(), m_Renderer->GetVulkanDevice(), m_Renderer->GetVulkanSwapChain());
+	m_GuiSystem->Init(m_Renderer->GetInstance(), m_Renderer->GetQueue(), m_Renderer->GetRenderPass());
+
+	GUIWindow* gUIwindow = m_GuiSystem->CreateGUIWindow();
+	gUIwindow->Init(glm::vec2(0, 0), glm::vec2(400, 400), "Test Window", true);
 }
 
 SceneManager::~SceneManager()
@@ -45,7 +53,10 @@ void SceneManager::UpdateScene(float a_Dt)
 
 		glfwPollEvents();
 		m_CameraController->UpdateActiveCamera();
+
+		m_GuiSystem->Update();
 		m_ObjectManager->UpdateObjects(deltaTime);
+
 
 		double t_End = glfwGetTime();
 		deltaTime = static_cast<float>(t_End - t_CurrentTime);

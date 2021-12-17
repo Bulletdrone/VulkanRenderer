@@ -6,6 +6,8 @@
 
 #include "Structs/SceneData.h"
 
+class GUISystem;
+
 class SceneManager
 {
 public:
@@ -24,6 +26,7 @@ private:
 	std::vector<Scene> m_Scenes;
 
 	Renderer* m_Renderer;
+	GUISystem* m_GuiSystem;
 
 	ObjectManager* m_ObjectManager;
 	CameraController* m_CameraController;

@@ -28,6 +28,9 @@
     <Filter Include="MainRenderer\VulkanDebug">
       <UniqueIdentifier>{41425b40-895c-4d50-b6f7-c413859c8a44}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ImGuiFiles">
+      <UniqueIdentifier>{312b92d5-a7f9-4926-83e3-75ca059323f8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -93,6 +96,29 @@
     </ClCompile>
     <ClCompile Include="MainRenderer\Handlers\DescriptorHandler.cpp">
       <Filter>MainRenderer\Handlers</Filter>
+    </ClCompile>
+    <ClCompile Include="GUISystem\ImGUI\GUITypes.cpp" />
+    <ClCompile Include="GUISystem\ImGUI\GUI.cpp" />
+    <ClCompile Include="..\ExternalLibraries\ImGUI\imgui.cpp">
+      <Filter>ImGuiFiles</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ExternalLibraries\ImGUI\imgui_demo.cpp">
+      <Filter>ImGuiFiles</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ExternalLibraries\ImGUI\imgui_impl_glfw.cpp">
+      <Filter>ImGuiFiles</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ExternalLibraries\ImGUI\imgui_impl_vulkan.cpp">
+      <Filter>ImGuiFiles</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ExternalLibraries\ImGUI\imgui_draw.cpp">
+      <Filter>ImGuiFiles</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ExternalLibraries\ImGUI\imgui_tables.cpp">
+      <Filter>ImGuiFiles</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ExternalLibraries\ImGUI\imgui_widgets.cpp">
+      <Filter>ImGuiFiles</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -185,6 +211,32 @@
     </ClInclude>
     <ClInclude Include="MainRenderer\Handlers\DescriptorHandler.h">
       <Filter>MainRenderer\Handlers</Filter>
+    </ClInclude>
+    <ClInclude Include="GUISystem\ImGUI\GUITypes.h" />
+    <ClInclude Include="GUISystem\ImGUI\GUI.h" />
+    <ClInclude Include="..\ExternalLibraries\ImGUI\imgui.h">
+      <Filter>ImGuiFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ExternalLibraries\ImGUI\imgui_impl_glfw.h">
+      <Filter>ImGuiFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ExternalLibraries\ImGUI\imgui_impl_vulkan.h">
+      <Filter>ImGuiFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ExternalLibraries\ImGUI\imconfig.h">
+      <Filter>ImGuiFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ExternalLibraries\ImGUI\imgui_internal.h">
+      <Filter>ImGuiFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ExternalLibraries\ImGUI\imstb_rectpack.h">
+      <Filter>ImGuiFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ExternalLibraries\ImGUI\imstb_textedit.h">
+      <Filter>ImGuiFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ExternalLibraries\ImGUI\imstb_truetype.h">
+      <Filter>ImGuiFiles</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

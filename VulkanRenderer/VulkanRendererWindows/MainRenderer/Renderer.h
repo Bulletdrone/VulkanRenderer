@@ -61,11 +61,12 @@ public:
 	//Getters
 	GLFWwindow* GetWindow() const { return m_Window->GetWindow(); }
 	VulkanDevice& GetVulkanDevice() { return m_VulkanDevice; }
+	VulkanSwapChain& GetVulkanSwapChain() { return m_VulkanSwapChain; }
+	VkInstance& GetInstance() { return mvk_Instance; }
+	VkQueue& GetQueue() { return mvk_GraphicsQueue; }
+	VkRenderPass& GetRenderPass() { return mvk_RenderPass; }
 
-	float GetAspectRatio()
-	{
-		return m_VulkanSwapChain.SwapChainExtent.width / (float)m_VulkanSwapChain.SwapChainExtent.height;
-	}
+	float GetAspectRatio() { return m_VulkanSwapChain.SwapChainExtent.width / (float)m_VulkanSwapChain.SwapChainExtent.height; }
 
 	//Set the mesh vector pointer in the Renderer from the one in ObjectManager.
 	void SetRenderObjectsVector(std::vector<BaseRenderObject*>* a_RenderObjects);
