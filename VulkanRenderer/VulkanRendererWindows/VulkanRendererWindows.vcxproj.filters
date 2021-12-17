@@ -31,6 +31,9 @@
     <Filter Include="ImGuiFiles">
       <UniqueIdentifier>{312b92d5-a7f9-4926-83e3-75ca059323f8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GUISystem">
+      <UniqueIdentifier>{ab55315d-2646-4ff9-8747-ee50e6477e16}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -97,8 +100,6 @@
     <ClCompile Include="MainRenderer\Handlers\DescriptorHandler.cpp">
       <Filter>MainRenderer\Handlers</Filter>
     </ClCompile>
-    <ClCompile Include="GUISystem\ImGUI\GUITypes.cpp" />
-    <ClCompile Include="GUISystem\ImGUI\GUI.cpp" />
     <ClCompile Include="..\ExternalLibraries\ImGUI\imgui.cpp">
       <Filter>ImGuiFiles</Filter>
     </ClCompile>
@@ -119,6 +120,12 @@
     </ClCompile>
     <ClCompile Include="..\ExternalLibraries\ImGUI\imgui_widgets.cpp">
       <Filter>ImGuiFiles</Filter>
+    </ClCompile>
+    <ClCompile Include="GUISystem\GUI.cpp">
+      <Filter>GUISystem</Filter>
+    </ClCompile>
+    <ClCompile Include="GUISystem\GUITypes.cpp">
+      <Filter>GUISystem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -212,8 +219,6 @@
     <ClInclude Include="MainRenderer\Handlers\DescriptorHandler.h">
       <Filter>MainRenderer\Handlers</Filter>
     </ClInclude>
-    <ClInclude Include="GUISystem\ImGUI\GUITypes.h" />
-    <ClInclude Include="GUISystem\ImGUI\GUI.h" />
     <ClInclude Include="..\ExternalLibraries\ImGUI\imgui.h">
       <Filter>ImGuiFiles</Filter>
     </ClInclude>
@@ -237,6 +242,12 @@
     </ClInclude>
     <ClInclude Include="..\ExternalLibraries\ImGUI\imstb_truetype.h">
       <Filter>ImGuiFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="GUISystem\GUI.h">
+      <Filter>GUISystem</Filter>
+    </ClInclude>
+    <ClInclude Include="GUISystem\GUITypes.h">
+      <Filter>GUISystem</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

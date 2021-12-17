@@ -1,6 +1,6 @@
 #include "SceneManager.h"
 
-#include "../GUISystem/ImGUI/GUI.h"
+#include "../GUISystem/GUI.h"
 
 SceneManager::SceneManager()
 {
@@ -18,7 +18,10 @@ SceneManager::SceneManager()
 	m_GuiSystem->Init(m_Renderer->GetInstance(), m_Renderer->GetQueue(), m_Renderer->GetRenderPass());
 
 	GUIWindow* gUIwindow = m_GuiSystem->CreateGUIWindow();
-	gUIwindow->Init(glm::vec2(0, 0), glm::vec2(400, 400), "Test Window", true);
+	gUIwindow->Init(glm::vec2(0, 0), glm::vec2(300, 100), "Test Window", true);
+
+	gUIwindow->AddText("Vulkan Renderer says hello to the user.");
+
 }
 
 SceneManager::~SceneManager()

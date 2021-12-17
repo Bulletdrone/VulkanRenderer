@@ -97,8 +97,8 @@ private:
 
 	std::vector<FrameData> m_FrameData;
 
-	size_t m_CurrentFrame = 0;
-	size_t m_PreviousFrame = -1;
+	int m_CurrentFrame = 0;
+	int m_PreviousFrame = -1;
 
 	//Primary Vulkan Data;
 	VkInstance mvk_Instance;
