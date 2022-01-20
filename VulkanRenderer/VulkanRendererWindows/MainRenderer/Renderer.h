@@ -54,7 +54,7 @@ public:
 
 	void DrawFrame(uint32_t& r_ImageIndex, float a_dt);
 	void DrawObjects(VkCommandBuffer& r_CmdBuffer);
-	void UpdateUniformBuffer(uint32_t a_CurrentImage, float a_dt);
+	void UpdateUniformBuffer(uint32_t a_CurrentImage);
 
 	bool CheckDeviceExtensionSupport(VkPhysicalDevice a_Device);
 

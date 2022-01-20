@@ -27,7 +27,7 @@ void VulkanDevice::CleanupDevice()
     }
 }
 
-void VulkanDevice::VulkanDeviceSetup(VkPhysicalDevice a_PhysicalDevice, Window& a_Window, VulkanDebug* debug, size_t a_FrameBufferAmount)
+void VulkanDevice::VulkanDeviceSetup(VkPhysicalDevice a_PhysicalDevice, VulkanDebug* debug, size_t a_FrameBufferAmount)
 {
     m_DeviceCommandBuffer.resize(a_FrameBufferAmount);
 
@@ -346,7 +346,7 @@ void VulkanDevice::CreateIndexBuffers(BufferData<uint32_t>* a_IndexData)
     vkFreeMemory(m_LogicalDevice, t_StagingBufferMemory, nullptr);
 }
 
-void VulkanDevice::CreateUniformBuffers(VkBuffer& r_UniformBuffer, VkDeviceMemory& r_UniformBufferMemory, const size_t a_SwampChainSize, VkDeviceSize a_BufferSize)
+void VulkanDevice::CreateUniformBuffers(VkBuffer& r_UniformBuffer, VkDeviceMemory& r_UniformBufferMemory, VkDeviceSize a_BufferSize)
 {
         CreateBuffer(a_BufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
             r_UniformBuffer, r_UniformBufferMemory);

@@ -28,7 +28,7 @@ Renderer::Renderer()
 	m_Window->SetupVKWindow(mvk_Instance);
 	VkPhysicalDevice physicalDevice = PickPhysicalDevice();
 
-	m_VulkanDevice.VulkanDeviceSetup(physicalDevice, *m_Window, DE_VulkanDebug, FRAMEBUFFER_AMOUNT);
+	m_VulkanDevice.VulkanDeviceSetup(physicalDevice, DE_VulkanDebug, FRAMEBUFFER_AMOUNT);
 	m_VulkanDevice.CreateLogicalDevice(std::vector<const char*>(), *m_Window, mvk_GraphicsQueue, mvk_PresentQueue);
 	
 	SetupHandlers();
@@ -76,7 +76,7 @@ void Renderer::SetupRenderObjects()
 
 	for (uint32_t i = 0; i < FRAMEBUFFER_AMOUNT; i++)
 	{
-		m_VulkanDevice.CreateUniformBuffers(mvk_ViewProjectionBuffers[i], mvk_ViewProjectionBuffersMemory[i], m_FrameData.size(), sizeof(ViewProjection));
+		m_VulkanDevice.CreateUniformBuffers(mvk_ViewProjectionBuffers[i], mvk_ViewProjectionBuffersMemory[i], sizeof(ViewProjection));
 	}
 
 	CreateSyncObjects();
@@ -374,7 +374,7 @@ void Renderer::DrawFrame(uint32_t& r_ImageIndex, float a_dt)
 
 	VkResult t_Result = vkAcquireNextImageKHR(m_VulkanDevice, m_VulkanSwapChain.SwapChain, UINT64_MAX, frameData.ImageAvailableSemaphore, VK_NULL_HANDLE, &r_ImageIndex);
 
-	UpdateUniformBuffer(r_ImageIndex, a_dt);
+	UpdateUniformBuffer(r_ImageIndex);
 
 	if (t_Result == VK_ERROR_OUT_OF_DATE_KHR || t_Result == VK_SUBOPTIMAL_KHR || m_Window->m_FrameBufferResized)
 	{
@@ -514,7 +514,7 @@ void Renderer::DrawObjects(VkCommandBuffer& r_CmdBuffer)
 	}
 }
 
-void Renderer::UpdateUniformBuffer(uint32_t a_CurrentImage, float a_dt)
+void Renderer::UpdateUniformBuffer(uint32_t a_CurrentImage)
 {
 	ViewProjection ubo = p_ActiveCamera->GetViewProjection();
 

@@ -15,10 +15,10 @@ public:
 	void AddRenderObject(BaseRenderObject* a_NewShape);
 
 	//Increases the m_CurrentRenderID by 1 and returns it.
-	size_t GetNextRenderID() { return m_CurrentRenderID++; }
+	uint32_t GetNextRenderID() { return m_CurrentRenderID++; }
 
 private:
-	size_t m_CurrentRenderID = 0;
+	uint32_t m_CurrentRenderID = 0;
 
 	std::vector<BaseRenderObject*> m_RenderObjects;
 

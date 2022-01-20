@@ -28,7 +28,7 @@ public:
 	void CleanupDevice();
 
 	//Send nullptr to vulkanDebug if you do not want to enable debug.
-	void VulkanDeviceSetup(VkPhysicalDevice a_PhysicalDevice, Window& a_Window, VulkanDebug* debug, size_t a_FrameBufferAmount);
+	void VulkanDeviceSetup(VkPhysicalDevice a_PhysicalDevice, VulkanDebug* debug, size_t a_FrameBufferAmount);
 	void CreateLogicalDevice(std::vector<const char*> a_EnabledExtensions, Window& r_Window, VkQueue& r_GraphicsQueue, VkQueue& r_PresentQueue);
 
 	// Physical device representation
@@ -84,7 +84,7 @@ public:
 	//Buffer Functions
 	void CreateVertexBuffers(BufferData<Vertex>* a_VertexData);
 	void CreateIndexBuffers(BufferData<uint32_t>* a_IndexData);
-	void CreateUniformBuffers(VkBuffer& r_UniformBuffer, VkDeviceMemory& r_UniformBufferMemory, const size_t a_SwampChainSize, VkDeviceSize a_BufferSize);
+	void CreateUniformBuffers(VkBuffer& r_UniformBuffer, VkDeviceMemory& r_UniformBufferMemory, VkDeviceSize a_BufferSize);
 	//Standard Buffer Creation
 	void CreateBuffer(VkDeviceSize a_Size, VkBufferUsageFlags a_Usage, VkMemoryPropertyFlags a_Properties, VkBuffer& r_Buffer, VkDeviceMemory& r_BufferMemory);
 	void CopyBuffer(VkDeviceSize a_Size, VkBuffer& r_SrcBuffer, VkBuffer& r_DstBuffer);

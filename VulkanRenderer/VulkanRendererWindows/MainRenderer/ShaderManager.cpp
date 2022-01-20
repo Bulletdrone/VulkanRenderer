@@ -151,7 +151,7 @@ uint32_t ShaderManager::CreatePipelineData(const VkRenderPass& r_RenderPass, std
 	//Generating the Actual Pipeline
 	VkPipelineLayoutCreateInfo t_PipelineLayoutInfo{};
 	t_PipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-	t_PipelineLayoutInfo.setLayoutCount = a_DescriptorSetLayouts.size(); // Optional
+	t_PipelineLayoutInfo.setLayoutCount = static_cast<uint32_t>(a_DescriptorSetLayouts.size()); // Optional
 	t_PipelineLayoutInfo.pSetLayouts = a_DescriptorSetLayouts.data(); // Optional
 	t_PipelineLayoutInfo.pushConstantRangeCount = 1; // Optional
 	t_PipelineLayoutInfo.pPushConstantRanges = &t_InstanceModelPushConstantRange; // Optional

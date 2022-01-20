@@ -318,7 +318,7 @@ bool DescriptorBuilder::Build(VkDescriptorSet& a_Set, VkDescriptorSetLayout& a_L
 	t_LayoutInfo.pNext = nullptr;
 
 	t_LayoutInfo.pBindings = m_Bindings.data();
-	t_LayoutInfo.bindingCount = m_Bindings.size();
+	t_LayoutInfo.bindingCount = static_cast<uint32_t>(m_Bindings.size());
 
 	p_Cache->CreateLayout(&t_LayoutInfo);
 
@@ -332,7 +332,7 @@ bool DescriptorBuilder::Build(VkDescriptorSet& a_Set, VkDescriptorSetLayout& a_L
 		w.dstSet = a_Set;
 	}
 
-	vkUpdateDescriptorSets(p_Alloc->device, m_Writes.size(), m_Writes.data(), 0, nullptr);
+	vkUpdateDescriptorSets(p_Alloc->device, static_cast<uint32_t>(m_Writes.size()), m_Writes.data(), 0, nullptr);
 
 
 	return true;

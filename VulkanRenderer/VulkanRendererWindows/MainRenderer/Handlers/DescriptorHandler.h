@@ -91,6 +91,6 @@ private:
 	std::vector<VkWriteDescriptorSet> m_Writes;
 	std::vector<VkDescriptorSetLayoutBinding> m_Bindings;
 
-	DescriptorLayoutCache* p_Cache;
-	DescriptorAllocator* p_Alloc;
+	DescriptorLayoutCache* p_Cache = nullptr;
+	DescriptorAllocator* p_Alloc = nullptr;
 };

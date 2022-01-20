@@ -7,7 +7,7 @@ namespace VkInit
 	{
 		VkDescriptorBufferInfo t_BufferInfo{};
 		t_BufferInfo.buffer = r_UniformBuffer;
-		t_BufferInfo.offset = 0;
+		t_BufferInfo.offset = a_Offset;
 		t_BufferInfo.range = a_BufferSize;
 
 		return t_BufferInfo;

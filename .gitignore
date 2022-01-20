@@ -13,3 +13,4 @@ VulkanRenderer/Resources/Images/Background.png
 VulkanRenderer/Resources/Models/Pavillion.obj
 VulkanRenderer/GLSLShaders/compile.bat
 VulkanRenderer/VulkanRendererWindows/imgui.ini
+*.vcxproj.user

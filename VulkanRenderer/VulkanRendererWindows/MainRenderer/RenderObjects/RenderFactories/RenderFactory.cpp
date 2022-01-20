@@ -16,7 +16,7 @@ RenderFactory::~RenderFactory()
 	ClearRenderObjects();
 }
 
-BaseRenderObject* RenderFactory::CreateRenderObject(bool& r_NewObject, const size_t a_RenderID, ShapeType a_ShapeType, Transform* a_Transform, Material& a_Material)
+BaseRenderObject* RenderFactory::CreateRenderObject(bool& r_NewObject, const uint32_t a_RenderID, ShapeType a_ShapeType, Transform* a_Transform, Material& a_Material)
 {
 	CheckRenderObject(a_ShapeType);
 	return new RenderShape(a_RenderID, a_Transform, a_Material, m_RenderObjectsData[static_cast<size_t>(a_ShapeType)]);

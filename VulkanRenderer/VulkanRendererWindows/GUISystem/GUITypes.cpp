@@ -56,6 +56,7 @@ namespace GUITypes
 			assert(elementSize < 4 || elementSize > 1);
 			break;
 		}
+		return false;
 	}
 
 	bool FSlider::DrawElement()
@@ -78,5 +79,6 @@ namespace GUITypes
 			assert(elementSize < 4 || elementSize > 1);
 			break;
 		}
+		return false;
 	}
 }
