@@ -107,10 +107,10 @@ size_t DescriptorLayoutCache::DescriptorLayoutInfo::hash() const
 	for (const VkDescriptorSetLayoutBinding& b : bindings)
 	{
 		//pack the binding data into a single int64. Not fully correct but it's ok
-		size_t binding_hash = b.binding | b.descriptorType << 8 | b.descriptorCount << 16 | b.stageFlags << 24;
+		uint64_t bindingHash = static_cast<uint64_t>(b.binding | b.descriptorType << 8 | b.descriptorCount << 16 | b.stageFlags << 24);
 
 		//shuffle the packed binding data and xor it with the main hash
-		result ^= hash<size_t>()(binding_hash);
+		result ^= hash<size_t>()(bindingHash);
 	}
 
 	return result;

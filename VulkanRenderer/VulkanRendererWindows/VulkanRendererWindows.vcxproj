@@ -19,16 +19,15 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\ExternalLibraries\ImGUI\imgui.cpp" />
-    <ClCompile Include="..\ExternalLibraries\ImGUI\imgui_demo.cpp" />
-    <ClCompile Include="..\ExternalLibraries\ImGUI\imgui_draw.cpp" />
-    <ClCompile Include="..\ExternalLibraries\ImGUI\imgui_impl_glfw.cpp" />
-    <ClCompile Include="..\ExternalLibraries\ImGUI\imgui_impl_vulkan.cpp" />
-    <ClCompile Include="..\ExternalLibraries\ImGUI\imgui_tables.cpp" />
-    <ClCompile Include="..\ExternalLibraries\ImGUI\imgui_widgets.cpp" />
     <ClCompile Include="GUISystem\GUI.cpp" />
     <ClCompile Include="GUISystem\GUITypes.cpp" />
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="GUISystem\ImGUI\backends\imgui_impl_glfw.cpp" />
+    <ClCompile Include="GUISystem\ImGUI\backends\imgui_impl_vulkan.cpp" />
+    <ClCompile Include="GUISystem\ImGUI\imgui.cpp" />
+    <ClCompile Include="GUISystem\ImGUI\imgui_demo.cpp" />
+    <ClCompile Include="GUISystem\ImGUI\imgui_draw.cpp" />
+    <ClCompile Include="GUISystem\ImGUI\imgui_tables.cpp" />
+    <ClCompile Include="GUISystem\ImGUI\imgui_widgets.cpp" />
     <ClCompile Include="MainRenderer\CameraController.cpp" />
     <ClCompile Include="MainRenderer\Handlers\DepthHandler.cpp" />
     <ClCompile Include="MainRenderer\Handlers\DescriptorHandler.cpp" />
@@ -42,8 +41,6 @@
     <ClCompile Include="MainRenderer\RenderObjects\RenderFactories\RenderFactory.cpp" />
     <ClCompile Include="MainRenderer\RenderObjects\RenderShape.cpp" />
     <ClCompile Include="MainRenderer\RenderObjects\SceneObject.cpp" />
-    <ClCompile Include="MainRenderer\Scene.cpp" />
-    <ClCompile Include="MainRenderer\SceneManager.cpp" />
     <ClCompile Include="MainRenderer\ShaderManager.cpp" />
     <ClCompile Include="MainRenderer\Tools\ResourceLoader.cpp" />
     <ClCompile Include="MainRenderer\VulkanDebugger\VulkanDebug.cpp" />
@@ -52,16 +49,16 @@
     <ClCompile Include="MainRenderer\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\ExternalLibraries\ImGUI\imconfig.h" />
-    <ClInclude Include="..\ExternalLibraries\ImGUI\imgui.h" />
-    <ClInclude Include="..\ExternalLibraries\ImGUI\imgui_impl_glfw.h" />
-    <ClInclude Include="..\ExternalLibraries\ImGUI\imgui_impl_vulkan.h" />
-    <ClInclude Include="..\ExternalLibraries\ImGUI\imgui_internal.h" />
-    <ClInclude Include="..\ExternalLibraries\ImGUI\imstb_rectpack.h" />
-    <ClInclude Include="..\ExternalLibraries\ImGUI\imstb_textedit.h" />
-    <ClInclude Include="..\ExternalLibraries\ImGUI\imstb_truetype.h" />
     <ClInclude Include="GUISystem\GUI.h" />
     <ClInclude Include="GUISystem\GUITypes.h" />
+    <ClInclude Include="GUISystem\ImGUI\backends\imgui_impl_glfw.h" />
+    <ClInclude Include="GUISystem\ImGUI\backends\imgui_impl_vulkan.h" />
+    <ClInclude Include="GUISystem\ImGUI\imconfig.h" />
+    <ClInclude Include="GUISystem\ImGUI\imgui.h" />
+    <ClInclude Include="GUISystem\ImGUI\imgui_internal.h" />
+    <ClInclude Include="GUISystem\ImGUI\imstb_rectpack.h" />
+    <ClInclude Include="GUISystem\ImGUI\imstb_textedit.h" />
+    <ClInclude Include="GUISystem\ImGUI\imstb_truetype.h" />
     <ClInclude Include="MainRenderer\CameraController.h" />
     <ClInclude Include="MainRenderer\Handlers\DepthHandler.h" />
     <ClInclude Include="MainRenderer\Handlers\DescriptorHandler.h" />
@@ -77,13 +74,10 @@
     <ClInclude Include="MainRenderer\RenderObjects\RenderFactories\RenderFactory.h" />
     <ClInclude Include="MainRenderer\RenderObjects\RenderShape.h" />
     <ClInclude Include="MainRenderer\RenderObjects\SceneObject.h" />
-    <ClInclude Include="MainRenderer\Scene.h" />
-    <ClInclude Include="MainRenderer\SceneManager.h" />
     <ClInclude Include="MainRenderer\ShaderManager.h" />
     <ClInclude Include="MainRenderer\Structs\BufferData.h" />
     <ClInclude Include="MainRenderer\Structs\FrameData.h" />
     <ClInclude Include="MainRenderer\Structs\PipelineData.h" />
-    <ClInclude Include="MainRenderer\Structs\SceneData.h" />
     <ClInclude Include="MainRenderer\Structs\TextureData.h" />
     <ClInclude Include="MainRenderer\Tools\ObjectPool.h" />
     <ClInclude Include="MainRenderer\Tools\ResourceLoader.h" />
@@ -102,26 +96,26 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -147,23 +141,31 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)ExternalLibraries;$(SolutionDir)ExternalLibraries\GLFW\$(Platform)\include;$(SolutionDir)ExternalLibraries\Vulkan\Include;$(ProjectDir)MainRenderer;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)ExternalLibraries;$(SolutionDir)ExternalLibraries\GLFW\$(Platform)\include;$(SolutionDir)ExternalLibraries\Vulkan\Include;$(ProjectDir)GUISystem;$(ProjectDir)MainRenderer;$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
+    <IgnoreImportLibrary>false</IgnoreImportLibrary>
+    <TargetName>Renderer</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)ExternalLibraries;$(SolutionDir)ExternalLibraries\GLFW\$(Platform)\include;$(SolutionDir)ExternalLibraries\Vulkan\Include;$(ProjectDir)MainRenderer;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)ExternalLibraries;$(SolutionDir)ExternalLibraries\GLFW\$(Platform)\include;$(SolutionDir)ExternalLibraries\Vulkan\Include;$(ProjectDir)GUISystem;$(ProjectDir)MainRenderer;$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
+    <IgnoreImportLibrary>false</IgnoreImportLibrary>
+    <TargetName>Renderer</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)ExternalLibraries;$(SolutionDir)ExternalLibraries\GLFW\$(Platform)\include;$(SolutionDir)ExternalLibraries\Vulkan\Include;$(ProjectDir)MainRenderer;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)ExternalLibraries;$(SolutionDir)ExternalLibraries\GLFW\$(Platform)\include;$(SolutionDir)ExternalLibraries\Vulkan\Include;$(ProjectDir)GUISystem;$(ProjectDir)MainRenderer;$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
+    <IgnoreImportLibrary>false</IgnoreImportLibrary>
+    <TargetName>Renderer</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)ExternalLibraries;$(SolutionDir)ExternalLibraries\GLFW\$(Platform)\include;$(SolutionDir)ExternalLibraries\Vulkan\Include;$(ProjectDir)MainRenderer;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)ExternalLibraries;$(SolutionDir)ExternalLibraries\GLFW\$(Platform)\include;$(SolutionDir)ExternalLibraries\Vulkan\Include;$(ProjectDir)GUISystem;$(ProjectDir)MainRenderer;$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
+    <IgnoreImportLibrary>false</IgnoreImportLibrary>
+    <TargetName>Renderer</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -172,6 +174,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -179,6 +182,13 @@
       <AdditionalDependencies>vulkan-1.lib;glfw3_mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)ExternalLibraries\GLFW\$(Platform)\lib;$(SolutionDir)ExternalLibraries\Vulkan\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <ProjectReference>
+      <UseLibraryDependencyInputs>true</UseLibraryDependencyInputs>
+    </ProjectReference>
+    <Lib>
+      <AdditionalLibraryDirectories>$(SolutionDir)ExternalLibraries\GLFW\$(Platform)\lib;$(SolutionDir)ExternalLibraries\Vulkan\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib;glfw3_mt.lib;</AdditionalDependencies>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -189,6 +199,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -198,6 +209,13 @@
       <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)ExternalLibraries\GLFW\$(Platform)\lib;$(SolutionDir)ExternalLibraries\Vulkan\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <ProjectReference>
+      <UseLibraryDependencyInputs>true</UseLibraryDependencyInputs>
+    </ProjectReference>
+    <Lib>
+      <AdditionalLibraryDirectories>$(SolutionDir)ExternalLibraries\GLFW\$(Platform)\lib;$(SolutionDir)ExternalLibraries\Vulkan\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib; glfw3.lib;</AdditionalDependencies>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -206,6 +224,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -213,6 +232,13 @@
       <AdditionalDependencies>vulkan-1.lib;glfw3_mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)ExternalLibraries\GLFW\$(Platform)\lib;$(SolutionDir)ExternalLibraries\Vulkan\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <ProjectReference>
+      <UseLibraryDependencyInputs>true</UseLibraryDependencyInputs>
+    </ProjectReference>
+    <Lib>
+      <AdditionalLibraryDirectories>$(SolutionDir)ExternalLibraries\GLFW\$(Platform)\lib;$(SolutionDir)ExternalLibraries\Vulkan\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib;glfw3_mt.lib;</AdditionalDependencies>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -223,6 +249,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -232,6 +259,13 @@
       <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)ExternalLibraries\GLFW\$(Platform)\lib;$(SolutionDir)ExternalLibraries\Vulkan\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <ProjectReference>
+      <UseLibraryDependencyInputs>true</UseLibraryDependencyInputs>
+    </ProjectReference>
+    <Lib>
+      <AdditionalLibraryDirectories>$(SolutionDir)ExternalLibraries\GLFW\$(Platform)\lib;$(SolutionDir)ExternalLibraries\Vulkan\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib; glfw3.lib;</AdditionalDependencies>
+    </Lib>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

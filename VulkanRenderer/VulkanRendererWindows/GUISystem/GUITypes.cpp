@@ -3,8 +3,6 @@
 
 #pragma warning (push, 0)
 #include "ImGUI/imgui.h"
-
-#include "imGUI/imgui_impl_vulkan.h"
 #pragma warning (pop)
 
 

@@ -37,8 +37,8 @@ ObjectManager::ObjectManager(Renderer* a_Renderer)
 	//pip_SpaceImage.p_DescriptorData = &m_DescriptorData[0];
 	//pip_SpaceImage.p_DescriptorData->texture = &m_Textures[0];
 	//Load Texture
-	p_Renderer->SetupImage(m_Textures[0], "../Resources/Images/Background.png");
-	p_Renderer->SetupImage(m_Textures[1], "../Resources/Images/Background1.png");
+	p_Renderer->SetupImage(m_Textures[0], "../VulkanRenderer/Resources/Images/Background.png");
+	p_Renderer->SetupImage(m_Textures[1], "../VulkanRenderer/Resources/Images/Background1.png");
 
 	//std::vector<TextureData> t_GlobalTextures;
 	//SetupDescriptor(des_Global, 1, t_GlobalTextures);

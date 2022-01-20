@@ -93,7 +93,7 @@ void RenderFactory::CreateRenderObject(ShapeType a_ShapeType)
 		throw;
 		break;
 	case ShapeType::Pavillion:
-		t_Mesh = ResourceLoader::LoadModel("../Resources/Models/Pavillion.obj");
+		t_Mesh = ResourceLoader::LoadModel("../VulkanRenderer/Resources/Models/Pavillion.obj");
 		break;
 	}
 

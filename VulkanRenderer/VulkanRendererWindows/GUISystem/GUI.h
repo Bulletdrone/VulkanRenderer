@@ -7,8 +7,6 @@
 
 #include "Window.h"
 
-
-
 typedef int ImGuiWindowFlags;
 
 class VulkanDevice;

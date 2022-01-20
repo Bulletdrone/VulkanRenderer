@@ -3,7 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31205.134
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VulkanRendererWindows", "VulkanRendererWindows\VulkanRendererWindows.vcxproj", "{E56267D3-0A31-4C06-B4F7-EA3541021306}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VulkanEngine", "VulkanEngine\VulkanEngine.vcxproj", "{8CDE395B-5475-455C-A28D-D783F4B2BF15}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E56267D3-0A31-4C06-B4F7-EA3541021306} = {E56267D3-0A31-4C06-B4F7-EA3541021306}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VulkanRendererWindows", "VulkanRenderer\VulkanRendererWindows\VulkanRendererWindows.vcxproj", "{E56267D3-0A31-4C06-B4F7-EA3541021306}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,6 +22,18 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8CDE395B-5475-455C-A28D-D783F4B2BF15}.Debug|ARM.ActiveCfg = Debug|Win32
+		{8CDE395B-5475-455C-A28D-D783F4B2BF15}.Debug|ARM64.ActiveCfg = Debug|Win32
+		{8CDE395B-5475-455C-A28D-D783F4B2BF15}.Debug|x64.ActiveCfg = Debug|x64
+		{8CDE395B-5475-455C-A28D-D783F4B2BF15}.Debug|x64.Build.0 = Debug|x64
+		{8CDE395B-5475-455C-A28D-D783F4B2BF15}.Debug|x86.ActiveCfg = Debug|Win32
+		{8CDE395B-5475-455C-A28D-D783F4B2BF15}.Debug|x86.Build.0 = Debug|Win32
+		{8CDE395B-5475-455C-A28D-D783F4B2BF15}.Release|ARM.ActiveCfg = Release|Win32
+		{8CDE395B-5475-455C-A28D-D783F4B2BF15}.Release|ARM64.ActiveCfg = Release|Win32
+		{8CDE395B-5475-455C-A28D-D783F4B2BF15}.Release|x64.ActiveCfg = Release|x64
+		{8CDE395B-5475-455C-A28D-D783F4B2BF15}.Release|x64.Build.0 = Release|x64
+		{8CDE395B-5475-455C-A28D-D783F4B2BF15}.Release|x86.ActiveCfg = Release|Win32
+		{8CDE395B-5475-455C-A28D-D783F4B2BF15}.Release|x86.Build.0 = Release|Win32
 		{E56267D3-0A31-4C06-B4F7-EA3541021306}.Debug|ARM.ActiveCfg = Debug|Win32
 		{E56267D3-0A31-4C06-B4F7-EA3541021306}.Debug|ARM64.ActiveCfg = Debug|Win32
 		{E56267D3-0A31-4C06-B4F7-EA3541021306}.Debug|x64.ActiveCfg = Debug|x64

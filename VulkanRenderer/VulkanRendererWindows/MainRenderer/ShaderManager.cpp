@@ -19,8 +19,8 @@ uint32_t ShaderManager::CreatePipelineData(const VkRenderPass& r_RenderPass, std
 	PipeLineData& pipeLineData = PipelinePool.GetEmptyObject(pipelineID);
 	pipeLineData.pipeID = pipelineID;
 
-	auto t_VertShaderCode = ResourceLoader::ReadFile("../Resources/Shaders/unlitVert.spv");
-	auto t_FragShaderCode = ResourceLoader::ReadFile("../Resources/Shaders/unlitFrag.spv");
+	auto t_VertShaderCode = ResourceLoader::ReadFile("../VulkanRenderer/Resources/Shaders/unlitVert.spv");
+	auto t_FragShaderCode = ResourceLoader::ReadFile("../VulkanRenderer/Resources/Shaders/unlitFrag.spv");
 
 	VkShaderModule t_VertShaderModule = CreateShaderModule(t_VertShaderCode);
 	VkShaderModule t_FragShaderModule = CreateShaderModule(t_FragShaderCode);
