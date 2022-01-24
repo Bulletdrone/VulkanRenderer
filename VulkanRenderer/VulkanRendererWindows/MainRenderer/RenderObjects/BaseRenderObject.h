@@ -10,7 +10,7 @@ class BaseRenderObject : public SceneObject
 {
 public:
 	BaseRenderObject(const uint32_t a_ID, Transform* a_Transform, Material& a_Material);
-	~BaseRenderObject();
+	virtual ~BaseRenderObject();
 
 	virtual void Update() = 0;
 	virtual void Draw() = 0;

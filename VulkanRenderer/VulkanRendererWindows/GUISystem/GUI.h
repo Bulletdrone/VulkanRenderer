@@ -9,7 +9,7 @@
 
 typedef int ImGuiWindowFlags;
 
-class VulkanDevice;
+struct VulkanDevice;
 class VulkanSwapChain;
 
 struct GLFWwindow;
@@ -92,8 +92,8 @@ public:
 private:
 	std::vector<GUIWindow> m_GUIWindows;
 
-	VkDescriptorPool m_ImguiPool;
-
+	VkDescriptorPool m_ImguiPool = VK_NULL_HANDLE;
+	
 	VulkanDevice& rm_Device;
 	const VulkanSwapChain& rm_SwapChain;
 	GLFWwindow* p_Window;

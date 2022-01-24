@@ -6,9 +6,11 @@
 #include <cstdint>
 #include <algorithm>
 
+#pragma warning (push, 0)
 #include "ImGUI/imgui.h"
 
 #include "imGUI/Backends/imgui_impl_vulkan.h"
+#pragma warning (pop)
 
 
 Renderer::Renderer()
@@ -33,7 +35,7 @@ Renderer::Renderer()
 	
 	SetupHandlers();
 	m_VulkanSwapChain.ConnectVulkanDevice(&m_VulkanDevice);
-	m_VulkanSwapChain.CreateSwapChain(*m_Window, m_FrameData.size());
+	m_VulkanSwapChain.CreateSwapChain(*m_Window, static_cast<uint32_t>(m_FrameData.size()));
 	m_VulkanSwapChain.CreateImageViews(m_ImageHandler);
 	CreateRenderPass();
 
@@ -113,7 +115,7 @@ void Renderer::RecreateSwapChain()
 		
 	CleanupSwapChain();
 
-	m_VulkanSwapChain.CreateSwapChain(*m_Window, m_FrameData.size());
+	m_VulkanSwapChain.CreateSwapChain(*m_Window, static_cast<uint32_t>(m_FrameData.size()));
 	m_VulkanSwapChain.CreateImageViews(m_ImageHandler);
 	CreateRenderPass();
 
@@ -366,7 +368,7 @@ void Renderer::SetupImage(TextureData& a_TextureData, const char* a_ImagePath)
 	a_TextureData.textureSampler = m_ImageHandler->CreateTextureSampler();
 }
 
-void Renderer::DrawFrame(uint32_t& r_ImageIndex, float a_dt)
+void Renderer::DrawFrame(uint32_t& r_ImageIndex)
 {
 	FrameData& frameData = m_FrameData[m_CurrentFrame];
 
@@ -468,9 +470,9 @@ void Renderer::DrawObjects(VkCommandBuffer& r_CmdBuffer)
 	PipeLineData* t_CurrentPipeLine = nullptr;
 
 	//Create this once for performance boost of not creating a mat4 everytime.
-	InstanceModel t_PushInstance;
+	InstanceModel t_PushInstance{};
 
-	for (int i = 0; i < p_RenderObjects->size(); i++)
+	for (size_t i = 0; i < p_RenderObjects->size(); i++)
 	{
 		BaseRenderObject* t_RenderObject = p_RenderObjects->at(i);
 		uint32_t t_PipelineID = t_RenderObject->GetPipeLineID();

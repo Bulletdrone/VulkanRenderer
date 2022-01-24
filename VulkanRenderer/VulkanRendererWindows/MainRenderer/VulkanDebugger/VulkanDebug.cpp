@@ -23,6 +23,8 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
 }
 #pragma endregion
 
+#pragma warning( push )
+#pragma warning( disable : 4100 )
 //Debug Message Caller.
 static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
     VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
@@ -34,6 +36,7 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
 
     return VK_FALSE;
 }
+#pragma warning( pop )
 
 //Vulkan Debugger.
 VulkanDebug::VulkanDebug(const VkInstance& r_VKInstance)

@@ -1,5 +1,8 @@
 #pragma once
+
+#pragma warning (push, 0)
 #include <Vulkan/vulkan.h>
+#pragma warning (pop)
 
 #include <vector>
 #include <utility>
@@ -20,13 +23,13 @@ public:
 
 		bool operator==(const DescriptorLayoutInfo& a_Other) const;
 
-		size_t hash() const;
+		uint64_t hash() const;
 	};
 
 private:
 	struct DescriptorLayoutHash 
 	{
-		std::size_t operator()(const DescriptorLayoutInfo& a_K) const
+		uint64_t operator()(const DescriptorLayoutInfo& a_K) const
 		{
 			return a_K.hash();
 		}

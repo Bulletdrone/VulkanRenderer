@@ -1,7 +1,9 @@
 #pragma once
 
-#include <Vulkan/vulkan.h>
 
+#pragma warning (push, 0)
+#include <Vulkan/vulkan.h>
+#pragma warning (pop)
 #include <vector>
 
 class VulkanDebug
@@ -25,7 +27,7 @@ public:
 
 private:
 	const VkInstance& rm_VKInstance;
-	VkDebugUtilsMessengerEXT m_DebugMessanger;
+	VkDebugUtilsMessengerEXT m_DebugMessanger = VK_NULL_HANDLE;
 
 	//Vulcan ValidationData.
 	std::vector<const char*> m_ValidationLayers = {

@@ -27,6 +27,5 @@ namespace Engine
 
 		}
 		throw std::runtime_error("failed to delete ID from m_LoadedModels in a Scene.");
-		return false;
 	}
 }

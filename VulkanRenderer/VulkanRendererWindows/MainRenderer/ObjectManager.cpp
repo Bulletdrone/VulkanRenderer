@@ -94,6 +94,7 @@ void ObjectManager::SetupStartObjects()
 
 void ObjectManager::UpdateObjects(float a_Dt)
 {
+	(void)a_Dt;
 	uint32_t t_ImageIndex;
 
 	for (size_t i = 0; i < m_RenderObjects.size(); i++)
@@ -101,7 +102,7 @@ void ObjectManager::UpdateObjects(float a_Dt)
 		m_RenderObjects[i]->Update();
 	}
 
-	p_Renderer->DrawFrame(t_ImageIndex, a_Dt);
+	p_Renderer->DrawFrame(t_ImageIndex);
 
 	//Update Uniform Buffer
 	//p_Renderer->UpdateUniformBuffer(t_ImageIndex, a_Dt);

@@ -3,7 +3,7 @@
 #include "Handlers/ImageHandler.h"
 
 struct SwapChainSupportDetails {
-	VkSurfaceCapabilitiesKHR capabilities;
+	VkSurfaceCapabilitiesKHR capabilities{};
 	std::vector<VkSurfaceFormatKHR> formats;
 	std::vector<VkPresentModeKHR> presentModes;
 };
@@ -18,7 +18,7 @@ public:
 
 	void ConnectVulkanDevice(VulkanDevice* a_VulkanDevice);
 	
-	void CreateSwapChain(Window& r_Window, const size_t a_FrameAmount);
+	void CreateSwapChain(Window& r_Window, const uint32_t a_FrameAmount);
 	void CreateImageViews(ImageHandler* p_ImageHandler);
 
 	//The SwapChain for buffering images and more.

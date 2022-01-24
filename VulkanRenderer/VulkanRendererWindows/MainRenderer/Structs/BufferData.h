@@ -1,10 +1,13 @@
 #pragma once
+
+#pragma warning (push, 0)
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/hash.hpp>
 
 #include <Vulkan/vulkan.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#pragma warning (pop)
 
 #include <array>
 #include <vector>

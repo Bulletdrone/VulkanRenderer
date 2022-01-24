@@ -11,7 +11,7 @@ void DescriptorLayoutCache::Init(VkDevice a_Device)
 
 void DescriptorLayoutCache::Cleanup()
 {
-	for (auto pair : layoutCache)
+	for (auto& pair : layoutCache)
 	{
 		vkDestroyDescriptorSetLayout(device, pair.second, nullptr);
 	}
@@ -74,7 +74,7 @@ bool DescriptorLayoutCache::DescriptorLayoutInfo::operator==(const DescriptorLay
 	}
 	else {
 		//compare each of the bindings is the same. Bindings are sorted so they will match
-		for (int i = 0; i < bindings.size(); i++)
+		for (size_t i = 0; i < bindings.size(); i++)
 		{
 			if (a_Other.bindings[i].binding != bindings[i].binding)
 			{
@@ -97,12 +97,9 @@ bool DescriptorLayoutCache::DescriptorLayoutInfo::operator==(const DescriptorLay
 	}
 }
 
-size_t DescriptorLayoutCache::DescriptorLayoutInfo::hash() const 
+uint64_t DescriptorLayoutCache::DescriptorLayoutInfo::hash() const 
 {
-	using std::size_t;
-	using std::hash;
-
-	size_t result = hash<size_t>()(bindings.size());
+	uint64_t result = std::hash<uint64_t>()(bindings.size());
 
 	for (const VkDescriptorSetLayoutBinding& b : bindings)
 	{
@@ -110,7 +107,7 @@ size_t DescriptorLayoutCache::DescriptorLayoutInfo::hash() const
 		uint64_t bindingHash = static_cast<uint64_t>(b.binding | b.descriptorType << 8 | b.descriptorCount << 16 | b.stageFlags << 24);
 
 		//shuffle the packed binding data and xor it with the main hash
-		result ^= hash<size_t>()(bindingHash);
+		result ^= std::hash<uint64_t>()(bindingHash);
 	}
 
 	return result;
@@ -228,7 +225,7 @@ VkDescriptorPool DescriptorAllocator::CreatePool(uint32_t a_Count, VkDescriptorP
 	std::vector<VkDescriptorPoolSize> t_Sizes;
 	t_Sizes.reserve(m_DescriptorPoolSizes.standardSize.size());
 
-	for (auto sz : m_DescriptorPoolSizes.standardSize)
+	for (auto& sz : m_DescriptorPoolSizes.standardSize)
 	{
 		t_Sizes.push_back({ sz.first, uint32_t(sz.second * a_Count) });
 	}

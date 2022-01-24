@@ -1,6 +1,8 @@
 #pragma once
+#pragma warning (push, 0)
 #include <Vulkan/vulkan.h>
 #include <glm/glm.hpp>
+#pragma warning (pop)
 
 class Material
 {

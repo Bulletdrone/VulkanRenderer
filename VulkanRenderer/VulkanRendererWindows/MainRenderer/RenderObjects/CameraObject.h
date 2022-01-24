@@ -11,7 +11,7 @@ class CameraObject : public SceneObject
 {
 public:
 	CameraObject(const uint32_t a_ID, Transform* a_Transform, const uint32_t a_CameraID, float a_Fov, float a_AspectRatio, float a_NearField, float a_FarField);
-	~CameraObject();
+	virtual ~CameraObject();
 
 	virtual void Update();
 

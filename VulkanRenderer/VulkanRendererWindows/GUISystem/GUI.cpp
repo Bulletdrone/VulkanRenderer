@@ -49,7 +49,6 @@
 		//Setup context
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
-		ImGuiIO& io = ImGui::GetIO();
 
 		ImGui_ImplGlfw_InitForVulkan(p_Window, true);
 

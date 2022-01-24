@@ -23,7 +23,7 @@ public:
 		@param a_Transform, the Transform of the Object.
 		@param a_PipelineID, the Pipeline the object will use.
 		@return the created pointer to a renderobject.*/ 
-	BaseRenderObject* CreateRenderObject(bool& r_NewObject, const uint32_t a_RenderID, ShapeType a_ShapeType, Transform* a_Transform, Material& a_Material);
+	BaseRenderObject* CreateRenderObject(const uint32_t a_RenderID, ShapeType a_ShapeType, Transform* a_Transform, Material& a_Material);
 
 	//Remove all RenderObjects from the Vector.
 	void ClearRenderObjects();

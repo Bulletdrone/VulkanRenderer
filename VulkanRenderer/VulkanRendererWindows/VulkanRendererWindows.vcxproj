@@ -145,6 +145,8 @@
     <LibraryPath>$(LibraryPath)</LibraryPath>
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
     <TargetName>Renderer</TargetName>
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -152,6 +154,8 @@
     <LibraryPath>$(LibraryPath)</LibraryPath>
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
     <TargetName>Renderer</TargetName>
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>

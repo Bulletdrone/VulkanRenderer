@@ -5,7 +5,7 @@ class SceneObject
 {
 public:
 	SceneObject(const uint32_t a_ID, Transform* a_Transform);
-	~SceneObject();
+	virtual ~SceneObject();
 
 	virtual void Update() = 0;
 

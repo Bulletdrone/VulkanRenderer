@@ -1,5 +1,8 @@
 #include "VulkanSwapChain.h"
 
+#include <stdexcept>
+#include <algorithm>
+
 VulkanSwapChain::VulkanSwapChain()
 {}
 
@@ -9,7 +12,7 @@ void VulkanSwapChain::ConnectVulkanDevice(VulkanDevice* a_VulkanDevice)
 }
 
 
-void VulkanSwapChain::CreateSwapChain(Window& r_Window, const size_t a_FrameAmount)
+void VulkanSwapChain::CreateSwapChain(Window& r_Window, const uint32_t a_FrameAmount)
 {
 	VkSwapchainKHR t_OldSwapChain = SwapChain;
 

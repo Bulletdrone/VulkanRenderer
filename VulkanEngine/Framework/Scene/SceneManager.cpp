@@ -39,6 +39,7 @@ namespace Engine
 
 	void SceneManager::UpdateScene(float a_Dt)
 	{
+		(void)a_Dt;
 		double t_StartTime = glfwGetTime();
 		float deltaTime = 0.1f;
 		int t_FrameCount = 0;
@@ -85,7 +86,7 @@ namespace Engine
 
 	void SceneManager::SetScene(uint32_t a_SceneID)
 	{
-		CurrentScene = a_SceneID;
+		CurrentScene = static_cast<uint32_t>(a_SceneID);
 
 		Scene t_Scene = m_Scenes[CurrentScene];
 		m_RenderFactory->ResetRenderObjects(t_Scene.GetLoadedModels());
@@ -103,10 +104,9 @@ namespace Engine
 
 	void SceneManager::CreateShape(ShapeType a_ShapeType, Transform* a_Transform, Material& a_Material)
 	{
-		bool newMesh;
-		BaseRenderObject* t_NewShape = m_RenderFactory->CreateRenderObject(newMesh, m_ObjectManager->GetNextRenderID(), a_ShapeType, a_Transform, a_Material);
+		BaseRenderObject* t_NewShape = m_RenderFactory->CreateRenderObject(m_ObjectManager->GetNextRenderID(), a_ShapeType, a_Transform, a_Material);
 
-		if (newMesh) m_Renderer->SetupMesh(t_NewShape->GetMeshData());
+		m_Renderer->SetupMesh(t_NewShape->GetMeshData());
 
 		m_ObjectManager->AddRenderObject(t_NewShape);
 	}

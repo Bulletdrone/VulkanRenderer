@@ -11,8 +11,8 @@ class CameraController;
 class RenderFactory;
 class GUISystem;
 
-struct Transform;
-struct Material;
+class Transform;
+class Material;
 
 namespace Engine 
 {
@@ -30,7 +30,7 @@ namespace Engine
 		void CreateShape(ShapeType a_ShapeType, Transform* a_Transform, Material& a_Material);
 
 	private:
-		uint32_t CurrentScene = -1;
+		int32_t CurrentScene = -1;
 		std::vector<Scene> m_Scenes;
 
 		Renderer* m_Renderer;

@@ -1,13 +1,11 @@
 #pragma once
 
 #include <optional>
-
-#include <Vulkan/vulkan.hpp>
-
 #include "VulkanDebugger/VulkanDebug.h"
 
 #include <Structs/BufferData.h>
 #include "Window.h"
+
 
 struct QueueFamilyIndices {
 	std::optional<uint32_t> graphicsFamily;
