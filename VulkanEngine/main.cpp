@@ -1,3 +1,4 @@
+#include "Precomp.h"
 #include "Framework/Scene/SceneManager.h"
 
 int main() 

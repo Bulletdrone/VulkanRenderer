@@ -1,3 +1,4 @@
+#include "Precomp.h"
 #include "SceneManager.h"
 
 #include "ObjectManager.h"

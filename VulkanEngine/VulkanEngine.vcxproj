@@ -19,14 +19,24 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Framework\ResourceSystem\Resource.cpp" />
+    <ClCompile Include="Framework\ResourceSystem\ResourceAllocator.cpp" />
+    <ClCompile Include="Framework\ResourceSystem\TextureResource.cpp" />
     <ClCompile Include="Framework\Scene\Scene.cpp" />
     <ClCompile Include="Framework\Scene\SceneManager.cpp" />
+    <ClCompile Include="Framework\Precomp\Logger.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Framework\Precomp\Precomp.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Framework\ResourceSystem\Resource.h" />
+    <ClInclude Include="Framework\ResourceSystem\ResourceAllocator.h" />
+    <ClInclude Include="Framework\ResourceSystem\TextureResource.h" />
     <ClInclude Include="Framework\Scene\Scene.h" />
     <ClInclude Include="Framework\Scene\SceneData.h" />
     <ClInclude Include="Framework\Scene\SceneManager.h" />
+    <ClInclude Include="Framework\Precomp\Precomp.h" />
+    <ClInclude Include="Framework\Precomp\Logger.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\VulkanRenderer\VulkanRendererWindows\VulkanRendererWindows.vcxproj">
@@ -95,11 +105,11 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)ExternalLibraries;$(SolutionDir)ExternalLibraries\GLFW\$(Platform)\include;$(SolutionDir)ExternalLibraries\Vulkan\Include;$(SolutionDir)VulkanRenderer\VulkanRendererWindows\GUISystem;$(SolutionDir)VulkanRenderer\VulkanRendererWindows\MainRenderer;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)ExternalLibraries;$(SolutionDir)ExternalLibraries\GLFW\$(Platform)\include;$(SolutionDir)ExternalLibraries\Vulkan\Include;$(SolutionDir)VulkanRenderer\VulkanRendererWindows\GUISystem;$(SolutionDir)VulkanRenderer\VulkanRendererWindows\MainRenderer;$(ProjectDir)Framework\Precomp;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)ExternalLibraries;$(SolutionDir)ExternalLibraries\GLFW\$(Platform)\include;$(SolutionDir)ExternalLibraries\Vulkan\Include;$(SolutionDir)VulkanRenderer\VulkanRendererWindows\GUISystem;$(SolutionDir)VulkanRenderer\VulkanRendererWindows\MainRenderer;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)ExternalLibraries;$(SolutionDir)ExternalLibraries\GLFW\$(Platform)\include;$(SolutionDir)ExternalLibraries\Vulkan\Include;$(SolutionDir)VulkanRenderer\VulkanRendererWindows\GUISystem;$(SolutionDir)VulkanRenderer\VulkanRendererWindows\MainRenderer;$(ProjectDir)Framework\Precomp;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -109,6 +119,8 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>Precomp.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -123,13 +135,15 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>Precomp.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -152,6 +166,8 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <PrecompiledHeader>Create</PrecompiledHeader>
+      <PrecompiledHeaderFile>Precomp.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -166,13 +182,15 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <PrecompiledHeader>Create</PrecompiledHeader>
+      <PrecompiledHeaderFile>Precomp.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
