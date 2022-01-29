@@ -11,7 +11,7 @@ void DescriptorLayoutCache::Init(VkDevice a_Device)
 
 void DescriptorLayoutCache::Cleanup()
 {
-	for (auto& pair : layoutCache)
+	for (auto& pair : m_LayoutCache)
 	{
 		vkDestroyDescriptorSetLayout(device, pair.second, nullptr);
 	}
@@ -49,8 +49,8 @@ VkDescriptorSetLayout DescriptorLayoutCache::CreateLayout(VkDescriptorSetLayoutC
 		}
 	}
 
-	auto it = layoutCache.find(t_LayoutInfo);
-	if (it != layoutCache.end())
+	auto it = m_LayoutCache.find(t_LayoutInfo);
+	if (it != m_LayoutCache.end())
 	{
 		return (*it).second;
 	}
@@ -61,7 +61,7 @@ VkDescriptorSetLayout DescriptorLayoutCache::CreateLayout(VkDescriptorSetLayoutC
 		vkCreateDescriptorSetLayout(device, a_LayoutInfo, nullptr, &layout);
 
 		//add to cache
-		layoutCache[t_LayoutInfo] = layout;
+		m_LayoutCache[t_LayoutInfo] = layout;
 		return layout;
 	}
 }
