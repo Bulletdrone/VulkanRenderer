@@ -1,5 +1,8 @@
 #pragma once
 #include "Resource.h"
+#include "Structs/Texture.h"
+
+class Renderer;
 
 namespace Engine
 {
@@ -13,20 +16,10 @@ namespace Engine
 
 			virtual bool IsInitialized();
 
-			virtual bool Load(const char* a_FilePath);
+			bool Load(const char* a_FilePath);
 			virtual bool Unload();
-	
 
-		private:
-			unsigned char* m_PixelData = nullptr;
-
-			//In Bytes
-			uint64_t m_ImageSize = 0;
-
-			//Metrics
-			uint32_t m_TexWidth = 0;
-			uint32_t m_TexHeight = 0;
-			uint32_t m_TexChannels = 0;
+			Texture texture;
 		};
 	}
 }

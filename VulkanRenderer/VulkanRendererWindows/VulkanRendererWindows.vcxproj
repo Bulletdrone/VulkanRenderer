@@ -78,6 +78,7 @@
     <ClInclude Include="MainRenderer\Structs\BufferData.h" />
     <ClInclude Include="MainRenderer\Structs\FrameData.h" />
     <ClInclude Include="MainRenderer\Structs\PipelineData.h" />
+    <ClInclude Include="MainRenderer\Structs\Texture.h" />
     <ClInclude Include="MainRenderer\Structs\TextureData.h" />
     <ClInclude Include="MainRenderer\Tools\ObjectPool.h" />
     <ClInclude Include="MainRenderer\Tools\ResourceLoader.h" />
@@ -141,7 +142,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)ExternalLibraries;$(SolutionDir)ExternalLibraries\GLFW\$(Platform)\include;$(SolutionDir)ExternalLibraries\Vulkan\Include;$(ProjectDir)GUISystem;$(ProjectDir)MainRenderer;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)ExternalLibraries;$(SolutionDir)ExternalLibraries\GLFW\$(Platform)\include;$(SolutionDir)ExternalLibraries\Vulkan\Include;$(ProjectDir)GUISystem;$(ProjectDir)MainRenderer;$(SolutionDir);$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
     <TargetName>Renderer</TargetName>
@@ -150,7 +151,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)ExternalLibraries;$(SolutionDir)ExternalLibraries\GLFW\$(Platform)\include;$(SolutionDir)ExternalLibraries\Vulkan\Include;$(ProjectDir)GUISystem;$(ProjectDir)MainRenderer;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)ExternalLibraries;$(SolutionDir)ExternalLibraries\GLFW\$(Platform)\include;$(SolutionDir)ExternalLibraries\Vulkan\Include;$(ProjectDir)GUISystem;$(ProjectDir)MainRenderer;$(SolutionDir);$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
     <TargetName>Renderer</TargetName>
@@ -159,14 +160,14 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)ExternalLibraries;$(SolutionDir)ExternalLibraries\GLFW\$(Platform)\include;$(SolutionDir)ExternalLibraries\Vulkan\Include;$(ProjectDir)GUISystem;$(ProjectDir)MainRenderer;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)ExternalLibraries;$(SolutionDir)ExternalLibraries\GLFW\$(Platform)\include;$(SolutionDir)ExternalLibraries\Vulkan\Include;$(ProjectDir)GUISystem;$(ProjectDir)MainRenderer;$(SolutionDir);$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
     <TargetName>Renderer</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)ExternalLibraries;$(SolutionDir)ExternalLibraries\GLFW\$(Platform)\include;$(SolutionDir)ExternalLibraries\Vulkan\Include;$(ProjectDir)GUISystem;$(ProjectDir)MainRenderer;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)ExternalLibraries;$(SolutionDir)ExternalLibraries\GLFW\$(Platform)\include;$(SolutionDir)ExternalLibraries\Vulkan\Include;$(ProjectDir)GUISystem;$(ProjectDir)MainRenderer;$(SolutionDir);$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
     <TargetName>Renderer</TargetName>

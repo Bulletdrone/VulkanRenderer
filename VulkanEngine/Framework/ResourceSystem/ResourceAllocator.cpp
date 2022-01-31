@@ -3,6 +3,7 @@
 
 //ResourceType includes
 #include "TextureResource.h"
+#include "Renderer.h"
 
 namespace Engine
 {
@@ -52,7 +53,7 @@ namespace Engine
 		Resource::TextureResource* t_Texture = new Resource::TextureResource(t_Index);
 		
 		t_Texture->Load(a_FilePath);
-
+		p_Renderer->SetupImage(t_Texture->texture);
 		m_Resources.emplace(std::make_pair(t_Index, t_Texture));
 
 		return t_Index;
@@ -64,7 +65,7 @@ namespace Engine
 
 		while (*a_FilePath != '\0')
 		{
-			t_Hash += static_cast<unsigned int>(*a_FilePath++);
+			t_Hash += static_cast<uint64_t>(*a_FilePath++);
 		}
 		return t_Hash;
 	}

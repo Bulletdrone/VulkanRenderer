@@ -1,7 +1,5 @@
 #include "ImageHandler.h"
-
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb/stb_image.h>
+#include "Structs/Texture.h"
 
 #include <fstream>
 
@@ -53,14 +51,11 @@ void ImageHandler::CreateImage(VkImage& r_Image, VkDeviceMemory& r_ImageMemory,
     vkBindImageMemory(rm_VulkanDevice, r_Image, r_ImageMemory, 0);
 }
 
-void ImageHandler::CreateTextureImage(VkImage& r_Image, VkDeviceMemory& r_ImageMemory,
-    const char* a_FilePath, VkDeviceSize& r_ImageSize, int& r_TexWidth, int& r_TexHeight, int& r_TexChannels)
+void ImageHandler::CreateTextureImage(Texture& a_Texture)
 {
-    stbi_uc* t_ImagePixels = stbi_load(a_FilePath, &r_TexWidth, &r_TexHeight, &r_TexChannels, STBI_rgb_alpha);
+    VkDeviceSize t_ImageSize = static_cast<VkDeviceSize>(a_Texture.texWidth * a_Texture.texHeight * RGBASize);
 
-    r_ImageSize = static_cast<VkDeviceSize>(r_TexWidth * r_TexHeight * 4);
-
-    if (!t_ImagePixels)
+    if (!a_Texture.pixelData)
     {
         throw std::runtime_error("failed to load texture image!");
     }
@@ -68,24 +63,22 @@ void ImageHandler::CreateTextureImage(VkImage& r_Image, VkDeviceMemory& r_ImageM
     VkBuffer t_StagingBuffer;
     VkDeviceMemory t_StagingBufferMemory;
 
-    rm_VulkanDevice.CreateBuffer(r_ImageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+    rm_VulkanDevice.CreateBuffer(t_ImageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
         t_StagingBuffer, t_StagingBufferMemory);
 
     void* data;
-    vkMapMemory(rm_VulkanDevice, t_StagingBufferMemory, 0, r_ImageSize, 0, &data);
-    memcpy(data, t_ImagePixels, static_cast<size_t>(r_ImageSize));
+    vkMapMemory(rm_VulkanDevice, t_StagingBufferMemory, 0, t_ImageSize, 0, &data);
+    memcpy(data, a_Texture.pixelData, static_cast<size_t>(t_ImageSize));
     vkUnmapMemory(rm_VulkanDevice, t_StagingBufferMemory);
 
-    stbi_image_free(t_ImagePixels);
-
-    CreateImage(r_Image, r_ImageMemory, r_TexWidth, r_TexHeight, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_TILING_OPTIMAL,
+    CreateImage(a_Texture.textureImage, a_Texture.textureImageMemory, a_Texture.texWidth, a_Texture.texHeight, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_TILING_OPTIMAL,
         VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-    TransitionImageLayout(r_Image, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-    CopyBufferToImage(t_StagingBuffer, r_Image, static_cast<uint32_t>(r_TexWidth), static_cast<uint32_t>(r_TexHeight));
+    TransitionImageLayout(a_Texture.textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+    CopyBufferToImage(t_StagingBuffer, a_Texture.textureImage, a_Texture.texWidth, a_Texture.texHeight);
 
-    TransitionImageLayout(r_Image, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    TransitionImageLayout(a_Texture.textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
     vkDestroyBuffer(rm_VulkanDevice, t_StagingBuffer, nullptr);
     vkFreeMemory(rm_VulkanDevice, t_StagingBufferMemory, nullptr);

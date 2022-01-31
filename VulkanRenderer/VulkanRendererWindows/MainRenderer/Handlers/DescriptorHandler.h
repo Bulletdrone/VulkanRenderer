@@ -36,7 +36,7 @@ private:
 	};
 
 	std::unordered_map<DescriptorLayoutInfo, VkDescriptorSetLayout, DescriptorLayoutHash> m_LayoutCache;
-	VkDevice device;
+	VkDevice device = VK_NULL_HANDLE;
 };
 
 class DescriptorAllocator
@@ -67,7 +67,7 @@ public:
 
 	void Cleanup();
 
-	VkDevice device;
+	VkDevice device = VK_NULL_HANDLE;
 
 private:
 	VkDescriptorPool GetPool();

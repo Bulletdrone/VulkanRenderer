@@ -6,8 +6,9 @@
 
 
 struct Model;
-struct Material;
+class Material;
 
+class Renderer;
 
 namespace Engine
 {
@@ -23,6 +24,18 @@ namespace Engine
 
 	class ResourceAllocator
 	{
+	public: 
+		static ResourceAllocator& GetInstance()
+		{
+			static ResourceAllocator instance;
+
+			return instance;
+		}
+
+		//Safer for Singleton.
+		ResourceAllocator(ResourceAllocator const&) = delete;
+		void operator=(ResourceAllocator const&) = delete;
+
 	public:
 		ResourceAllocator();
 		~ResourceAllocator();
@@ -37,6 +50,8 @@ namespace Engine
 		void UnloadResource(const char* a_FilePath);
 		void UnloadResource(HashIndex a_ID);
 
+		void SetRenderer(Renderer* a_Renderer) { p_Renderer = a_Renderer; }
+
 	private:
 		HashIndex CreateTexture(const char* a_FilePath);
 
@@ -45,6 +60,7 @@ namespace Engine
 
 	private:
 		std::unordered_map<HashIndex, Resource::Resource*> m_Resources;
+		Renderer* p_Renderer;
 	};
 
 
@@ -66,9 +82,9 @@ namespace Engine
 		//If you cannot find it create and return the resource.
 		if (t_Iterator != m_Resources.end())
 		{
-			return *dynamic_cast<T*>(&m_Resources.at(t_HashIndex));
+			return *dynamic_cast<T*>(m_Resources.at(t_HashIndex));
 		}
 
-		return *dynamic_cast<T*>(&m_Resources.at(t_HashIndex));
+		return *dynamic_cast<T*>(m_Resources.at(LoadResource(a_FilePath, a_Type)));
 	}
 };

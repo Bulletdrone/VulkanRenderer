@@ -356,16 +356,12 @@ void Renderer::SetupMesh(MeshData* a_MeshData)
 	m_VulkanDevice.CreateIndexBuffers(a_MeshData->GetIndexData());
 }
 
-void Renderer::SetupImage(TextureData& a_TextureData, const char* a_ImagePath)
+void Renderer::SetupImage(Texture& a_Texture)
 {
-	VkDeviceSize t_Size;
-	int t_Width, t_Height, t_Channels;
+	m_ImageHandler->CreateTextureImage(a_Texture);
 
-	m_ImageHandler->CreateTextureImage(a_TextureData.textureImage, a_TextureData.textureImageMemory,
-		a_ImagePath, t_Size, t_Width, t_Height, t_Channels);
-
-	a_TextureData.textureImageView = m_ImageHandler->CreateImageView(a_TextureData.textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_ASPECT_COLOR_BIT);
-	a_TextureData.textureSampler = m_ImageHandler->CreateTextureSampler();
+	a_Texture.textureImageView = m_ImageHandler->CreateImageView(a_Texture.textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_ASPECT_COLOR_BIT);
+	a_Texture.textureSampler = m_ImageHandler->CreateTextureSampler();
 }
 
 void Renderer::DrawFrame(uint32_t& r_ImageIndex)

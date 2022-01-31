@@ -5,11 +5,15 @@
 #include "CameraController.h"
 #include "GUI.h"
 
+#include "ResourceSystem/ResourceAllocator.h";
+#include "ResourceSystem/TextureResource.h"
+
 namespace Engine
 {
 	SceneManager::SceneManager()
 	{
 		m_Renderer = new Renderer();
+		ResourceAllocator::GetInstance().SetRenderer(m_Renderer);
 		//Setting up the rest.
 		m_Renderer->CreateCommandPool();
 		m_Renderer->CreateDepthResources();
@@ -93,6 +97,8 @@ namespace Engine
 		m_RenderFactory->ResetRenderObjects(t_Scene.GetLoadedModels());
 
 		//Set Uniform Buffer for the SceneData.
+		//m_Renderer->SetupImage(ResourceAllocator::GetInstance().GetResource<Resource::TextureResource>("../VulkanRenderer/Resources/Images/Background.png", Resource::ResourceType::Texture).texture);
+		//m_Renderer->SetupImage(ResourceAllocator::GetInstance().GetResource<Resource::TextureResource>("../VulkanRenderer/Resources/Images/Background1.png", Resource::ResourceType::Texture).texture);
 
 		Transform* t_PTrans = new Transform(glm::vec3(0, 0, 0), 1);
 		CreateShape(ShapeType::Pavillion, t_PTrans, m_ObjectManager->mat_Pavillion);

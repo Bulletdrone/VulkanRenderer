@@ -22,9 +22,6 @@ private:
 
 	std::vector<BaseRenderObject*> m_RenderObjects;
 
-	std::vector<TextureData> m_Textures;
-
-
 	DescriptorAllocator* m_DescriptorAllocator;
 	DescriptorLayoutCache* m_DescriptorLayoutCache;
 

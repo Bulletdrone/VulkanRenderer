@@ -1,7 +1,7 @@
 #pragma once
 
 #include "MeshData.h"
-#include <Structs/TextureData.h>
+#include <Structs/Texture.h>
 
 //Pre-build renderdata that is created on startup. 
 //This will include loaded files and basic shapes.
@@ -12,7 +12,7 @@ struct RenderObjectData
 	RenderObjectData(MeshData* a_MeshData) 
 		: m_MeshData(a_MeshData) {}
 
-	RenderObjectData(MeshData* a_MeshData, TextureData* a_TexData)
+	RenderObjectData(MeshData* a_MeshData, Texture* a_TexData)
 		: m_MeshData(a_MeshData), p_TexData(a_TexData) {}
 
 	RenderObjectData(MeshData* p_MeshData, glm::vec4 a_Color)
@@ -21,7 +21,7 @@ struct RenderObjectData
 	~RenderObjectData() { delete m_MeshData; };
 
 	MeshData* m_MeshData;
-	TextureData* p_TexData = nullptr;
+	Texture* p_TexData = nullptr;
 
 	glm::vec4 m_Color = glm::vec4(1);
 };

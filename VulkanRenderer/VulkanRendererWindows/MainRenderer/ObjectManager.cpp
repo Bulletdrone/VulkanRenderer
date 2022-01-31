@@ -1,5 +1,6 @@
 #include "ObjectManager.h"
 #include "Tools/VulkanInitializers.h"
+#include <VulkanEngine/Framework/ResourceSystem/ResourceAllocator.h>
 
 ObjectManager::ObjectManager(Renderer* a_Renderer)
 	: p_Renderer(a_Renderer)
@@ -32,23 +33,12 @@ ObjectManager::ObjectManager(Renderer* a_Renderer)
 
 	p_Renderer->SetRenderObjectsVector(&m_RenderObjects);
 
-	m_Textures.resize(2);
+	//m_Textures.resize(2);
 
-	//pip_SpaceImage.p_DescriptorData = &m_DescriptorData[0];
-	//pip_SpaceImage.p_DescriptorData->texture = &m_Textures[0];
 	//Load Texture
-	p_Renderer->SetupImage(m_Textures[0], "../VulkanRenderer/Resources/Images/Background.png");
-	p_Renderer->SetupImage(m_Textures[1], "../VulkanRenderer/Resources/Images/Background1.png");
+	//p_Renderer->SetupImage(m_Textures[0], "../VulkanRenderer/Resources/Images/Background.png");
+	//p_Renderer->SetupImage(m_Textures[1], "../VulkanRenderer/Resources/Images/Background1.png");
 
-	//std::vector<TextureData> t_GlobalTextures;
-	//SetupDescriptor(des_Global, 1, t_GlobalTextures);
-
-	//std::vector<TextureData> pav; pav.push_back(m_Textures[0]);
-	//std::vector<TextureData> tri; tri.push_back(m_Textures[1]);
-	//SetupDescriptor(des_Pavillion, 0, pav);
-	//SetupDescriptor(des_Triangle, 0, tri);
-
-	//des_Pavillion = p_Renderer->CreateDescriptorLayout(&m_Textures. );
 	std::vector<VkDescriptorSetLayout> r_DescriptorLayouts{ layout_SingleBufferCamera, layout_SingleImageObject };
 	
 	mat_Pavillion.PipelineID = p_Renderer->CreateGraphicsPipeline(r_DescriptorLayouts);
@@ -81,12 +71,14 @@ void ObjectManager::SetupStartObjects()
 	t_Builder.BindBuffer(0, &buffer2, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT);
 	t_Builder.Build(p_Renderer->GlobalSet[1], layout_SingleBufferCamera);
 
-	VkDescriptorImageInfo image = VkInit::CreateDescriptorImageInfo(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, m_Textures[0].textureImageView, m_Textures[0].textureSampler);
+	Texture& tex1 = Engine::ResourceAllocator::GetInstance().GetResource<Engine::Resource::TextureResource>("../VulkanRenderer/Resources/Images/Background.png", Engine::Resource::ResourceType::Texture).texture;
+	VkDescriptorImageInfo image = VkInit::CreateDescriptorImageInfo(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, tex1.textureImageView, tex1.textureSampler);
 	t_Builder = DescriptorBuilder::Begin(m_DescriptorLayoutCache, m_DescriptorAllocator);
 	t_Builder.BindImage(1, &image, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);
 	t_Builder.Build(mat_Pavillion.GetDescriptorSet(), layout_SingleImageObject);
 
-	VkDescriptorImageInfo imageTri = VkInit::CreateDescriptorImageInfo(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, m_Textures[1].textureImageView, m_Textures[1].textureSampler);
+	Texture& tex2 = Engine::ResourceAllocator::GetInstance().GetResource<Engine::Resource::TextureResource>("../VulkanRenderer/Resources/Images/Background1.png", Engine::Resource::ResourceType::Texture).texture;
+	VkDescriptorImageInfo imageTri = VkInit::CreateDescriptorImageInfo(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, tex2.textureImageView, tex2.textureSampler);
 	t_Builder = DescriptorBuilder::Begin(m_DescriptorLayoutCache, m_DescriptorAllocator);
 	t_Builder.BindImage(1, &imageTri, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);
 	t_Builder.Build(mat_Rectangle.GetDescriptorSet(), layout_SingleImageObject);
