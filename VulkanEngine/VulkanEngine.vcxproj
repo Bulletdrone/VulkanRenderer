@@ -27,6 +27,7 @@
     <ClCompile Include="Framework\Precomp\Logger.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Framework\Precomp\Precomp.cpp" />
+    <ClCompile Include="Framework\ResourceSystem\MeshResource.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Framework\ResourceSystem\Resource.h" />
@@ -37,6 +38,7 @@
     <ClInclude Include="Framework\Scene\SceneManager.h" />
     <ClInclude Include="Framework\Precomp\Precomp.h" />
     <ClInclude Include="Framework\Precomp\Logger.h" />
+    <ClInclude Include="Framework\ResourceSystem\MeshResource.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\VulkanRenderer\VulkanRendererWindows\VulkanRendererWindows.vcxproj">

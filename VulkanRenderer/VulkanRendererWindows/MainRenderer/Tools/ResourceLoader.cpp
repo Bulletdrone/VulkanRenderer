@@ -70,7 +70,12 @@ MeshData* ResourceLoader::LoadModel(const char* a_Filename)
         }
     }
 
-    return new MeshData(vertices, indices);
+    MeshData* t_MeshData = new MeshData();
+
+    t_MeshData->vertices = new BufferData<Vertex>(vertices);
+    t_MeshData->indices = new BufferData<uint32_t>(indices);
+
+    return t_MeshData;
 }
 
 std::vector<char> ResourceLoader::ReadFile(const std::string& filename) {

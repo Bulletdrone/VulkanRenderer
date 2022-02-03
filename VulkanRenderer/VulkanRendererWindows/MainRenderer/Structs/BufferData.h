@@ -80,7 +80,7 @@ public:
 
 	void DeleteBuffers(VkDevice& r_Device);
 
-	const VkDeviceSize CreateBufferSize() const;
+	const VkDeviceSize GetBufferSize() const;
 
 	const std::vector<T>& GetElements() const { return elements; }
 	const size_t GetElementCount() const { return elements.size(); }
@@ -116,7 +116,7 @@ inline void BufferData<T>::DeleteBuffers(VkDevice & r_Device)
 
 
 template <typename T>
-inline const VkDeviceSize BufferData<T>::CreateBufferSize() const //Returns the vertexBuffer in bytes.
+inline const VkDeviceSize BufferData<T>::GetBufferSize() const //Returns the vertexBuffer in bytes.
 {
 	return sizeof(elements[0]) * elements.size();
 }

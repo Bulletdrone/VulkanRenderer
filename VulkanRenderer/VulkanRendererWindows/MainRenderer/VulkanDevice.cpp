@@ -302,7 +302,7 @@ VkCommandBufferAllocateInfo VulkanDevice::CreateCommandBufferInfo(VkCommandPool&
 
 void VulkanDevice::CreateVertexBuffers(BufferData<Vertex>* a_VertexData)
 {
-    VkDeviceSize t_BufferSize = a_VertexData->CreateBufferSize();
+    VkDeviceSize t_BufferSize = a_VertexData->GetBufferSize();
 
     VkBuffer t_StagingBuffer;
     VkDeviceMemory t_StagingBufferMemory;
@@ -325,7 +325,7 @@ void VulkanDevice::CreateVertexBuffers(BufferData<Vertex>* a_VertexData)
 
 void VulkanDevice::CreateIndexBuffers(BufferData<uint32_t>* a_IndexData)
 {
-    VkDeviceSize t_BufferSize = a_IndexData->CreateBufferSize();
+    VkDeviceSize t_BufferSize = a_IndexData->GetBufferSize();
 
     VkBuffer t_StagingBuffer;
     VkDeviceMemory t_StagingBufferMemory;

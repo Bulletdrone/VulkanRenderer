@@ -39,6 +39,9 @@
     <ClCompile Include="Framework\Precomp\Logger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Framework\ResourceSystem\MeshResource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Framework\Scene\Scene.h">
@@ -63,6 +66,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Framework\Precomp\Logger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Framework\ResourceSystem\MeshResource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

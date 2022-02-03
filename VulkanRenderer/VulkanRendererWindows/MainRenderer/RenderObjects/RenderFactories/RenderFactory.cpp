@@ -77,7 +77,10 @@ void RenderFactory::CreateRenderObject(ShapeType a_ShapeType)
 
 		t_Indices = { 0, 1, 2 };
 
-		t_Mesh = new MeshData(t_Vertices, t_Indices);
+		t_Mesh = new MeshData();
+		t_Mesh->vertices = new BufferData<Vertex>(t_Vertices);
+		t_Mesh->indices = new BufferData<uint32_t>(t_Indices);
+
 		break;
 	case ShapeType::Rectangle:
 		t_Vertices = { {{-1.0f, -0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}},
@@ -87,7 +90,10 @@ void RenderFactory::CreateRenderObject(ShapeType a_ShapeType)
 
 		t_Indices = { 0, 1, 2, 2, 3, 0 };
 
-		t_Mesh = new MeshData(t_Vertices, t_Indices);
+		t_Mesh = new MeshData();
+		t_Mesh->vertices = new BufferData<Vertex>(t_Vertices);
+		t_Mesh->indices = new BufferData<uint32_t>(t_Indices);
+
 		break;
 	case ShapeType::SkyBoxRect:
 		throw;
