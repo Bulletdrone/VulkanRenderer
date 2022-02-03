@@ -23,7 +23,7 @@ public:
 	VkShaderModule CreateShaderModule(const std::vector<char>& code);
 
 public:
-	ObjectPool<PipeLineData> PipelinePool{ ObjectPool<PipeLineData>(10, 5) };
+	ObjectPool<PipeLineData> PipelinePool{ ObjectPool<PipeLineData>() };
 
 private:
 	VulkanDevice& rm_VulkanDevice;

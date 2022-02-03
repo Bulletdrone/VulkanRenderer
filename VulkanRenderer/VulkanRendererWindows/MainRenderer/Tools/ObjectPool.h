@@ -5,9 +5,7 @@ template <typename T>
 class ObjectPool
 {
 public:
-	/*  @param a_Size: the initial Size of the pool.
-		@param a_Addition: the increase of the size when no empty objects exist. 0 becomes a 1. */
-	ObjectPool(uint32_t a_Size, uint32_t a_Addition);
+	ObjectPool();
 	~ObjectPool();
 
 	/*  Get a filled object on a array position.
@@ -24,7 +22,7 @@ public:
 		@return An empty Object reference that needs to be filled in. */
 	T& GetEmptyObject(uint32_t& r_Pos);
 
-	const uint32_t Size() { return size; }
+	const uint32_t Size() const { return size; }
 
 private:
 	//Increase the size of arr and isEmpty by the uint32_t addition.
@@ -34,19 +32,12 @@ private:
 	T* arr;
 	bool* isEmpty;
 
-	uint32_t size;
-	uint32_t addition;
+	uint32_t size = 8;
 };
 
 template <typename T>
-inline ObjectPool<T>::ObjectPool(uint32_t a_Size, uint32_t a_Addition)
+inline ObjectPool<T>::ObjectPool()
 {
-	size = a_Size;
-	if (a_Addition != 0)
-		addition = a_Addition;
-	else
-		addition = 1;
-
 	arr = new T[size];
 	isEmpty = new bool[size];
 }
@@ -92,7 +83,7 @@ inline T& ObjectPool<T>::GetEmptyObject(uint32_t& r_Position)
 template <typename T>
 inline void ObjectPool<T>::AddExtraElements(uint32_t& r_Position)
 {
-	uint32_t newSize = size + addition;
+	uint32_t newSize = size * 2;
 
 	T* newArr = new T[newSize];
 	bool* newIsEmpty = new bool[newSize] {false};
