@@ -92,8 +92,8 @@ public:
 private:
 	const std::vector<T> elements;
 
-	VkBuffer vkBuffer;
-	VkDeviceMemory vkBufferMemory;
+	VkBuffer vkBuffer = VK_NULL_HANDLE;
+	VkDeviceMemory vkBufferMemory = VK_NULL_HANDLE;
 };
 
 

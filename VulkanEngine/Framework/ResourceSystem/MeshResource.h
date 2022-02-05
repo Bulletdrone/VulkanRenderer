@@ -17,7 +17,7 @@ namespace Engine
 			virtual bool Load(const char* a_FilePath);
 			virtual bool Unload();
 
-			MeshData meshData;
+			MeshData meshData{};
 		};
 	}
 }

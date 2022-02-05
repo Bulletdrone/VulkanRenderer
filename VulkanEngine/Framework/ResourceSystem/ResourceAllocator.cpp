@@ -3,6 +3,7 @@
 
 //ResourceType includes
 #include "TextureResource.h"
+#include "MeshResource.h"
 #include "Renderer.h"
 
 namespace Engine
@@ -27,6 +28,9 @@ namespace Engine
 		{
 		case Resource::ResourceType::Texture:
 			return CreateTexture(a_FilePath);
+			break;
+		case Resource::ResourceType::Mesh:
+			return CreateModel(a_FilePath);
 			break;
 		default:
 			Logger::Assert(false, "ResourceType is wrong to load in resource, doesn't exist or wrong casting.");
@@ -55,6 +59,19 @@ namespace Engine
 		t_Texture->Load(a_FilePath);
 		p_Renderer->SetupImage(t_Texture->texture);
 		m_Resources.emplace(std::make_pair(t_Index, t_Texture));
+
+		return t_Index;
+	}
+
+	HashIndex ResourceAllocator::CreateModel(const char* a_FilePath)
+	{
+		HashIndex t_Index = GetHashFromPath(a_FilePath);
+
+		Resource::MeshResource* t_Mesh = new Resource::MeshResource(t_Index);
+
+		t_Mesh->Load(a_FilePath);
+		p_Renderer->SetupMesh(&t_Mesh->meshData);
+		m_Resources.emplace(std::make_pair(t_Index, t_Mesh));
 
 		return t_Index;
 	}

@@ -17,6 +17,7 @@ namespace Engine
 		enum class ResourceType
 		{
 			Texture,
+			Mesh
 		};
 	}
 
@@ -54,7 +55,7 @@ namespace Engine
 
 	private:
 		HashIndex CreateTexture(const char* a_FilePath);
-
+		HashIndex CreateModel(const char* a_FilePath);
 
 		HashIndex GetHashFromPath(const char* a_FilePath);
 

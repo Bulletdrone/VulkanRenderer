@@ -6,7 +6,7 @@
 #include "GUI.h"
 
 #include "ResourceSystem/ResourceAllocator.h";
-#include "ResourceSystem/TextureResource.h"
+#include "ResourceSystem/TextureResource.h";
 
 namespace Engine
 {
@@ -19,7 +19,7 @@ namespace Engine
 		m_Renderer->CreateDepthResources();
 		m_Renderer->CreateFrameBuffers();
 
-		m_RenderFactory = new RenderFactory();
+		//m_RenderFactory = new RenderFactory();
 		m_ObjectManager = new ObjectManager(m_Renderer);
 		m_CameraController = new CameraController(m_Renderer);
 
@@ -80,8 +80,7 @@ namespace Engine
 
 	void SceneManager::NewScene(const char* a_SceneName, SceneData a_SceneData, bool a_SetScene)
 	{
-		uint32_t t_RenderObjects[3] = { 0, 1 , 3 };
-		Scene scene(a_SceneName, t_RenderObjects, 3, a_SceneData);
+		Scene scene(a_SceneName, 3, a_SceneData);
 
 		m_Scenes.push_back(scene);
 
@@ -94,22 +93,22 @@ namespace Engine
 		CurrentScene = static_cast<uint32_t>(a_SceneID);
 
 		Scene t_Scene = m_Scenes[CurrentScene];
-		m_RenderFactory->ResetRenderObjects(t_Scene.GetLoadedModels());
+		//m_RenderFactory->ResetRenderObjects(t_Scene.GetLoadedModels());
 
 		//Set Uniform Buffer for the SceneData.
 		//m_Renderer->SetupImage(ResourceAllocator::GetInstance().GetResource<Resource::TextureResource>("../VulkanRenderer/Resources/Images/Background.png", Resource::ResourceType::Texture).texture);
 		//m_Renderer->SetupImage(ResourceAllocator::GetInstance().GetResource<Resource::TextureResource>("../VulkanRenderer/Resources/Images/Background1.png", Resource::ResourceType::Texture).texture);
 
 		Transform* t_PTrans = new Transform(glm::vec3(0, 0, 0), 1);
-		CreateShape(ShapeType::Pavillion, t_PTrans, m_ObjectManager->mat_Pavillion);
+		CreateShape(t_PTrans, m_ObjectManager->mat_Pavillion);
 
 		Transform* t_Transform2 = new Transform(glm::vec3(-0.7f, 0.9f, 0.2), 1);
-		CreateShape(ShapeType::Rectangle, t_Transform2, m_ObjectManager->mat_Rectangle);
+		CreateShape(t_Transform2, m_ObjectManager->mat_Rectangle);
 
 		m_ObjectManager->SetupStartObjects();
 	}
 
-	void SceneManager::CreateShape(ShapeType a_ShapeType, Transform* a_Transform, Material& a_Material)
+	void SceneManager::CreateShape(Transform* a_Transform, Material& a_Material)
 	{
 		BaseRenderObject* t_NewShape = m_RenderFactory->CreateRenderObject(m_ObjectManager->GetNextRenderID(), a_ShapeType, a_Transform, a_Material);
 

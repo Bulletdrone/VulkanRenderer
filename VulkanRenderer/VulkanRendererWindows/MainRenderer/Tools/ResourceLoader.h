@@ -10,7 +10,7 @@
 class ResourceLoader
 {
 public:
-	static MeshData* LoadModel(const char* a_Filename);
+	//static MeshData* LoadModel(const char* a_Filename);
 
 	static std::vector<char> ReadFile(const std::string& filename);
 };

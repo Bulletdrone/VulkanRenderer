@@ -12,99 +12,57 @@ RenderFactory::RenderFactory()
 }
 
 RenderFactory::~RenderFactory()
-{
-	ClearRenderObjects();
-}
+{}
 
-BaseRenderObject* RenderFactory::CreateRenderObject(const uint32_t a_RenderID, ShapeType a_ShapeType, Transform* a_Transform, Material& a_Material)
+BaseRenderObject* RenderFactory::CreateRenderObject(const uint32_t a_RenderID, Transform* a_Transform, Material& a_Material)
 {
-	CheckRenderObject(a_ShapeType);
 	return new RenderShape(a_RenderID, a_Transform, a_Material, m_RenderObjectsData[static_cast<size_t>(a_ShapeType)]);
 }
 
-//Clear all the current loaded objects.
-void RenderFactory::ClearRenderObjects()
+void RenderFactory::CreateRenderObject()
 {
-	for (size_t i = 0; i < m_CurrentLoadedObjectsID.size(); i++)
-	{
-		delete m_RenderObjectsData[m_CurrentLoadedObjectsID[i]];
-	}
-	m_RenderObjectsData.clear();
-	m_CurrentLoadedObjectsID.clear();
-}
+	//MeshData* t_Mesh;
 
-bool RenderFactory::CheckRenderObject(ShapeType a_ShapeType)
-{
-	for (size_t i = 0; i < m_CurrentLoadedObjectsID.size(); i++)
-	{
-		if (m_CurrentLoadedObjectsID[i] == static_cast<uint32_t>(a_ShapeType))
-			return false;
-	}
+	////temp
+	//std::vector<Vertex> t_Vertices;
+	//std::vector<uint32_t> t_Indices;
 
-	CreateRenderObject(a_ShapeType);
-	return true;
-}
+	//switch (a_ShapeType)
+	//{
+	//default:
+	//	t_Mesh = nullptr;
+	//	break;
+	//case ShapeType::Triangle:
+	//	t_Vertices = { {{0.0f, -0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f} },
+	//		{{0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}},
+	//		{{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}},
+	//	};
 
-void RenderFactory::ResetRenderObjects(const std::vector<uint32_t>& a_AvailableRenderObjects)
-{
-	ClearRenderObjects();
-	m_RenderObjectsData.resize(m_AllShapes);
+	//	t_Indices = { 0, 1, 2 };
 
-	for (size_t i = 0; i < a_AvailableRenderObjects.size(); i++)
-	{
-		CreateRenderObject(static_cast<ShapeType>(a_AvailableRenderObjects[i]));
-	}
-}
+	//	t_Mesh = new MeshData();
+	//	t_Mesh->vertices = new BufferData<Vertex>(t_Vertices);
+	//	t_Mesh->indices = new BufferData<uint32_t>(t_Indices);
 
-void RenderFactory::CreateRenderObject(ShapeType a_ShapeType)
-{
-	MeshData* t_Mesh;
+	//	break;
+	//case ShapeType::Rectangle:
+	//	t_Vertices = { {{-1.0f, -0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}},
+	//					{{1.0f, -0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f}},
+	//					{{1.0f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}},
+	//					{{-1.0f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}} };
 
-	//temp
-	std::vector<Vertex> t_Vertices;
-	std::vector<uint32_t> t_Indices;
+	//	t_Indices = { 0, 1, 2, 2, 3, 0 };
 
-	switch (a_ShapeType)
-	{
-	default:
-		t_Mesh = nullptr;
-		break;
-	case ShapeType::Triangle:
-		t_Vertices = { {{0.0f, -0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f} },
-			{{0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}},
-			{{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}},
-		};
+	//	t_Mesh = new MeshData();
+	//	t_Mesh->vertices = new BufferData<Vertex>(t_Vertices);
+	//	t_Mesh->indices = new BufferData<uint32_t>(t_Indices);
 
-		t_Indices = { 0, 1, 2 };
-
-		t_Mesh = new MeshData();
-		t_Mesh->vertices = new BufferData<Vertex>(t_Vertices);
-		t_Mesh->indices = new BufferData<uint32_t>(t_Indices);
-
-		break;
-	case ShapeType::Rectangle:
-		t_Vertices = { {{-1.0f, -0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}},
-						{{1.0f, -0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f}},
-						{{1.0f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}},
-						{{-1.0f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}} };
-
-		t_Indices = { 0, 1, 2, 2, 3, 0 };
-
-		t_Mesh = new MeshData();
-		t_Mesh->vertices = new BufferData<Vertex>(t_Vertices);
-		t_Mesh->indices = new BufferData<uint32_t>(t_Indices);
-
-		break;
-	case ShapeType::SkyBoxRect:
-		throw;
-		break;
-	case ShapeType::Pavillion:
-		t_Mesh = ResourceLoader::LoadModel("../VulkanRenderer/Resources/Models/Pavillion.obj");
-		break;
-	}
-
-	uint32_t t_VecPos = static_cast<uint32_t>(a_ShapeType);
-
-	m_RenderObjectsData[t_VecPos] = new RenderObjectData(t_Mesh);
-	m_CurrentLoadedObjectsID.push_back(t_VecPos);
+	//	break;
+	//case ShapeType::SkyBoxRect:
+	//	throw;
+	//	break;
+	//case ShapeType::Pavillion:
+	//	t_Mesh = ResourceLoader::LoadModel("../VulkanRenderer/Resources/Models/Pavillion.obj");
+	//	break;
+	//}
 }

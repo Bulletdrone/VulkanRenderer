@@ -1,14 +1,5 @@
 #pragma once
 #include <RenderObjects/RenderShape.h>
-#include <Tools/ResourceLoader.h>
-
-enum class ShapeType
-{
-	Triangle,
-	Rectangle,
-	SkyBoxRect,
-	Pavillion
-};
 
 class RenderFactory
 {
@@ -23,23 +14,10 @@ public:
 		@param a_Transform, the Transform of the Object.
 		@param a_PipelineID, the Pipeline the object will use.
 		@return the created pointer to a renderobject.*/ 
-	BaseRenderObject* CreateRenderObject(const uint32_t a_RenderID, ShapeType a_ShapeType, Transform* a_Transform, Material& a_Material);
-
-	//Remove all RenderObjects from the Vector.
-	void ClearRenderObjects();
-
-	/*  Check if a RenderObject already exists, creates a new one if it doesn't exist..
-		@param a_ShapeType, The kind of object that you want to create.
-		@return false if the shape was already loaded, true if the shape was made. */
-	bool CheckRenderObject(ShapeType a_ShapeType);
-
-	/*  Remove all RenderObjects and instantiate new shapes.
-		@param a_AvailableRenderObjects, The new shapes you want to load in. */
-	void ResetRenderObjects(const std::vector<uint32_t>& a_AvailableRenderObjects);
-
+	BaseRenderObject* CreateRenderObject(const uint32_t a_RenderID, Transform* a_Transform, Material& a_Material);
 
 private:
-	void CreateRenderObject(ShapeType a_ShapeType);
+	void CreateRenderObject();
 
 	uint32_t m_AllShapes = 4;
 	std::vector<RenderObjectData*> m_RenderObjectsData;

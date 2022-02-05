@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Renderer.h"
-#include "RenderObjects/RenderFactories/RenderFactory.h"
 
 class ObjectManager
 {
@@ -12,6 +11,8 @@ public:
 	void SetupStartObjects();
 
 	void UpdateObjects(float a_Dt);
+
+	void CreateRenderObject();
 	void AddRenderObject(BaseRenderObject* a_NewShape);
 
 	//Increases the m_CurrentRenderID by 1 and returns it.

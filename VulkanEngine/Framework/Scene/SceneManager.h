@@ -3,8 +3,6 @@
 
 #include "Scene.h"
 
-enum class ShapeType;
-
 class Renderer;
 class ObjectManager;
 class CameraController;
@@ -27,7 +25,7 @@ namespace Engine
 		void NewScene(const char* a_SceneName, SceneData a_SceneData, bool a_SetScene);
 		void SetScene(uint32_t a_SceneID);
 
-		void CreateShape(ShapeType a_ShapeType, Transform* a_Transform, Material& a_Material);
+		void CreateShape(Transform* a_Transform, Material& a_Material);
 
 	private:
 		int32_t CurrentScene = -1;

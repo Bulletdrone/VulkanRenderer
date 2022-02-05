@@ -63,7 +63,7 @@ namespace Engine
             {
                 for (const auto& l_Index : l_Shape.mesh.indices)
                 {
-                    Vertex vertex;
+                    Vertex vertex{};
 
                     vertex.position = glm::vec3(
                         static_cast<float>(t_Attrib.vertices[3 * l_Index.vertex_index + 0]),
