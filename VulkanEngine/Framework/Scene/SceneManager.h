@@ -25,7 +25,7 @@ namespace Engine
 		void NewScene(const char* a_SceneName, SceneData a_SceneData, bool a_SetScene);
 		void SetScene(uint32_t a_SceneID);
 
-		void CreateShape(Transform* a_Transform, Material& a_Material);
+		void CreateShape(Transform* a_Transform, Material& a_Material, const char* a_MeshPath);
 
 	private:
 		int32_t CurrentScene = -1;

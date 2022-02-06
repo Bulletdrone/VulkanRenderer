@@ -12,7 +12,7 @@ struct Texture
 	uint32_t texHeight = 0;
 	uint32_t texChannels = 0;
 
-	const VkDeviceSize TexSize() const { return static_cast<VkDeviceSize>(texWidth * texHeight * RGBASize); }
+	const VkDeviceSize TexSize() const { return static_cast<VkDeviceSize>(texWidth) * static_cast<VkDeviceSize>(texHeight) * static_cast<VkDeviceSize>(RGBASize); }
 
 	#pragma region Vulkan
 	void UpdateDescriptor()

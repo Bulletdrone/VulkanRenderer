@@ -1,9 +1,6 @@
 #pragma once
 #include <stdint.h>
 #include <unordered_map>
-//#include "Resource.h"
-#include "TextureResource.h"
-
 
 struct Model;
 class Material;
@@ -14,6 +11,8 @@ namespace Engine
 {
 	namespace Resource 
 	{ 
+		class Resource;
+
 		enum class ResourceType
 		{
 			Texture,
@@ -58,7 +57,6 @@ namespace Engine
 		HashIndex CreateModel(const char* a_FilePath);
 
 		HashIndex GetHashFromPath(const char* a_FilePath);
-
 	private:
 		std::unordered_map<HashIndex, Resource::Resource*> m_Resources;
 		Renderer* p_Renderer;

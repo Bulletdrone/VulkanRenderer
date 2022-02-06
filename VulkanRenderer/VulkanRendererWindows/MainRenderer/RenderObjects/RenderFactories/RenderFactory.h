@@ -14,12 +14,8 @@ public:
 		@param a_Transform, the Transform of the Object.
 		@param a_PipelineID, the Pipeline the object will use.
 		@return the created pointer to a renderobject.*/ 
-	BaseRenderObject* CreateRenderObject(const uint32_t a_RenderID, Transform* a_Transform, Material& a_Material);
+	BaseRenderObject* CreateRenderObject(const uint32_t a_RenderID, Transform* a_Transform, Material& a_Material, const char* a_MeshPath);
 
 private:
 	void CreateRenderObject();
-
-	uint32_t m_AllShapes = 4;
-	std::vector<RenderObjectData*> m_RenderObjectsData;
-	std::vector<uint32_t> m_CurrentLoadedObjectsID;
 };

@@ -1,6 +1,7 @@
 #include "ObjectManager.h"
 #include "Tools/VulkanInitializers.h"
 #include <VulkanEngine/Framework/ResourceSystem/ResourceAllocator.h>
+#include <VulkanEngine/Framework/ResourceSystem/TextureResource.h>
 
 ObjectManager::ObjectManager(Renderer* a_Renderer)
 	: p_Renderer(a_Renderer)

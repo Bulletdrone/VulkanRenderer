@@ -1,23 +1,21 @@
 #include "RenderFactory.h"
 
-RenderFactory::RenderFactory()
-{
-	//std::vector<ShapeType> t_Shape;
-	//t_Shape.push_back(ShapeType::Triangle);
-	//t_Shape.push_back(ShapeType::Rectangle);
-	//t_Shape.push_back(ShapeType::Pavillion);
-	m_RenderObjectsData.resize(m_AllShapes);
+#include <VulkanEngine/Framework/ResourceSystem/ResourceAllocator.h>
+#include <VulkanEngine/Framework/ResourceSystem/MeshResource.h>
 
-	//SetSceneObjects(t_Shape);
-}
+RenderFactory::RenderFactory()
+{}
 
 RenderFactory::~RenderFactory()
 {}
 
-BaseRenderObject* RenderFactory::CreateRenderObject(const uint32_t a_RenderID, Transform* a_Transform, Material& a_Material)
+BaseRenderObject* RenderFactory::CreateRenderObject(const uint32_t a_RenderID, Transform* a_Transform, Material& a_Material, const char* a_MeshPath)
 {
-	return new RenderShape(a_RenderID, a_Transform, a_Material, m_RenderObjectsData[static_cast<size_t>(a_ShapeType)]);
+	return new RenderShape(a_RenderID, a_Transform, a_Material, 
+		new RenderObjectData(&Engine::ResourceAllocator::GetInstance().GetResource<Engine::Resource::MeshResource>(a_MeshPath, Engine::Resource::ResourceType::Mesh).meshData));
 }
+
+
 
 void RenderFactory::CreateRenderObject()
 {
