@@ -2,7 +2,7 @@
 
 #include "SceneObject.h"
 
-#include "Components/RenderObjectData.h"
+#include "Components/MeshData.h"
 #include "Components/Material.h"
 #include <Structs/PipelineData.h>
 
@@ -29,17 +29,17 @@ public:
 	VkDescriptorSet& GetMaterialDescriptorSet() const { return r_Material.GetDescriptorSet(); }
 
 	Material* GetMaterial() const { return &r_Material; }
-	MeshData* GetMeshData() const { return p_RenderObjectData->m_MeshData; }
+	MeshData* GetMeshData() const { return p_MeshData; }
 
-	BufferData<Vertex>* GetVertexData() const { return p_RenderObjectData->m_MeshData->GetVertexData(); }
-	BufferData<uint32_t>* GetIndexData() const { return p_RenderObjectData->m_MeshData->GetIndexData(); }
+	BufferData<Vertex>* GetVertexData() const { return p_MeshData->GetVertexData(); }
+	BufferData<uint32_t>* GetIndexData() const { return p_MeshData->GetIndexData(); }
 
 protected:
 	//Matrices.
 	glm::mat4 m_Model;
 
 	//Vertex Data with it's buffers.
-	RenderObjectData* p_RenderObjectData = nullptr;
+	MeshData* p_MeshData = nullptr;
 	//PipelineData.
 	Material& r_Material;
 

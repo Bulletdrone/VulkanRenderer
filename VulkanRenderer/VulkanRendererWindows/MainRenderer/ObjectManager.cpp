@@ -2,6 +2,10 @@
 #include "Tools/VulkanInitializers.h"
 #include <VulkanEngine/Framework/ResourceSystem/ResourceAllocator.h>
 #include <VulkanEngine/Framework/ResourceSystem/TextureResource.h>
+#include <VulkanEngine/Framework/ResourceSystem/MeshResource.h>
+
+
+#include "RenderObjects/RenderShape.h"
 
 ObjectManager::ObjectManager(Renderer* a_Renderer)
 	: p_Renderer(a_Renderer)
@@ -104,4 +108,9 @@ void ObjectManager::UpdateObjects(float a_Dt)
 void ObjectManager::AddRenderObject(BaseRenderObject* a_NewShape)
 {
 	m_RenderObjects.push_back(a_NewShape);
+}
+
+BaseRenderObject* ObjectManager::CreateRenderObject(const uint32_t a_RenderID, Transform* a_Transform, Material& a_Material, const char* a_MeshPath)
+{
+	return new RenderShape(a_RenderID, a_Transform, a_Material, &Engine::ResourceAllocator::GetInstance().GetResource<Engine::Resource::MeshResource>(a_MeshPath, Engine::Resource::ResourceType::Mesh).meshData);
 }

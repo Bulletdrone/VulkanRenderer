@@ -5,10 +5,8 @@
 #include "CameraController.h"
 #include "GUI.h"
 
-#include "ResourceSystem/ResourceAllocator.h";
-#include "ResourceSystem/TextureResource.h";
-
-#include "RenderObjects/RenderFactories/RenderFactory.h"
+#include "ResourceSystem/ResourceAllocator.h"
+#include "ResourceSystem/TextureResource.h"
 
 namespace Engine
 {
@@ -37,7 +35,6 @@ namespace Engine
 
 	SceneManager::~SceneManager()
 	{
-		delete m_RenderFactory;
 		delete m_CameraController;
 		delete m_ObjectManager;
 
@@ -112,7 +109,7 @@ namespace Engine
 
 	void SceneManager::CreateShape(Transform* a_Transform, Material& a_Material, const char* a_MeshPath)
 	{
-		BaseRenderObject* t_NewShape = m_RenderFactory->CreateRenderObject(m_ObjectManager->GetNextRenderID(), a_Transform, a_Material, a_MeshPath);
+		BaseRenderObject* t_NewShape = m_ObjectManager->CreateRenderObject(m_ObjectManager->GetNextRenderID(), a_Transform, a_Material, a_MeshPath);
 
 		m_Renderer->SetupMesh(t_NewShape->GetMeshData());
 

@@ -18,6 +18,8 @@
 constexpr uint32_t FRAMEBUFFER_AMOUNT = 2;
 constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
+struct Texture;
+
 class Renderer
 {
 public:

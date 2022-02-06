@@ -36,7 +36,5 @@ namespace Engine
 
 		ObjectManager* m_ObjectManager;
 		CameraController* m_CameraController;
-
-		RenderFactory* m_RenderFactory;
 	};
 }

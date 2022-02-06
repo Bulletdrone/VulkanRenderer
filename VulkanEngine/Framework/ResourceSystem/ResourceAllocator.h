@@ -59,9 +59,8 @@ namespace Engine
 		HashIndex GetHashFromPath(const char* a_FilePath);
 	private:
 		std::unordered_map<HashIndex, Resource::Resource*> m_Resources;
-		Renderer* p_Renderer;
+		Renderer* p_Renderer = nullptr;
 	};
-
 
 	template<typename T>
 	inline T& ResourceAllocator::GetResource(HashIndex a_ID)

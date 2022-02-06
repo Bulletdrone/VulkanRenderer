@@ -12,6 +12,7 @@
 #include "imGUI/Backends/imgui_impl_vulkan.h"
 #pragma warning (pop)
 
+#include "Structs/Texture.h"
 
 Renderer::Renderer()
 {

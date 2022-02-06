@@ -3,8 +3,6 @@
 #include <Vulkan/vulkan.h>
 #pragma warning (pop)
 
-#include <RenderObjects/Components/RenderObjectData.h>
-
 struct PipeLineData
 {
 	uint32_t pipeID = 0;

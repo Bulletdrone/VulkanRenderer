@@ -2,6 +2,8 @@
 
 #include "Renderer.h"
 
+class BaseRenderObject;
+
 class ObjectManager
 {
 public:
@@ -12,7 +14,8 @@ public:
 
 	void UpdateObjects(float a_Dt);
 
-	void CreateRenderObject();
+	BaseRenderObject* CreateRenderObject(const uint32_t a_RenderID, Transform* a_Transform, Material& a_Material, const char* a_MeshPath);
+
 	void AddRenderObject(BaseRenderObject* a_NewShape);
 
 	//Increases the m_CurrentRenderID by 1 and returns it.
