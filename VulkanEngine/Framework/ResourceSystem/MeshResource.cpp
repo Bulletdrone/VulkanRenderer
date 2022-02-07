@@ -4,17 +4,19 @@
 //#define TINYOBJLOADER_IMPLEMENTATION
 #pragma warning (push, 0)
 #include <ObjLoader/tiny_obj_loader.h>
-#include "glm/glm.hpp"
+#include <glm/glm.hpp>
 #pragma warning (pop)
-
 #include <unordered_map>
+
+#include "ResourceAllocator.h"
+#include "Renderer.h"
 
 namespace Engine
 {
 	namespace Resource
 	{
-		MeshResource::MeshResource(const uint64_t a_HashID)
-			: Resource(a_HashID)
+		MeshResource::MeshResource(const uint64_t a_HashID, ResourceAllocator& a_ResourceAllocator)
+			: Resource(a_HashID, a_ResourceAllocator)
 		{}
 
         MeshResource::~MeshResource()
@@ -82,7 +84,6 @@ namespace Engine
                     vertex.color = { 1.0f, 1.0f, 1.0f };
 
 
-
                     if (t_UniqueVertices.count(vertex) == 0) {
                         t_UniqueVertices[vertex] = static_cast<uint32_t>(vertices.size());
                         vertices.push_back(vertex);
@@ -94,6 +95,10 @@ namespace Engine
 
             meshData.vertices = new BufferData<Vertex>(vertices);
             meshData.indices = new BufferData<uint32_t>(indices);
+
+            //setup in renderer.
+            r_ResourceAllocator.p_Renderer->SetupMesh(&meshData);
+
             return true;
 		}
 

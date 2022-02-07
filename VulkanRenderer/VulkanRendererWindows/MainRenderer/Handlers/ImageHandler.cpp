@@ -51,11 +51,11 @@ void ImageHandler::CreateImage(VkImage& r_Image, VkDeviceMemory& r_ImageMemory,
     vkBindImageMemory(rm_VulkanDevice, r_Image, r_ImageMemory, 0);
 }
 
-void ImageHandler::CreateTextureImage(Texture& a_Texture)
+void ImageHandler::CreateTextureImage(Texture& a_Texture, const unsigned char* a_Image)
 {
     VkDeviceSize t_ImageSize = static_cast<VkDeviceSize>(a_Texture.texWidth * a_Texture.texHeight * RGBASize);
 
-    if (!a_Texture.pixelData)
+    if (!a_Image)
     {
         throw std::runtime_error("failed to load texture image!");
     }
@@ -69,7 +69,7 @@ void ImageHandler::CreateTextureImage(Texture& a_Texture)
 
     void* data;
     vkMapMemory(rm_VulkanDevice, t_StagingBufferMemory, 0, t_ImageSize, 0, &data);
-    memcpy(data, a_Texture.pixelData, static_cast<size_t>(t_ImageSize));
+    memcpy(data, a_Image, static_cast<size_t>(t_ImageSize));
     vkUnmapMemory(rm_VulkanDevice, t_StagingBufferMemory);
 
     CreateImage(a_Texture.textureImage, a_Texture.textureImageMemory, a_Texture.texWidth, a_Texture.texHeight, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_TILING_OPTIMAL,

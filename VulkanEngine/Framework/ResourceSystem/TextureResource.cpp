@@ -6,12 +6,15 @@
 #include <stb/stb_image.h>
 #pragma warning (pop)
 
+#include "ResourceAllocator.h"
+#include "Renderer.h"
+
 namespace Engine
 {
 	namespace Resource
 	{
-		TextureResource::TextureResource(const uint64_t a_HashID)
-			: Resource(a_HashID)
+		TextureResource::TextureResource(const uint64_t a_HashID, ResourceAllocator& a_ResourceAllocator)
+			: Resource(a_HashID, a_ResourceAllocator)
 		{}
 
 		TextureResource::~TextureResource()
@@ -32,12 +35,12 @@ namespace Engine
 		bool TextureResource::Load(const char* a_FilePath)
 		{
 			int t_Width, t_Height, t_Channels;
-			texture.pixelData = stbi_load(a_FilePath, &t_Width, &t_Height, &t_Channels, STBI_rgb_alpha);
-			
+			unsigned char* t_data = stbi_load(a_FilePath, &t_Width, &t_Height, &t_Channels, STBI_rgb_alpha);
+
 			//If the loading fails.
-			if (texture.pixelData == NULL)
+			if (t_data == NULL)
 			{
-				texture.pixelData = nullptr;
+				t_data = nullptr;
 				printf("Image loading Failed.");
 				printf(stbi_failure_reason());
 				return false;
@@ -48,14 +51,18 @@ namespace Engine
 			texture.texHeight = static_cast<uint32_t>(t_Height);
 			texture.texChannels = static_cast<uint32_t>(t_Channels);
 
+
+			//Setup in renderer.
+			r_ResourceAllocator.p_Renderer->SetupImage(texture, t_data);
+
+			//It's loaded in the GPU so remove the data.
+			stbi_image_free(t_data);
+
 			return true;
 		}
 
 		bool TextureResource::Unload()
 		{
-			stbi_image_free(texture.pixelData);
-			texture.pixelData = nullptr;
-
 			printf("Texture might not been removed in Renderer.");
 
 			return false;

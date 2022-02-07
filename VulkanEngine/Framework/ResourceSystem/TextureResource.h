@@ -11,7 +11,7 @@ namespace Engine
 		class TextureResource : public Resource
 		{
 		public:
-			TextureResource(const uint64_t a_HashID);
+			TextureResource(const uint64_t a_HashID, ResourceAllocator& a_ResourceAllocator);
 			~TextureResource();
 
 			virtual bool IsInitialized();

@@ -4,9 +4,6 @@ constexpr uint32_t RGBASize = 4;
 
 struct Texture
 {
-	//Non-Vulkan Data.
-	unsigned char* pixelData = nullptr;
-
 	//Metrics
 	uint32_t texWidth = 0;
 	uint32_t texHeight = 0;

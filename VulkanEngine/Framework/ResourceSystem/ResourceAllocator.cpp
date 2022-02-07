@@ -4,6 +4,8 @@
 //ResourceType includes
 #include "TextureResource.h"
 #include "MeshResource.h"
+#include "ShaderResource.h"
+
 #include "Renderer.h"
 
 namespace Engine
@@ -23,21 +25,28 @@ namespace Engine
 
 	HashIndex ResourceAllocator::LoadResource(const char* a_FilePath, Resource::ResourceType a_Type)
 	{
-		auto t_Iterator = m_Resources.find(GetHashFromPath(a_FilePath));
+		HashIndex t_Hash = GetHashFromPath(a_FilePath);
+
+		Resource::Resource* resource = nullptr;
+
 		switch (a_Type)
 		{
 		case Resource::ResourceType::Texture:
-			return CreateTexture(a_FilePath);
+			resource = new Resource::TextureResource(t_Hash, *this);
 			break;
 		case Resource::ResourceType::Mesh:
-			return CreateModel(a_FilePath);
+			resource = new Resource::MeshResource(t_Hash, *this);
 			break;
 		default:
 			Logger::Assert(false, "ResourceType is wrong to load in resource, doesn't exist or wrong casting.");
 			break;
 		}
 
-		return 0;
+		Logger::Assert(resource->Load(a_FilePath), "Failed to load resource");
+
+		m_Resources.emplace(std::make_pair(t_Hash, resource));
+
+		return t_Hash;
 	}
 
 	void ResourceAllocator::UnloadResource(const char* a_FilePath)
@@ -48,32 +57,6 @@ namespace Engine
 	void ResourceAllocator::UnloadResource(HashIndex a_ID)
 	{
 		Logger::Assert(m_Resources.at(a_ID)->Unload(), "Failed to unload Resource");
-	}
-
-
-	HashIndex ResourceAllocator::CreateTexture(const char* a_FilePath)
-	{
-		HashIndex t_Index = GetHashFromPath(a_FilePath);
-		Resource::TextureResource* t_Texture = new Resource::TextureResource(t_Index);
-		
-		t_Texture->Load(a_FilePath);
-		p_Renderer->SetupImage(t_Texture->texture);
-		m_Resources.emplace(std::make_pair(t_Index, t_Texture));
-
-		return t_Index;
-	}
-
-	HashIndex ResourceAllocator::CreateModel(const char* a_FilePath)
-	{
-		HashIndex t_Index = GetHashFromPath(a_FilePath);
-
-		Resource::MeshResource* t_Mesh = new Resource::MeshResource(t_Index);
-
-		t_Mesh->Load(a_FilePath);
-		p_Renderer->SetupMesh(&t_Mesh->meshData);
-		m_Resources.emplace(std::make_pair(t_Index, t_Mesh));
-
-		return t_Index;
 	}
 
 	HashIndex ResourceAllocator::GetHashFromPath(const char* a_FilePath)

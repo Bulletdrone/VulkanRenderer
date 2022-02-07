@@ -45,9 +45,6 @@
     <ClCompile Include="MainRenderer\VulkanDebugger\VulkanDebug.cpp">
       <Filter>MainRenderer\VulkanDebug</Filter>
     </ClCompile>
-    <ClCompile Include="MainRenderer\Tools\ResourceLoader.cpp">
-      <Filter>Tools</Filter>
-    </ClCompile>
     <ClCompile Include="MainRenderer\RenderObjects\BaseRenderObject.cpp">
       <Filter>RenderObjects</Filter>
     </ClCompile>
@@ -104,6 +101,7 @@
     <ClCompile Include="GUISystem\ImGUI\backends\imgui_impl_glfw.cpp" />
     <ClCompile Include="GUISystem\ImGUI\backends\imgui_impl_vulkan.cpp" />
     <ClCompile Include="MainRenderer\RenderObjects\Geometry\GeometryFactory.cpp" />
+    <ClCompile Include="MainRenderer\Tools\ResourceLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainRenderer\Renderer.h">
@@ -114,9 +112,6 @@
     </ClInclude>
     <ClInclude Include="MainRenderer\VulkanDebugger\VulkanDebug.h">
       <Filter>MainRenderer\VulkanDebug</Filter>
-    </ClInclude>
-    <ClInclude Include="MainRenderer\Tools\ResourceLoader.h">
-      <Filter>Tools</Filter>
     </ClInclude>
     <ClInclude Include="MainRenderer\Structs\BufferData.h">
       <Filter>Structs</Filter>
@@ -197,5 +192,6 @@
     <ClInclude Include="GUISystem\ImGUI\backends\imgui_impl_vulkan.h" />
     <ClInclude Include="MainRenderer\Structs\Texture.h" />
     <ClInclude Include="MainRenderer\RenderObjects\Geometry\GeometryFactory.h" />
+    <ClInclude Include="MainRenderer\Tools\ResourceLoader.h" />
   </ItemGroup>
 </Project>

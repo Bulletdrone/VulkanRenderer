@@ -52,7 +52,7 @@ public:
 
 	//BufferData
 	void SetupMesh(MeshData* a_MeshData);
-	void SetupImage(Texture& a_Texture);
+	void SetupImage(Texture& a_Texture, const unsigned char* a_ImageBuffer);
 
 	void DrawFrame(uint32_t& r_ImageIndex);
 	void DrawObjects(VkCommandBuffer& r_CmdBuffer);

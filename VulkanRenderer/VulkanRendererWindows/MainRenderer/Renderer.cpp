@@ -13,6 +13,7 @@
 #pragma warning (pop)
 
 #include "Structs/Texture.h"
+#include "Tools/VulkanInitializers.h"
 
 Renderer::Renderer()
 {
@@ -357,9 +358,9 @@ void Renderer::SetupMesh(MeshData* a_MeshData)
 	m_VulkanDevice.CreateIndexBuffers(a_MeshData->GetIndexData());
 }
 
-void Renderer::SetupImage(Texture& a_Texture)
+void Renderer::SetupImage(Texture& a_Texture, const unsigned char* a_ImageBuffer)
 {
-	m_ImageHandler->CreateTextureImage(a_Texture);
+	m_ImageHandler->CreateTextureImage(a_Texture, a_ImageBuffer);
 
 	a_Texture.textureImageView = m_ImageHandler->CreateImageView(a_Texture.textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_ASPECT_COLOR_BIT);
 	a_Texture.textureSampler = m_ImageHandler->CreateTextureSampler();

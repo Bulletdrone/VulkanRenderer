@@ -9,6 +9,8 @@ class Renderer;
 
 namespace Engine
 {
+	typedef uint64_t HashIndex;
+
 	namespace Resource 
 	{ 
 		class Resource;
@@ -19,8 +21,6 @@ namespace Engine
 			Mesh
 		};
 	}
-
-	typedef uint64_t HashIndex;
 
 	class ResourceAllocator
 	{
@@ -53,12 +53,12 @@ namespace Engine
 		void SetRenderer(Renderer* a_Renderer) { p_Renderer = a_Renderer; }
 
 	private:
-		HashIndex CreateTexture(const char* a_FilePath);
-		HashIndex CreateModel(const char* a_FilePath);
-
 		HashIndex GetHashFromPath(const char* a_FilePath);
+
 	private:
 		std::unordered_map<HashIndex, Resource::Resource*> m_Resources;
+
+	public:
 		Renderer* p_Renderer = nullptr;
 	};
 

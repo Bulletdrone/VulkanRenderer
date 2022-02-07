@@ -12,7 +12,7 @@ public:
 
 	void CreateImage(VkImage& r_Image, VkDeviceMemory& r_ImageMemory,
 		uint32_t a_Width, uint32_t a_Height, VkFormat a_Format, VkImageTiling a_Tiling, VkImageUsageFlags a_Usage, VkMemoryPropertyFlags a_Properties);
-	void CreateTextureImage(Texture& a_Texture);
+	void CreateTextureImage(Texture& a_Texture, const unsigned char* a_ImageBuffer);
 	void CopyBufferToImage(VkBuffer a_Buffer, VkImage a_Image, uint32_t a_Width, uint32_t a_Height);
 
 	void TransitionImageLayout(VkImage a_Image, VkFormat a_Format, VkImageLayout a_OldLayout, VkImageLayout a_NewLayout);
