@@ -18,7 +18,8 @@ namespace Engine
 		enum class ResourceType
 		{
 			Texture,
-			Mesh
+			Mesh,
+			Shader
 		};
 	}
 

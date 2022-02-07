@@ -1,7 +1,13 @@
 #include "ShaderManager.h"
-#include <Structs/BufferData.h>
+
+#include "Structs/BufferData.h"
+#include "Structs/Shader.h"
+
+#include <VulkanEngine/Framework/ResourceSystem/ResourceAllocator.h>
+#include <VulkanEngine/Framework/ResourceSystem/ShaderResource.h>
 
 #include <iostream>
+
 
 ShaderManager::ShaderManager(VulkanDevice& r_VulkanDevice, const VkExtent2D& r_VKSwapChainExtent)
 	: rm_VulkanDevice(r_VulkanDevice), rmvk_SwapChainExtent(r_VKSwapChainExtent)
@@ -19,11 +25,15 @@ uint32_t ShaderManager::CreatePipelineData(const VkRenderPass& r_RenderPass, std
 	PipeLineData& pipeLineData = PipelinePool.GetEmptyObject(pipelineID);
 	pipeLineData.pipeID = pipelineID;
 
-	auto t_VertShaderCode = ResourceLoader::ReadFile("../VulkanRenderer/Resources/Shaders/unlitVert.spv");
-	auto t_FragShaderCode = ResourceLoader::ReadFile("../VulkanRenderer/Resources/Shaders/unlitFrag.spv");
+	VkShaderModule t_VertShaderModule = Engine::ResourceAllocator::GetInstance()
+		.GetResource<Engine::Resource::ShaderResource>(
+			"../VulkanRenderer/Resources/Shaders/unlitVert.spv", 
+			Engine::Resource::ResourceType::Shader).shader.shaderModule;
 
-	VkShaderModule t_VertShaderModule = CreateShaderModule(t_VertShaderCode);
-	VkShaderModule t_FragShaderModule = CreateShaderModule(t_FragShaderCode);
+	VkShaderModule t_FragShaderModule = Engine::ResourceAllocator::GetInstance()
+		.GetResource<Engine::Resource::ShaderResource>(
+			"../VulkanRenderer/Resources/Shaders/unlitFrag.spv", 
+			Engine::Resource::ResourceType::Shader).shader.shaderModule;
 
 	//Setting up Vertex.
 	VkPipelineShaderStageCreateInfo t_VertShaderStageInfo{};
@@ -187,23 +197,8 @@ uint32_t ShaderManager::CreatePipelineData(const VkRenderPass& r_RenderPass, std
 		throw std::runtime_error("failed to create graphics pipeline!");
 	}
 
-	vkDestroyShaderModule(rm_VulkanDevice, t_VertShaderModule, nullptr);
-	vkDestroyShaderModule(rm_VulkanDevice, t_FragShaderModule, nullptr);
+	//vkDestroyShaderModule(rm_VulkanDevice, t_VertShaderModule, nullptr);
+	//vkDestroyShaderModule(rm_VulkanDevice, t_FragShaderModule, nullptr);
 
 	return pipeLineData.pipeID;
-}
-
-VkShaderModule ShaderManager::CreateShaderModule(const std::vector<char>& a_Code)
-{
-	VkShaderModuleCreateInfo t_CreateInfo{};
-	t_CreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-	t_CreateInfo.codeSize = a_Code.size();
-	t_CreateInfo.pCode = reinterpret_cast<const uint32_t*>(a_Code.data());
-
-	VkShaderModule t_ShaderModule;
-	if (vkCreateShaderModule(rm_VulkanDevice, &t_CreateInfo, nullptr, &t_ShaderModule) != VK_SUCCESS) {
-		throw std::runtime_error("failed to create shader module!");
-	}
-
-	return t_ShaderModule;
 }

@@ -38,4 +38,15 @@ namespace VkInit
 
 		return t_LayoutBinding;
 	}
+
+	//Shader Creation
+	inline VkShaderModuleCreateInfo CreateShaderModule(const unsigned char* a_ShaderCode, const size_t a_CodeSize)
+	{
+		VkShaderModuleCreateInfo t_CreateInfo{};
+		t_CreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+		t_CreateInfo.codeSize = a_CodeSize;
+		t_CreateInfo.pCode = reinterpret_cast<const uint32_t*>(a_ShaderCode);
+
+		return t_CreateInfo;
+	}
 }

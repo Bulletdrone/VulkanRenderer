@@ -13,6 +13,7 @@
 #pragma warning (pop)
 
 #include "Structs/Texture.h"
+#include "Structs/Shader.h"
 #include "Tools/VulkanInitializers.h"
 
 Renderer::Renderer()
@@ -364,6 +365,18 @@ void Renderer::SetupImage(Texture& a_Texture, const unsigned char* a_ImageBuffer
 
 	a_Texture.textureImageView = m_ImageHandler->CreateImageView(a_Texture.textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_ASPECT_COLOR_BIT);
 	a_Texture.textureSampler = m_ImageHandler->CreateTextureSampler();
+}
+
+Shader Renderer::CreateShader(const unsigned char* a_ShaderCode, const size_t a_CodeSize)
+{
+	VkShaderModuleCreateInfo t_CreateInfo = VkInit::CreateShaderModule(a_ShaderCode, a_CodeSize);
+
+	Shader shader{};
+	if (vkCreateShaderModule(m_VulkanDevice, &t_CreateInfo, nullptr, &shader.shaderModule) != VK_SUCCESS) {
+		throw std::runtime_error("failed to create shader module!");
+	}
+
+	return shader;
 }
 
 void Renderer::DrawFrame(uint32_t& r_ImageIndex)

@@ -19,6 +19,7 @@ constexpr uint32_t FRAMEBUFFER_AMOUNT = 2;
 constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
 struct Texture;
+struct Shader;
 
 class Renderer
 {
@@ -53,6 +54,7 @@ public:
 	//BufferData
 	void SetupMesh(MeshData* a_MeshData);
 	void SetupImage(Texture& a_Texture, const unsigned char* a_ImageBuffer);
+	Shader CreateShader(const unsigned char* a_ShaderCode, const size_t a_CodeSize);
 
 	void DrawFrame(uint32_t& r_ImageIndex);
 	void DrawObjects(VkCommandBuffer& r_CmdBuffer);
@@ -68,7 +70,7 @@ public:
 	VkQueue& GetQueue() { return mvk_GraphicsQueue; }
 	VkRenderPass& GetRenderPass() { return mvk_RenderPass; }
 
-	float GetAspectRatio() { return m_VulkanSwapChain.SwapChainExtent.width / (float)m_VulkanSwapChain.SwapChainExtent.height; }
+	float GetAspectRatio() { return m_VulkanSwapChain.SwapChainExtent.width / static_cast<float>(m_VulkanSwapChain.SwapChainExtent.height); }
 
 	//Set the mesh vector pointer in the Renderer from the one in ObjectManager.
 	void SetRenderObjectsVector(std::vector<BaseRenderObject*>* a_RenderObjects);

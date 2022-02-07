@@ -101,7 +101,6 @@
     <ClCompile Include="GUISystem\ImGUI\backends\imgui_impl_glfw.cpp" />
     <ClCompile Include="GUISystem\ImGUI\backends\imgui_impl_vulkan.cpp" />
     <ClCompile Include="MainRenderer\RenderObjects\Geometry\GeometryFactory.cpp" />
-    <ClCompile Include="MainRenderer\Tools\ResourceLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainRenderer\Renderer.h">
@@ -192,6 +191,6 @@
     <ClInclude Include="GUISystem\ImGUI\backends\imgui_impl_vulkan.h" />
     <ClInclude Include="MainRenderer\Structs\Texture.h" />
     <ClInclude Include="MainRenderer\RenderObjects\Geometry\GeometryFactory.h" />
-    <ClInclude Include="MainRenderer\Tools\ResourceLoader.h" />
+    <ClInclude Include="MainRenderer\Structs\Shader.h" />
   </ItemGroup>
 </Project>

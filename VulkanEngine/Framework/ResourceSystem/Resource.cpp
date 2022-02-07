@@ -36,14 +36,12 @@ namespace Engine
             }
 
             size_t t_FileSize = static_cast<size_t>(t_File.tellg());
-            char* t_ReadFile = nullptr;
+            char* t_ReadFile = new char[t_FileSize];
 
             t_File.seekg(0);
             t_File.read(t_ReadFile, t_FileSize);
-
             t_File.close();
 
-            
             return Buffer(reinterpret_cast<const unsigned char*>(t_ReadFile), t_FileSize);;
 		}
 	}

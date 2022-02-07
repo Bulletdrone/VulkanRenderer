@@ -42,6 +42,9 @@
     <ClCompile Include="Framework\ResourceSystem\MeshResource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Framework\ResourceSystem\ShaderResource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Framework\Scene\Scene.h">
@@ -69,6 +72,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Framework\ResourceSystem\MeshResource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Framework\ResourceSystem\ShaderResource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

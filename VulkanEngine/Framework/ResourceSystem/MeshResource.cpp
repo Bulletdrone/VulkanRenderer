@@ -3,6 +3,7 @@
 
 //#define TINYOBJLOADER_IMPLEMENTATION
 #pragma warning (push, 0)
+#define TINYOBJLOADER_IMPLEMENTATION
 #include <ObjLoader/tiny_obj_loader.h>
 #include <glm/glm.hpp>
 #pragma warning (pop)

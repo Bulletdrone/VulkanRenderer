@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="Framework\ResourceSystem\Resource.cpp" />
     <ClCompile Include="Framework\ResourceSystem\ResourceAllocator.cpp" />
+    <ClCompile Include="Framework\ResourceSystem\ShaderResource.cpp" />
     <ClCompile Include="Framework\ResourceSystem\TextureResource.cpp" />
     <ClCompile Include="Framework\Scene\Scene.cpp" />
     <ClCompile Include="Framework\Scene\SceneManager.cpp" />
@@ -32,6 +33,7 @@
   <ItemGroup>
     <ClInclude Include="Framework\ResourceSystem\Resource.h" />
     <ClInclude Include="Framework\ResourceSystem\ResourceAllocator.h" />
+    <ClInclude Include="Framework\ResourceSystem\ShaderResource.h" />
     <ClInclude Include="Framework\ResourceSystem\TextureResource.h" />
     <ClInclude Include="Framework\Scene\Scene.h" />
     <ClInclude Include="Framework\Scene\SceneData.h" />

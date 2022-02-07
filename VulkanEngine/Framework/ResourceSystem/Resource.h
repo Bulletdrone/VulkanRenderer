@@ -13,6 +13,7 @@ namespace Engine
 		{
 			Buffer(const unsigned char* a_Data, const size_t a_Size)
 				: data(a_Data), size(a_Size) {}
+			~Buffer() { delete[] data; }
 
 			const unsigned char* data = nullptr;
 			const size_t size = 0;

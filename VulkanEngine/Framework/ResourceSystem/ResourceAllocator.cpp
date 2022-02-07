@@ -37,6 +37,9 @@ namespace Engine
 		case Resource::ResourceType::Mesh:
 			resource = new Resource::MeshResource(t_Hash, *this);
 			break;
+		case Resource::ResourceType::Shader:
+			resource = new Resource::ShaderResource(t_Hash, *this);
+			break;
 		default:
 			Logger::Assert(false, "ResourceType is wrong to load in resource, doesn't exist or wrong casting.");
 			break;
