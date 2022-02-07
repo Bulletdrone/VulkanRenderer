@@ -11,10 +11,8 @@ namespace Engine
 	public:
 		/*  Create a Scene with a list of Models it must load.
 		@param a_SceneName, The name of the Scene.
-		@param a_LoadedObjects, Array of uint's that are used to pre-load objects using the RenderFactory in SceneManager.
-		@param a_ObjectCount, The size of the a_LoadedObjects array.
 		@param a_SceneData, The SceneData specific for this Scene, does the fog and main directional light. */
-		Scene(const char* a_SceneName, size_t a_ObjectCount, SceneData a_SceneData);
+		Scene(const char* a_SceneName, SceneData a_SceneData);
 		~Scene() {};
 
 

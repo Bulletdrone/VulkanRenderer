@@ -79,7 +79,7 @@ namespace Engine
 
 	void SceneManager::NewScene(const char* a_SceneName, SceneData a_SceneData, bool a_SetScene)
 	{
-		Scene scene(a_SceneName, 3, a_SceneData);
+		Scene scene(a_SceneName, a_SceneData);
 
 		m_Scenes.push_back(scene);
 
