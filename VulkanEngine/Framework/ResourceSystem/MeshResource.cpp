@@ -32,6 +32,8 @@ namespace Engine
 
 		bool MeshResource::Load(const char* a_FilePath)
 		{
+            Resource::Load(a_FilePath);
+
             tinyobj::attrib_t t_Attrib;
             std::vector<tinyobj::shape_t> t_Shapes;
             std::vector<tinyobj::material_t> t_Materials;

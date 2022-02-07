@@ -34,6 +34,8 @@ namespace Engine
 
 		bool TextureResource::Load(const char* a_FilePath)
 		{
+			Resource::Load(a_FilePath);
+
 			int t_Width, t_Height, t_Channels;
 			unsigned char* t_data = stbi_load(a_FilePath, &t_Width, &t_Height, &t_Channels, STBI_rgb_alpha);
 

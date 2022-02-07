@@ -26,13 +26,18 @@ namespace Engine
 
 			virtual bool IsInitialized() = 0;
 
-			virtual bool Load(const char* a_FilePath) = 0;
+			virtual bool Load(const char* a_FilePath);
 			virtual bool Unload() = 0;
 
-			const HashIndex GetHashIndex() { return m_HashID; };
+			const HashIndex GetHashIndex();
 
 		private:
 			const HashIndex m_HashID;
+
+#ifdef _DEBUG
+			//For now debug has the ability to reload.
+			const char* m_ResourcePath = nullptr;
+#endif _DEBUG
 
 		protected:
 			static Buffer ReadFile(const char* a_FilePath);
