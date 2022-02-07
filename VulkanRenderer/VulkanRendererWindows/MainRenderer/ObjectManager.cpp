@@ -16,6 +16,8 @@ ObjectManager::ObjectManager(Renderer* a_Renderer)
 	m_DescriptorLayoutCache = new DescriptorLayoutCache();
 	m_DescriptorLayoutCache->Init(p_Renderer->GetVulkanDevice());
 
+	m_GeometryFactory.Init(p_Renderer);
+
 
 	VkDescriptorSetLayoutBinding t_CameraBinding = VkInit::CreateDescriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 0);
 
@@ -58,6 +60,8 @@ ObjectManager::~ObjectManager()
 		delete m_RenderObjects[i];
 	}
 	m_RenderObjects.clear();
+
+	m_GeometryFactory.Cleanup(p_Renderer->GetVulkanDevice().m_LogicalDevice);
 }
 
 void ObjectManager::SetupStartObjects()
@@ -105,12 +109,22 @@ void ObjectManager::UpdateObjects(float a_Dt)
 	//p_Renderer->UpdateUniformBuffer(t_ImageIndex, a_Dt);
 }
 
-void ObjectManager::AddRenderObject(BaseRenderObject* a_NewShape)
+BaseRenderObject* ObjectManager::CreateRenderObject(Transform* a_Transform, Material& a_Material, GeometryType a_Type)
 {
-	m_RenderObjects.push_back(a_NewShape);
+	RenderShape* t_Shape = new RenderShape(GetNextRenderID(), a_Transform, a_Material, 
+		m_GeometryFactory.GetShape(a_Type));
+
+	m_RenderObjects.push_back(t_Shape);
+
+	return t_Shape;
 }
 
-BaseRenderObject* ObjectManager::CreateRenderObject(const uint32_t a_RenderID, Transform* a_Transform, Material& a_Material, const char* a_MeshPath)
+BaseRenderObject* ObjectManager::CreateRenderObject(Transform* a_Transform, Material& a_Material, const char* a_MeshPath)
 {
-	return new RenderShape(a_RenderID, a_Transform, a_Material, &Engine::ResourceAllocator::GetInstance().GetResource<Engine::Resource::MeshResource>(a_MeshPath, Engine::Resource::ResourceType::Mesh).meshData);
+	RenderShape* t_Shape = new RenderShape(GetNextRenderID(), a_Transform, a_Material, 
+		&Engine::ResourceAllocator::GetInstance().GetResource<Engine::Resource::MeshResource>(a_MeshPath, Engine::Resource::ResourceType::Mesh).meshData);
+
+	m_RenderObjects.push_back(t_Shape);
+
+	return t_Shape;
 }

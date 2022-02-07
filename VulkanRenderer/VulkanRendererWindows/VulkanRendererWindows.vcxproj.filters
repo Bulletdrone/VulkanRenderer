@@ -103,6 +103,7 @@
     <ClCompile Include="GUISystem\ImGUI\imgui_widgets.cpp" />
     <ClCompile Include="GUISystem\ImGUI\backends\imgui_impl_glfw.cpp" />
     <ClCompile Include="GUISystem\ImGUI\backends\imgui_impl_vulkan.cpp" />
+    <ClCompile Include="MainRenderer\RenderObjects\Geometry\GeometryFactory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainRenderer\Renderer.h">
@@ -195,5 +196,6 @@
     <ClInclude Include="GUISystem\ImGUI\backends\imgui_impl_glfw.h" />
     <ClInclude Include="GUISystem\ImGUI\backends\imgui_impl_vulkan.h" />
     <ClInclude Include="MainRenderer\Structs\Texture.h" />
+    <ClInclude Include="MainRenderer\RenderObjects\Geometry\GeometryFactory.h" />
   </ItemGroup>
 </Project>

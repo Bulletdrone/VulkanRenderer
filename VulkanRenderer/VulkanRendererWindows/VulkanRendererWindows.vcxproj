@@ -46,6 +46,7 @@
     <ClCompile Include="MainRenderer\VulkanDevice.cpp" />
     <ClCompile Include="MainRenderer\VulkanSwapChain.cpp" />
     <ClCompile Include="MainRenderer\Window.cpp" />
+    <ClCompile Include="MainRenderer\RenderObjects\Geometry\GeometryFactory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GUISystem\GUI.h" />
@@ -84,6 +85,7 @@
     <ClInclude Include="MainRenderer\VulkanDevice.h" />
     <ClInclude Include="MainRenderer\VulkanSwapChain.h" />
     <ClInclude Include="MainRenderer\Window.h" />
+    <ClInclude Include="MainRenderer\RenderObjects\Geometry\GeometryFactory.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

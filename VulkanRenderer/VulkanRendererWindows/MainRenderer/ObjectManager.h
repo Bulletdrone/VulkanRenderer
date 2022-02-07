@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Renderer.h"
+#include "RenderObjects/Geometry/GeometryFactory.h"
 
 class BaseRenderObject;
 
@@ -14,9 +15,10 @@ public:
 
 	void UpdateObjects(float a_Dt);
 
-	BaseRenderObject* CreateRenderObject(const uint32_t a_RenderID, Transform* a_Transform, Material& a_Material, const char* a_MeshPath);
-
-	void AddRenderObject(BaseRenderObject* a_NewShape);
+	//Create a renderobject from a basic shape.
+	BaseRenderObject* CreateRenderObject(Transform* a_Transform, Material& a_Material, GeometryType a_Type);
+	//Create a renderobject from a mesh.
+	BaseRenderObject* CreateRenderObject(Transform* a_Transform, Material& a_Material, const char* a_MeshPath);
 
 	//Increases the m_CurrentRenderID by 1 and returns it.
 	uint32_t GetNextRenderID() { return m_CurrentRenderID++; }
@@ -28,6 +30,8 @@ private:
 
 	DescriptorAllocator* m_DescriptorAllocator;
 	DescriptorLayoutCache* m_DescriptorLayoutCache;
+
+	GeometryFactory m_GeometryFactory;
 
 public:
 	//Data pipeline

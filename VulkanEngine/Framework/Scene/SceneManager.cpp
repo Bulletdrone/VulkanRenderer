@@ -99,20 +99,11 @@ namespace Engine
 		//m_Renderer->SetupImage(ResourceAllocator::GetInstance().GetResource<Resource::TextureResource>("../VulkanRenderer/Resources/Images/Background1.png", Resource::ResourceType::Texture).texture);
 
 		Transform* t_PTrans = new Transform(glm::vec3(0, 0, 0), 1);
-		CreateShape(t_PTrans, m_ObjectManager->mat_Pavillion, "../VulkanRenderer/Resources/Models/Pavillion.obj");
+		m_ObjectManager->CreateRenderObject(t_PTrans, m_ObjectManager->mat_Pavillion, "../VulkanRenderer/Resources/Models/Pavillion.obj");
 
 		Transform* t_Transform2 = new Transform(glm::vec3(-0.7f, 0.9f, 0.2), 1);
-		CreateShape(t_Transform2, m_ObjectManager->mat_Rectangle, "../VulkanRenderer/Resources/Models/Pavillion.obj");
+		m_ObjectManager->CreateRenderObject(t_Transform2, m_ObjectManager->mat_Rectangle, GeometryType::Quad);
 
 		m_ObjectManager->SetupStartObjects();
-	}
-
-	void SceneManager::CreateShape(Transform* a_Transform, Material& a_Material, const char* a_MeshPath)
-	{
-		BaseRenderObject* t_NewShape = m_ObjectManager->CreateRenderObject(m_ObjectManager->GetNextRenderID(), a_Transform, a_Material, a_MeshPath);
-
-		m_Renderer->SetupMesh(t_NewShape->GetMeshData());
-
-		m_ObjectManager->AddRenderObject(t_NewShape);
 	}
 }
