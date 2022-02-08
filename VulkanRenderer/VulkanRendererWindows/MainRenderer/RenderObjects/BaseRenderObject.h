@@ -25,8 +25,8 @@ public:
 	//Getters
 	const glm::mat4& GetModelMatrix() const { return m_Model; }
 
-	uint32_t GetPipeLineID() const { return r_Material.PipelineID; }
-	VkDescriptorSet& GetMaterialDescriptorSet() const { return r_Material.GetDescriptorSet(); }
+	uint32_t GetPipeLineID() const { return r_Material.pipelineID; }
+	VkDescriptorSet& GetMaterialDescriptorSet() const { return r_Material.secondDescriptorSet; }
 
 	Material* GetMaterial() const { return &r_Material; }
 	MeshData* GetMeshData() const { return p_MeshData; }

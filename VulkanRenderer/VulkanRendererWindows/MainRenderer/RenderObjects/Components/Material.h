@@ -4,23 +4,12 @@
 #include <glm/glm.hpp>
 #pragma warning (pop)
 
+constexpr uint32_t MATERIALBINDING = 1;
+
 class Material
 {
 public:
-	Material();
-	~Material();
-
-	//Returns if it was successful.
-	bool RecreateDescriptorSet();
-
-	VkDescriptorSet& GetDescriptorSet() { return m_SecondDescriptorSet; }
-
-public:
-	uint32_t PipelineID;
-
-private:
-
-	VkDescriptorSet m_SecondDescriptorSet{};
-
-	glm::vec4 m_AmbientColor = glm::vec4(0, 0, 0, 1); //w is transparency.
+	uint32_t pipelineID;
+	VkDescriptorSet secondDescriptorSet = VK_NULL_HANDLE;
+	glm::vec4 ambientColor = glm::vec4(0, 0, 0, 1); //w is transparency.
 };

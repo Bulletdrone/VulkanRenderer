@@ -71,10 +71,16 @@ void Renderer::SetupHandlers()
 	m_ImageHandler = new ImageHandler(m_VulkanDevice);
 
 	m_DepthHandler = new DepthHandler(m_VulkanDevice, m_ImageHandler);
+
+	m_DescriptorAllocator = new DescriptorAllocator();
+	m_DescriptorAllocator->Init(GetVulkanDevice());
+
+	m_DescriptorLayoutCache = new DescriptorLayoutCache();
+	m_DescriptorLayoutCache->Init(GetVulkanDevice());
 }
 
 //Call this after the creation of Vulkan.
-void Renderer::SetupRenderObjects()
+void Renderer::CreateStartBuffers()
 {
 	mvk_ViewProjectionBuffers.resize(FRAMEBUFFER_AMOUNT);
 	mvk_ViewProjectionBuffersMemory.resize(FRAMEBUFFER_AMOUNT);
@@ -83,6 +89,7 @@ void Renderer::SetupRenderObjects()
 	{
 		m_VulkanDevice.CreateUniformBuffers(mvk_ViewProjectionBuffers[i], mvk_ViewProjectionBuffersMemory[i], sizeof(ViewProjection));
 	}
+	CreateGlobalDescriptor();
 
 	CreateSyncObjects();
 }
@@ -127,7 +134,7 @@ void Renderer::RecreateSwapChain()
 	CreateDepthResources();
 	CreateFrameBuffers();
 
-	SetupRenderObjects();
+	CreateStartBuffers();
 	//m_ShaderManager->RecreateDescriptors(FRAMEBUFFER_AMOUNT, mvk_ViewProjectionBuffers, sizeof(ViewProjection));
 }
 
@@ -379,6 +386,57 @@ Shader Renderer::CreateShader(const unsigned char* a_ShaderCode, const size_t a_
 	return shader;
 }
 
+void Renderer::CreateGlobalDescriptor()
+{
+	DescriptorBuilder t_Builder{};
+
+	VkDescriptorSetLayoutBinding t_CameraBinding = VkInit::CreateDescriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 0);
+	VkDescriptorSetLayoutCreateInfo t_CameraLayoutInfo = VkInit::CreateDescriptorSetLayoutCreateInfo(VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO, 1, &t_CameraBinding);
+	m_GlobalSetLayout = m_DescriptorLayoutCache->CreateLayout(&t_CameraLayoutInfo);
+
+	VkDescriptorBufferInfo buffer1 = VkInit::CreateDescriptorBufferInfo(mvk_ViewProjectionBuffers[0], 0, sizeof(ViewProjection));
+	t_Builder = DescriptorBuilder::Begin(m_DescriptorLayoutCache, m_DescriptorAllocator);
+	t_Builder.BindBuffer(0, &buffer1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT);
+	t_Builder.Build(m_GlobalSet[0], m_GlobalSetLayout);
+
+	VkDescriptorBufferInfo buffer2 = VkInit::CreateDescriptorBufferInfo(mvk_ViewProjectionBuffers[1], 0, sizeof(ViewProjection));
+	t_Builder = DescriptorBuilder::Begin(m_DescriptorLayoutCache, m_DescriptorAllocator);
+	t_Builder.BindBuffer(0, &buffer2, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT);
+	t_Builder.Build(m_GlobalSet[1], m_GlobalSetLayout);
+}
+
+Material Renderer::CreateMaterial(uint32_t a_UniCount, VkBuffer* a_UniBuffers, uint32_t a_ImageCount, Texture* a_Images, glm::vec4 a_Color)
+{
+	Material material{};
+
+	VkDescriptorSetLayoutBinding t_ImageBinding = VkInit::CreateDescriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, MATERIALBINDING);
+	VkDescriptorSetLayoutCreateInfo t_ImageLayoutInfo = VkInit::CreateDescriptorSetLayoutCreateInfo(VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO, 1, &t_ImageBinding);
+	VkDescriptorSetLayout t_ImageLayout = m_DescriptorLayoutCache->CreateLayout(&t_ImageLayoutInfo);
+
+	std::vector<VkDescriptorSetLayout> r_DescriptorLayouts{ m_GlobalSetLayout, t_ImageLayout };
+	material.pipelineID = CreateGraphicsPipeline(r_DescriptorLayouts);
+
+	//Building descriptor sets.
+	DescriptorBuilder t_Builder{};
+
+	VkDescriptorImageInfo* t_Images = new VkDescriptorImageInfo[a_ImageCount];
+	for (uint32_t i = 0; i < a_ImageCount; i++)
+	{
+		t_Images[i] = VkInit::CreateDescriptorImageInfo(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, a_Images[i].textureImageView, a_Images[i].textureSampler);
+	}
+
+	t_Builder = DescriptorBuilder::Begin(m_DescriptorLayoutCache, m_DescriptorAllocator);
+	t_Builder.BindImage(a_ImageCount, t_Images, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);
+	t_Builder.Build(material.secondDescriptorSet, t_ImageLayout);
+
+	
+	delete[] t_Images;
+
+	material.ambientColor = a_Color;
+
+	return material;
+}
+
 void Renderer::DrawFrame(uint32_t& r_ImageIndex)
 {
 	FrameData& frameData = m_FrameData[m_CurrentFrame];
@@ -496,8 +554,8 @@ void Renderer::DrawObjects(VkCommandBuffer& r_CmdBuffer)
 
 			vkCmdBindPipeline(r_CmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, t_CurrentPipeLine->pipeLine);
 
-			vkCmdBindDescriptorSets(r_CmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, t_CurrentPipeLine->pipeLineLayout, 0, 1, &GlobalSet[m_CurrentFrame], 0, nullptr);
-			vkCmdBindDescriptorSets(r_CmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, t_CurrentPipeLine->pipeLineLayout, 1, 1, &t_RenderObject->GetMaterialDescriptorSet(), 0, nullptr);
+			vkCmdBindDescriptorSets(r_CmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, t_CurrentPipeLine->pipeLineLayout, 0, 1, &m_GlobalSet[m_CurrentFrame], 0, nullptr);
+			vkCmdBindDescriptorSets(r_CmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, t_CurrentPipeLine->pipeLineLayout, MATERIALBINDING, 1, &t_RenderObject->GetMaterialDescriptorSet(), 0, nullptr);
 		}
 		else if (t_RenderObject->GetMaterial() != t_LastMaterial)
 		{

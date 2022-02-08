@@ -39,6 +39,18 @@ namespace VkInit
 		return t_LayoutBinding;
 	}
 
+
+	inline VkDescriptorSetLayoutCreateInfo CreateDescriptorSetLayoutCreateInfo(VkStructureType a_Type, uint32_t a_BindingCount, VkDescriptorSetLayoutBinding* a_LayoutBinding)
+	{
+		VkDescriptorSetLayoutCreateInfo t_LayoutInfo{};
+		t_LayoutInfo.sType = a_Type;
+		t_LayoutInfo.bindingCount = a_BindingCount;
+		t_LayoutInfo.pBindings = a_LayoutBinding;
+
+		return t_LayoutInfo;
+	}
+
+
 	//Shader Creation
 	inline VkShaderModuleCreateInfo CreateShaderModule(const unsigned char* a_ShaderCode, const size_t a_CodeSize)
 	{
@@ -49,4 +61,5 @@ namespace VkInit
 
 		return t_CreateInfo;
 	}
+
 }

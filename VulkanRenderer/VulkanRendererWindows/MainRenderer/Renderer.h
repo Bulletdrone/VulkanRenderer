@@ -28,7 +28,7 @@ public:
 	~Renderer();
 
 	//Setting up that is done later.
-	void SetupRenderObjects();
+	void CreateStartBuffers();
 	void SetupHandlers();
 
 	void CleanupSwapChain();
@@ -56,6 +56,12 @@ public:
 	void SetupImage(Texture& a_Texture, const unsigned char* a_ImageBuffer);
 	Shader CreateShader(const unsigned char* a_ShaderCode, const size_t a_CodeSize);
 
+	//Only handles single images at the moment.
+	void CreateGlobalDescriptor();
+	Material CreateMaterial(uint32_t a_UniCount, VkBuffer* a_UniBuffers,
+		uint32_t a_ImageCount, Texture* a_Images, 
+		glm::vec4 a_Color = glm::vec4(0, 0, 0, 1));
+
 	void DrawFrame(uint32_t& r_ImageIndex);
 	void DrawObjects(VkCommandBuffer& r_CmdBuffer);
 	void UpdateUniformBuffer(uint32_t a_CurrentImage);
@@ -78,10 +84,15 @@ public:
 
 	std::vector<VkBuffer> mvk_ViewProjectionBuffers;
 	std::vector<VkDeviceMemory> mvk_ViewProjectionBuffersMemory;
-	VkDescriptorSet GlobalSet[2];
 
 private:
 	bool IsDeviceSuitable(VkPhysicalDevice a_Device);
+
+	DescriptorAllocator* m_DescriptorAllocator;
+	DescriptorLayoutCache* m_DescriptorLayoutCache;
+
+	VkDescriptorSetLayout m_GlobalSetLayout;
+	VkDescriptorSet m_GlobalSet[2];
 
 	//All the renderObjects in ObjectManager.
 	std::vector<BaseRenderObject*>* p_RenderObjects;

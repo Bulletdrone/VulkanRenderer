@@ -11,8 +11,6 @@ public:
 	ObjectManager(Renderer* a_Renderer);
 	~ObjectManager();
 
-	void SetupStartObjects();
-
 	void UpdateObjects(float a_Dt);
 
 	//Create a renderobject from a basic shape.
@@ -28,19 +26,8 @@ private:
 
 	std::vector<BaseRenderObject*> m_RenderObjects;
 
-	DescriptorAllocator* m_DescriptorAllocator;
-	DescriptorLayoutCache* m_DescriptorLayoutCache;
-
 	GeometryFactory m_GeometryFactory;
 
 public:
-	//Data pipeline
-	Material mat_Pavillion;
-	Material mat_Rectangle;
-
-	//Data descriptor
-	VkDescriptorSetLayout layout_SingleBufferCamera;
-	VkDescriptorSetLayout layout_SingleImageObject;
-
 	Renderer* p_Renderer;
 };
