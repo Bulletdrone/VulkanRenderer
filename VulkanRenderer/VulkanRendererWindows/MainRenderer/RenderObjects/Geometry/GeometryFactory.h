@@ -21,10 +21,9 @@ class GeometryFactory
 {
 public:
 	void Init(Renderer* a_Renderer);
-	void Cleanup(VkDevice& a_VkDevice);
-
-	MeshData* GetShape(GeometryType a_Type);
+	uint32_t GetShape(GeometryType a_Type);
 
 private:
-	std::vector<MeshData*> m_ShapeData;
+	uint32_t m_ShapeHandlers[static_cast<size_t>(GeometryType::Count)];
+
 };

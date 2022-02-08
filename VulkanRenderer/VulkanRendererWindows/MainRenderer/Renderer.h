@@ -52,7 +52,7 @@ public:
 	void ReplaceActiveCamera(CameraObject* a_Cam);
 
 	//BufferData
-	void SetupMesh(MeshData* a_MeshData);
+	uint32_t GenerateMesh(const std::vector<Vertex>& a_Vertices, const std::vector<uint32_t>& a_Indices);
 	void SetupImage(Texture& a_Texture, const unsigned char* a_ImageBuffer);
 	Shader CreateShader(const unsigned char* a_ShaderCode, const size_t a_CodeSize);
 
@@ -63,7 +63,7 @@ public:
 		glm::vec4 a_Color = glm::vec4(0, 0, 0, 1));
 
 	void DrawFrame(uint32_t& r_ImageIndex);
-	void DrawObjects(VkCommandBuffer& r_CmdBuffer);
+	void DrawObjects(VkCommandBuffer a_CmdBuffer);
 	void UpdateUniformBuffer(uint32_t a_CurrentImage);
 
 	bool CheckDeviceExtensionSupport(VkPhysicalDevice a_Device);
@@ -72,11 +72,11 @@ public:
 	GLFWwindow* GetWindow() const { return m_Window->GetWindow(); }
 	VulkanDevice& GetVulkanDevice() { return m_VulkanDevice; }
 	VulkanSwapChain& GetVulkanSwapChain() { return m_VulkanSwapChain; }
-	VkInstance& GetInstance() { return mvk_Instance; }
-	VkQueue& GetQueue() { return mvk_GraphicsQueue; }
-	VkRenderPass& GetRenderPass() { return mvk_RenderPass; }
+	const VkInstance GetInstance() const { return mvk_Instance; }
+	const VkQueue GetQueue() const { return mvk_GraphicsQueue; }
+	const VkRenderPass GetRenderPass() const { return mvk_RenderPass; }
 
-	float GetAspectRatio() { return m_VulkanSwapChain.SwapChainExtent.width / static_cast<float>(m_VulkanSwapChain.SwapChainExtent.height); }
+	const float GetAspectRatio() { return m_VulkanSwapChain.SwapChainExtent.width / static_cast<float>(m_VulkanSwapChain.SwapChainExtent.height); }
 
 	//Set the mesh vector pointer in the Renderer from the one in ObjectManager.
 	void SetRenderObjectsVector(std::vector<BaseRenderObject*>* a_RenderObjects);
@@ -97,6 +97,7 @@ private:
 	//All the renderObjects in ObjectManager.
 	std::vector<BaseRenderObject*>* p_RenderObjects;
 	ObjectPool<Material> m_MaterialPool;
+	ObjectPool<MeshData> m_MeshPool;
 
 	//Window Data.
 	Window* m_Window;

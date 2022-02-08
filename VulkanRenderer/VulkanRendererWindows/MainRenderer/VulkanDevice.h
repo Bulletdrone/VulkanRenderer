@@ -6,7 +6,6 @@
 #include <Structs/BufferData.h>
 #include "Window.h"
 
-
 struct QueueFamilyIndices {
 	std::optional<uint32_t> graphicsFamily;
 	std::optional<uint32_t> presentFamily;
@@ -70,22 +69,22 @@ public:
 	void FreeCommandPool();
 
 	void ClearPreviousCommand(size_t a_Frame);
-	VkCommandBuffer& CreateAndBeginCommand(size_t a_Frame, uint32_t a_QueueFamilyIndex, VkRenderPass& r_RenderPass, VkFramebuffer& r_SwapChainFrameBuffer, VkExtent2D& r_SwapChainExtent);
-	void EndCommand(VkCommandBuffer& r_CommandBuffer);
+	VkCommandBuffer CreateAndBeginCommand(size_t a_Frame, uint32_t a_QueueFamilyIndex, VkRenderPass r_RenderPass, VkFramebuffer r_SwapChainFrameBuffer, VkExtent2D& r_SwapChainExtent);
+	void EndCommand(VkCommandBuffer r_CommandBuffer);
 
 	VkCommandBuffer BeginSingleTimeCommands();
 	void EndSingleTimeCommands(VkCommandBuffer a_CommandBuffer);
 
 	VkCommandPoolCreateInfo CreateCommandPoolInfo(uint32_t a_QueueFamilyIndex, VkCommandPoolCreateFlags a_Flags);
-	VkCommandBufferAllocateInfo CreateCommandBufferInfo(VkCommandPool& r_Pool, uint32_t a_Count, VkCommandBufferLevel a_Level);
+	VkCommandBufferAllocateInfo CreateCommandBufferInfo(VkCommandPool r_Pool, uint32_t a_Count, VkCommandBufferLevel a_Level);
 
 	//Buffer Functions
-	void CreateVertexBuffers(BufferData<Vertex>* a_VertexData);
-	void CreateIndexBuffers(BufferData<uint32_t>* a_IndexData);
+	void CreateVertexBuffers(BufferData<Vertex>& a_VertexData, const std::vector<Vertex>& a_Vertices);
+	void CreateIndexBuffers(BufferData<uint32_t>& a_IndexData, const std::vector<uint32_t>& a_Indices);
 	void CreateUniformBuffers(VkBuffer& r_UniformBuffer, VkDeviceMemory& r_UniformBufferMemory, VkDeviceSize a_BufferSize);
 	//Standard Buffer Creation
 	void CreateBuffer(VkDeviceSize a_Size, VkBufferUsageFlags a_Usage, VkMemoryPropertyFlags a_Properties, VkBuffer& r_Buffer, VkDeviceMemory& r_BufferMemory);
-	void CopyBuffer(VkDeviceSize a_Size, VkBuffer& r_SrcBuffer, VkBuffer& r_DstBuffer);
+	void CopyBuffer(VkDeviceSize a_Size, VkBuffer r_SrcBuffer, VkBuffer r_DstBuffer);
 
 private:
 	bool ExtentionSupported(const std::string& a_Extension);

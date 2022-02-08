@@ -360,10 +360,18 @@ void Renderer::ReplaceActiveCamera(CameraObject* a_Cam)
 	p_ActiveCamera = a_Cam;
 }
 
-void Renderer::SetupMesh(MeshData* a_MeshData)
+uint32_t Renderer::GenerateMesh(const std::vector<Vertex>& a_Vertices, const std::vector<uint32_t>& a_Indices)
 {
-	m_VulkanDevice.CreateVertexBuffers(a_MeshData->GetVertexData());
-	m_VulkanDevice.CreateIndexBuffers(a_MeshData->GetIndexData());
+	uint32_t t_Index = 0;
+	MeshData& mesh = m_MeshPool.GetEmptyObject(t_Index);
+
+	mesh.vertices.elementSize = static_cast<uint32_t>(a_Vertices.size());
+	mesh.indices.elementSize = static_cast<uint32_t>(a_Indices.size());
+
+	m_VulkanDevice.CreateVertexBuffers(mesh.vertices, a_Vertices);
+	m_VulkanDevice.CreateIndexBuffers(mesh.indices, a_Indices);
+
+	return t_Index;
 }
 
 void Renderer::SetupImage(Texture& a_Texture, const unsigned char* a_ImageBuffer)
@@ -470,7 +478,7 @@ void Renderer::DrawFrame(uint32_t& r_ImageIndex)
 	//Draw the objects using a single command buffer.
 	m_VulkanDevice.ClearPreviousCommand(m_CurrentFrame);
 
-	VkCommandBuffer& t_MainBuffer = m_VulkanDevice.CreateAndBeginCommand(m_CurrentFrame, FindQueueFamilies(m_VulkanDevice.m_PhysicalDevice, *m_Window).graphicsFamily.value(),
+	VkCommandBuffer t_MainBuffer = m_VulkanDevice.CreateAndBeginCommand(m_CurrentFrame, FindQueueFamilies(m_VulkanDevice.m_PhysicalDevice, *m_Window).graphicsFamily.value(),
 		mvk_RenderPass, m_VulkanSwapChain.SwapChainFrameBuffers[m_CurrentFrame], m_VulkanSwapChain.SwapChainExtent);
 
 	DrawObjects(t_MainBuffer);
@@ -530,10 +538,11 @@ void Renderer::DrawFrame(uint32_t& r_ImageIndex)
 	m_CurrentFrame = (m_CurrentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
 
-void Renderer::DrawObjects(VkCommandBuffer& r_CmdBuffer)
+void Renderer::DrawObjects(VkCommandBuffer a_CmdBuffer)
 {
 	//Performance boost when getting the same data needed.
-	MeshData* t_LastMeshData = nullptr;
+	uint32_t t_LastMeshData = UINT32_MAX;
+	MeshData t_MeshData;
 
 	uint32_t t_LastMaterial = UINT32_MAX;
 	Material t_Material;
@@ -566,36 +575,39 @@ void Renderer::DrawObjects(VkCommandBuffer& r_CmdBuffer)
 				t_CurrentPipeLine = m_ShaderManager->PipelinePool.Get(t_PipelineID);
 				t_LastPipelineID = t_PipelineID;
 
-				vkCmdBindPipeline(r_CmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, t_CurrentPipeLine.pipeLine);
+				vkCmdBindPipeline(a_CmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, t_CurrentPipeLine.pipeLine);
 
-				vkCmdBindDescriptorSets(r_CmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, t_CurrentPipeLine.pipeLineLayout, 0, 1, &m_GlobalSet[m_CurrentFrame], 0, nullptr);
+				vkCmdBindDescriptorSets(a_CmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, t_CurrentPipeLine.pipeLineLayout, 0, 1, &m_GlobalSet[m_CurrentFrame], 0, nullptr);
 			}
 			if (t_LastMatDescriptorSet != t_Material.secondDescriptorSet)
 			{
-				vkCmdBindDescriptorSets(r_CmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, t_CurrentPipeLine.pipeLineLayout, 1, 1, &t_Material.secondDescriptorSet, 0, nullptr);
+				vkCmdBindDescriptorSets(a_CmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, t_CurrentPipeLine.pipeLineLayout, 1, 1, &t_Material.secondDescriptorSet, 0, nullptr);
 			}
 		}
 
 		//Set the Push constant data.
 		t_PushInstance.model = t_RenderObject->GetModelMatrix();
 
-		vkCmdPushConstants(r_CmdBuffer, t_CurrentPipeLine.pipeLineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(InstanceModel), &t_PushInstance);
+		vkCmdPushConstants(a_CmdBuffer, t_CurrentPipeLine.pipeLineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(InstanceModel), &t_PushInstance);
 
 		//only bind the mesh if it's a different one from last bind
-		if (t_RenderObject->GetMeshData() != t_LastMeshData) {
+		if (t_RenderObject->GetMeshHandle() != t_LastMeshData) {
+
+			t_MeshData = m_MeshPool.Get(t_RenderObject->GetMeshHandle());
+
 			//bind the mesh vertex buffer with offset 0
 			VkDeviceSize t_VertOffset = 0;
 			//Set Vertex
-			vkCmdBindVertexBuffers(r_CmdBuffer, 0, 1, &t_RenderObject->GetVertexData()->GetBuffer(), &t_VertOffset);
+			vkCmdBindVertexBuffers(a_CmdBuffer, 0, 1, &t_MeshData.vertices.buffer, &t_VertOffset);
 
 			//Set Indices
-			vkCmdBindIndexBuffer(r_CmdBuffer, t_RenderObject->GetIndexData()->GetBuffer(), 0, VK_INDEX_TYPE_UINT32);
+			vkCmdBindIndexBuffer(a_CmdBuffer, t_MeshData.indices.buffer, 0, VK_INDEX_TYPE_UINT32);
 
-			t_LastMeshData = t_RenderObject->GetMeshData();
+			
 		}
 
 		//vkCmdDraw(r_CmdBuffer, static_cast<uint32_t>(t_RenderObject->GetVertexData()->GetElementCount()), 1, 0, 0);
-		vkCmdDrawIndexed(r_CmdBuffer, static_cast<uint32_t>(t_RenderObject->GetIndexData()->GetElementCount()), 1, 0, 0, 0);
+		vkCmdDrawIndexed(a_CmdBuffer, static_cast<uint32_t>(t_MeshData.indices.elementSize), 1, 0, 0, 0);
 	}
 }
 

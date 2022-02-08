@@ -83,7 +83,7 @@ public:
 	GUISystem(GLFWwindow* a_Window, VulkanDevice& r_Device, const VulkanSwapChain& r_SwapChain);
 	~GUISystem();
 
-	void Init(VkInstance& r_Instance, VkQueue& r_Queue, VkRenderPass& r_MainRenderPass);
+	void Init(const VkInstance r_Instance, const VkQueue r_Queue, const VkRenderPass r_MainRenderPass);
 	void Update();
 
 	//Creates an GUIWindow and returns a pointer of the one being creatd inside m_GUIWindows.

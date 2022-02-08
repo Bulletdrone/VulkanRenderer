@@ -72,51 +72,28 @@ template<> struct std::hash<Vertex>
 };
 
 template <typename T>
-class BufferData
+struct BufferData
 {
-public:
-	BufferData(const std::vector<T> a_Elements);
-	~BufferData();
-
-	void DeleteBuffers(VkDevice& r_Device);
+	void DeleteBuffers(VkDevice r_Device);
 
 	const VkDeviceSize GetBufferSize() const;
 
-	const std::vector<T>& GetElements() const { return elements; }
-	const size_t GetElementCount() const { return elements.size(); }
+	uint32_t elementSize;
 
-	VkBuffer& GetBuffer() { return vkBuffer; }
-	VkDeviceMemory& GetBufferMemory() { return vkBufferMemory; }
-
-
-private:
-	const std::vector<T> elements;
-
-	VkBuffer vkBuffer = VK_NULL_HANDLE;
-	VkDeviceMemory vkBufferMemory = VK_NULL_HANDLE;
+	VkBuffer buffer = VK_NULL_HANDLE;
+	VkDeviceMemory bufferMemory = VK_NULL_HANDLE;
 };
 
-
 template<typename T>
-inline BufferData<T>::BufferData(const std::vector<T> a_Elements)
-	:	elements(a_Elements)
-{}
-
-
-template<typename T>
-inline BufferData<T>::~BufferData()
-{}
-
-template<typename T>
-inline void BufferData<T>::DeleteBuffers(VkDevice & r_Device)
+inline void BufferData<T>::DeleteBuffers(VkDevice r_Device)
 {
-	vkDestroyBuffer(r_Device, vkBuffer, nullptr);
-	vkFreeMemory(r_Device, vkBufferMemory, nullptr);
+	vkDestroyBuffer(r_Device, buffer, nullptr);
+	vkFreeMemory(r_Device, bufferMemory, nullptr);
 }
 
 
 template <typename T>
 inline const VkDeviceSize BufferData<T>::GetBufferSize() const //Returns the vertexBuffer in bytes.
 {
-	return sizeof(elements[0]) * elements.size();
+	return sizeof(T) * elementSize;
 }

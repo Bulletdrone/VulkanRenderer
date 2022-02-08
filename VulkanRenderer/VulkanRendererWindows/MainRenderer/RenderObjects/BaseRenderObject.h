@@ -26,17 +26,12 @@ public:
 	const glm::mat4& GetModelMatrix() const { return m_Model; }
 
 	const uint32_t GetMaterialHandle() const { return m_MatHandle; }
-	MeshData* GetMeshData() const { return p_MeshData; }
-
-	BufferData<Vertex>* GetVertexData() const { return p_MeshData->GetVertexData(); }
-	BufferData<uint32_t>* GetIndexData() const { return p_MeshData->GetIndexData(); }
+	const uint32_t GetMeshHandle() const { return m_MeshHandle; }
 
 protected:
 	//Matrices.
-	glm::mat4 m_Model;
+	glm::mat4 m_Model = glm::mat4(0);
 
-	//Vertex Data with it's buffers.
-	MeshData* p_MeshData = nullptr;
-	//PipelineData.
-	uint32_t m_MatHandle;
+	uint32_t m_MeshHandle = 0;
+	uint32_t m_MatHandle = 0;
 };

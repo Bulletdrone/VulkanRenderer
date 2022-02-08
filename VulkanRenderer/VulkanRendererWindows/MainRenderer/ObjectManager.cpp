@@ -1,8 +1,5 @@
 #include "ObjectManager.h"
 #include "Tools/VulkanInitializers.h"
-#include <VulkanEngine/Framework/ResourceSystem/ResourceAllocator.h>
-#include <VulkanEngine/Framework/ResourceSystem/MeshResource.h>
-
 
 #include "RenderObjects/RenderShape.h"
 
@@ -22,8 +19,6 @@ ObjectManager::~ObjectManager()
 		delete m_RenderObjects[i];
 	}
 	m_RenderObjects.clear();
-
-	m_GeometryFactory.Cleanup(p_Renderer->GetVulkanDevice().m_LogicalDevice);
 }
 
 void ObjectManager::UpdateObjects(float a_Dt)
@@ -41,18 +36,16 @@ void ObjectManager::UpdateObjects(float a_Dt)
 
 BaseRenderObject* ObjectManager::CreateRenderObject(Transform* a_Transform, uint32_t a_MaterialHandle, GeometryType a_Type)
 {
-	RenderShape* t_Shape = new RenderShape(GetNextRenderID(), a_Transform, a_MaterialHandle,
-		m_GeometryFactory.GetShape(a_Type));
+	RenderShape* t_Shape = new RenderShape(GetNextRenderID(), a_Transform, a_MaterialHandle, m_GeometryFactory.GetShape(a_Type));
 
 	m_RenderObjects.push_back(t_Shape);
 
 	return t_Shape;
 }
 
-BaseRenderObject* ObjectManager::CreateRenderObject(Transform* a_Transform, uint32_t a_MaterialHandle, const char* a_MeshPath)
+BaseRenderObject* ObjectManager::CreateRenderObject(Transform* a_Transform, uint32_t a_MaterialHandle, uint32_t a_MeshHandle)
 {
-	RenderShape* t_Shape = new RenderShape(GetNextRenderID(), a_Transform, a_MaterialHandle,
-		&Engine::ResourceAllocator::GetInstance().GetResource<Engine::Resource::MeshResource>(a_MeshPath, Engine::Resource::ResourceType::Mesh).meshData);
+	RenderShape* t_Shape = new RenderShape(GetNextRenderID(), a_Transform, a_MaterialHandle, a_MeshHandle);
 
 	m_RenderObjects.push_back(t_Shape);
 

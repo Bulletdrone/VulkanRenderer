@@ -188,7 +188,7 @@ void VulkanDevice::ClearPreviousCommand(size_t a_Frame)
     vkFreeCommandBuffers(m_LogicalDevice, m_CommandPool, 1, &m_DeviceCommandBuffer[a_Frame]);
 }
 
-VkCommandBuffer& VulkanDevice::CreateAndBeginCommand(size_t a_Frame, uint32_t a_QueueFamilyIndex, VkRenderPass& r_RenderPass, VkFramebuffer& r_SwapChainFrameBuffer, VkExtent2D& r_SwapChainExtent)
+VkCommandBuffer VulkanDevice::CreateAndBeginCommand(size_t a_Frame, uint32_t a_QueueFamilyIndex, VkRenderPass r_RenderPass, VkFramebuffer r_SwapChainFrameBuffer, VkExtent2D& r_SwapChainExtent)
 {
     VkCommandBuffer& commandBuffer = m_DeviceCommandBuffer[a_Frame];
 
@@ -233,7 +233,7 @@ VkCommandBuffer& VulkanDevice::CreateAndBeginCommand(size_t a_Frame, uint32_t a_
 }
 
 //finalize the render pass
-void VulkanDevice::EndCommand(VkCommandBuffer& r_CommandBuffer)
+void VulkanDevice::EndCommand(VkCommandBuffer r_CommandBuffer)
 {
     vkCmdEndRenderPass(r_CommandBuffer);
 
@@ -284,7 +284,7 @@ VkCommandPoolCreateInfo VulkanDevice::CreateCommandPoolInfo(uint32_t a_QueueFami
     return info;
 }
 
-VkCommandBufferAllocateInfo VulkanDevice::CreateCommandBufferInfo(VkCommandPool& r_Pool, uint32_t a_Count, VkCommandBufferLevel a_Level)
+VkCommandBufferAllocateInfo VulkanDevice::CreateCommandBufferInfo(VkCommandPool r_Pool, uint32_t a_Count, VkCommandBufferLevel a_Level)
 {
     VkCommandBufferAllocateInfo info = {};
     info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -300,9 +300,9 @@ VkCommandBufferAllocateInfo VulkanDevice::CreateCommandBufferInfo(VkCommandPool&
 
 #pragma region Specific Buffer Creation
 
-void VulkanDevice::CreateVertexBuffers(BufferData<Vertex>* a_VertexData)
+void VulkanDevice::CreateVertexBuffers(BufferData<Vertex>& a_VertexData, const std::vector<Vertex>& a_Vertices)
 {
-    VkDeviceSize t_BufferSize = a_VertexData->GetBufferSize();
+    VkDeviceSize t_BufferSize = a_VertexData.GetBufferSize();
 
     VkBuffer t_StagingBuffer;
     VkDeviceMemory t_StagingBufferMemory;
@@ -311,21 +311,21 @@ void VulkanDevice::CreateVertexBuffers(BufferData<Vertex>* a_VertexData)
 
     void* t_Data;
     vkMapMemory(m_LogicalDevice, t_StagingBufferMemory, 0, t_BufferSize, 0, &t_Data);
-    memcpy(t_Data, a_VertexData->GetElements().data(), (size_t)t_BufferSize);
+    memcpy(t_Data, a_Vertices.data(), t_BufferSize);
     vkUnmapMemory(m_LogicalDevice, t_StagingBufferMemory);
 
     CreateBuffer(t_BufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-        a_VertexData->GetBuffer(), a_VertexData->GetBufferMemory());
+        a_VertexData.buffer, a_VertexData.bufferMemory);
 
-    CopyBuffer(t_BufferSize, t_StagingBuffer, a_VertexData->GetBuffer());
+    CopyBuffer(t_BufferSize, t_StagingBuffer, a_VertexData.buffer);
 
     vkDestroyBuffer(m_LogicalDevice, t_StagingBuffer, nullptr);
     vkFreeMemory(m_LogicalDevice, t_StagingBufferMemory, nullptr);
 }
 
-void VulkanDevice::CreateIndexBuffers(BufferData<uint32_t>* a_IndexData)
+void VulkanDevice::CreateIndexBuffers(BufferData<uint32_t>& a_IndexData, const std::vector<uint32_t>& a_Indices)
 {
-    VkDeviceSize t_BufferSize = a_IndexData->GetBufferSize();
+    VkDeviceSize t_BufferSize = a_IndexData.GetBufferSize();
 
     VkBuffer t_StagingBuffer;
     VkDeviceMemory t_StagingBufferMemory;
@@ -334,13 +334,13 @@ void VulkanDevice::CreateIndexBuffers(BufferData<uint32_t>* a_IndexData)
 
     void* t_Data;
     vkMapMemory(m_LogicalDevice, t_StagingBufferMemory, 0, t_BufferSize, 0, &t_Data);
-    memcpy(t_Data, a_IndexData->GetElements().data(), (size_t)t_BufferSize);
+    memcpy(t_Data, a_Indices.data(), (size_t)t_BufferSize);
     vkUnmapMemory(m_LogicalDevice, t_StagingBufferMemory);
 
     CreateBuffer(t_BufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-        a_IndexData->GetBuffer(), a_IndexData->GetBufferMemory());
+        a_IndexData.buffer, a_IndexData.bufferMemory);
 
-    CopyBuffer(t_BufferSize, t_StagingBuffer, a_IndexData->GetBuffer());
+    CopyBuffer(t_BufferSize, t_StagingBuffer, a_IndexData.buffer);
 
     vkDestroyBuffer(m_LogicalDevice, t_StagingBuffer, nullptr);
     vkFreeMemory(m_LogicalDevice, t_StagingBufferMemory, nullptr);
@@ -384,7 +384,7 @@ void VulkanDevice::CreateBuffer(VkDeviceSize a_Size, VkBufferUsageFlags a_Usage,
     vkBindBufferMemory(m_LogicalDevice, r_Buffer, r_BufferMemory, 0);
 }
 
-void VulkanDevice::CopyBuffer(VkDeviceSize a_Size, VkBuffer& r_SrcBuffer, VkBuffer& r_DstBuffer)
+void VulkanDevice::CopyBuffer(VkDeviceSize a_Size, VkBuffer r_SrcBuffer, VkBuffer r_DstBuffer)
 {
     VkCommandBuffer t_CommandBuffer = BeginSingleTimeCommands();
 

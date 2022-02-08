@@ -1,7 +1,6 @@
 #include "Precomp.h"
 #include "MeshResource.h"
 
-//#define TINYOBJLOADER_IMPLEMENTATION
 #pragma warning (push, 0)
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <ObjLoader/tiny_obj_loader.h>
@@ -59,6 +58,7 @@ namespace Engine
                 return false;
             }
 
+            std::vector<glm::vec3> positions;
             std::vector<Vertex> vertices;
             std::vector<uint32_t> indices;
 
@@ -75,6 +75,8 @@ namespace Engine
                         static_cast<float>(t_Attrib.vertices[3 * l_Index.vertex_index + 1]),
                         static_cast<float>(t_Attrib.vertices[3 * l_Index.vertex_index + 2]));
 
+                    positions.push_back(vertex.position);
+
                     //vertex.normal = glm::vec3(
                     //    static_cast<float>(t_Attrib.normals[3 * l_Index.normal_index + 0]),
                     //    static_cast<float>(t_Attrib.normals[3 * l_Index.normal_index + 1]),
@@ -87,7 +89,8 @@ namespace Engine
                     vertex.color = { 1.0f, 1.0f, 1.0f };
 
 
-                    if (t_UniqueVertices.count(vertex) == 0) {
+                    if (t_UniqueVertices.count(vertex) == 0) 
+                    {
                         t_UniqueVertices[vertex] = static_cast<uint32_t>(vertices.size());
                         vertices.push_back(vertex);
                     }
@@ -96,11 +99,11 @@ namespace Engine
                 }
             }
 
-            meshData.vertices = new BufferData<Vertex>(vertices);
-            meshData.indices = new BufferData<uint32_t>(indices);
-
             //setup in renderer.
-            r_ResourceAllocator.p_Renderer->SetupMesh(&meshData);
+            meshHandle = r_ResourceAllocator.p_Renderer->GenerateMesh(vertices, indices);
+
+            mesh.vertices = positions;
+            mesh.indices = indices;
 
             return true;
 		}

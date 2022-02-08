@@ -4,6 +4,12 @@
 
 namespace Engine
 {
+	struct Mesh
+	{
+		std::vector<glm::vec3> vertices;
+		std::vector<uint32_t> indices;
+	};
+
 	namespace Resource
 	{
 		class MeshResource : public Resource
@@ -17,7 +23,8 @@ namespace Engine
 			virtual bool Load(const char* a_FilePath);
 			virtual bool Unload();
 
-			MeshData meshData{};
+			uint32_t meshHandle = UINT32_MAX;
+			Mesh mesh;
 		};
 	}
 }

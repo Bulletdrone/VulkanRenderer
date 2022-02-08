@@ -16,7 +16,7 @@ public:
 	//Create a renderobject from a basic shape.
 	BaseRenderObject* CreateRenderObject(Transform* a_Transform, uint32_t a_MaterialHandle, GeometryType a_Type);
 	//Create a renderobject from a mesh.
-	BaseRenderObject* CreateRenderObject(Transform* a_Transform, uint32_t a_MaterialHandle, const char* a_MeshPath);
+	BaseRenderObject* CreateRenderObject(Transform* a_Transform, uint32_t a_MaterialHandle, uint32_t a_MeshHandle);
 
 	//Increases the m_CurrentRenderID by 1 and returns it.
 	uint32_t GetNextRenderID() { return m_CurrentRenderID++; }

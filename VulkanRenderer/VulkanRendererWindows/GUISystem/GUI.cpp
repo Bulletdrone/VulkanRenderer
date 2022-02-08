@@ -20,7 +20,7 @@
 		ImGui_ImplVulkan_Shutdown();
 	}
 
-	void GUISystem::Init(VkInstance& r_Instance, VkQueue& r_Queue, VkRenderPass& r_MainRenderPass)
+	void GUISystem::Init(const VkInstance r_Instance, const VkQueue r_Queue, const VkRenderPass r_MainRenderPass)
 	{
 		VkDescriptorPoolSize t_PoolSizes[] =
 		{
