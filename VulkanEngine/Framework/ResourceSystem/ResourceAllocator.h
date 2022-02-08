@@ -9,7 +9,7 @@ class Renderer;
 
 namespace Engine
 {
-	typedef uint64_t HashIndex;
+	typedef uint64_t hashindex;
 
 	namespace Resource 
 	{ 
@@ -42,29 +42,29 @@ namespace Engine
 		~ResourceAllocator();
 
 		template <typename T>
-		T& GetResource(HashIndex a_ID);
+		T& GetResource(hashindex a_ID);
 		template <typename T>
 		T& GetResource(const char* a_FilePath, Resource::ResourceType a_Type);
 
-		HashIndex LoadResource(const char* a_FilePath, Resource::ResourceType a_Type);
+		hashindex LoadResource(const char* a_FilePath, Resource::ResourceType a_Type);
 
 		void UnloadResource(const char* a_FilePath);
-		void UnloadResource(HashIndex a_ID);
+		void UnloadResource(hashindex a_ID);
 
 		void SetRenderer(Renderer* a_Renderer) { p_Renderer = a_Renderer; }
 
 	private:
-		HashIndex GetHashFromPath(const char* a_FilePath);
+		hashindex GetHashFromPath(const char* a_FilePath);
 
 	private:
-		std::unordered_map<HashIndex, Resource::Resource*> m_Resources;
+		std::unordered_map<hashindex, Resource::Resource*> m_Resources;
 
 	public:
 		Renderer* p_Renderer = nullptr;
 	};
 
 	template<typename T>
-	inline T& ResourceAllocator::GetResource(HashIndex a_ID)
+	inline T& ResourceAllocator::GetResource(hashindex a_ID)
 	{
 		Resource::Resource& t_Resource = m_Resources.at(a_ID);
 
@@ -74,7 +74,7 @@ namespace Engine
 	template<typename T>
 	inline T& ResourceAllocator::GetResource(const char* a_FilePath, Resource::ResourceType a_Type)
 	{
-		HashIndex t_HashIndex = GetHashFromPath(a_FilePath);
+		hashindex t_HashIndex = GetHashFromPath(a_FilePath);
 
 		auto t_Iterator = m_Resources.find(t_HashIndex);
 

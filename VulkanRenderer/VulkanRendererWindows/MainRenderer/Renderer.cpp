@@ -537,9 +537,12 @@ void Renderer::DrawObjects(VkCommandBuffer& r_CmdBuffer)
 
 	uint32_t t_LastMaterial = UINT32_MAX;
 	Material t_Material;
+	VkDescriptorSet t_LastMatDescriptorSet = VK_NULL_HANDLE;
 
 	uint32_t t_LastPipelineID = UINT32_MAX;
 	PipeLineData t_CurrentPipeLine;
+
+	
 
 	Material t_CurrentMaterial{};
 
@@ -556,7 +559,7 @@ void Renderer::DrawObjects(VkCommandBuffer& r_CmdBuffer)
 			t_Material = m_MaterialPool.Get(t_LastMaterial);
 
 			uint32_t t_PipelineID = t_Material.pipelineID;
-			
+
 			//only bind the pipeline if it doesn't match with the already bound one
 			if (t_PipelineID != t_LastPipelineID)
 			{
@@ -566,9 +569,11 @@ void Renderer::DrawObjects(VkCommandBuffer& r_CmdBuffer)
 				vkCmdBindPipeline(r_CmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, t_CurrentPipeLine.pipeLine);
 
 				vkCmdBindDescriptorSets(r_CmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, t_CurrentPipeLine.pipeLineLayout, 0, 1, &m_GlobalSet[m_CurrentFrame], 0, nullptr);
-				//vkCmdBindDescriptorSets(r_CmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, t_CurrentPipeLine.pipeLineLayout, MATERIALBINDING, 1, &t_Material.secondDescriptorSet, 0, nullptr);
 			}
-			vkCmdBindDescriptorSets(r_CmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, t_CurrentPipeLine.pipeLineLayout, 1, 1, &t_Material.secondDescriptorSet, 0, nullptr);
+			if (t_LastMatDescriptorSet != t_Material.secondDescriptorSet)
+			{
+				vkCmdBindDescriptorSets(r_CmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, t_CurrentPipeLine.pipeLineLayout, 1, 1, &t_Material.secondDescriptorSet, 0, nullptr);
+			}
 		}
 
 		//Set the Push constant data.

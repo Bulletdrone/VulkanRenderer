@@ -1,5 +1,8 @@
 #pragma once
+#pragma warning (push, 0)
 #include <Vulkan/vulkan.h>
+#pragma warning (pop)
+
 constexpr uint32_t RGBASize = 4;
 
 struct Texture

@@ -23,9 +23,9 @@ namespace Engine
 		}
 	}
 
-	HashIndex ResourceAllocator::LoadResource(const char* a_FilePath, Resource::ResourceType a_Type)
+	hashindex ResourceAllocator::LoadResource(const char* a_FilePath, Resource::ResourceType a_Type)
 	{
-		HashIndex t_Hash = GetHashFromPath(a_FilePath);
+		hashindex t_Hash = GetHashFromPath(a_FilePath);
 
 		Resource::Resource* resource = nullptr;
 
@@ -57,12 +57,12 @@ namespace Engine
 		Logger::Assert(m_Resources.at(GetHashFromPath(a_FilePath))->Unload(), "Failed to unload Resource");
 	}
 
-	void ResourceAllocator::UnloadResource(HashIndex a_ID)
+	void ResourceAllocator::UnloadResource(hashindex a_ID)
 	{
 		Logger::Assert(m_Resources.at(a_ID)->Unload(), "Failed to unload Resource");
 	}
 
-	HashIndex ResourceAllocator::GetHashFromPath(const char* a_FilePath)
+	hashindex ResourceAllocator::GetHashFromPath(const char* a_FilePath)
 	{
 		uint64_t t_Hash = 0;
 

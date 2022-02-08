@@ -5,7 +5,7 @@ namespace Engine
 {
 	class ResourceAllocator;
 
-	typedef uint64_t HashIndex;
+	typedef uint64_t hashindex;
 
 	namespace Resource
 	{
@@ -30,10 +30,10 @@ namespace Engine
 			virtual bool Load(const char* a_FilePath);
 			virtual bool Unload() = 0;
 
-			const HashIndex GetHashIndex();
+			const hashindex GetHashIndex();
 
 		private:
-			const HashIndex m_HashID;
+			const hashindex m_HashID;
 
 #ifdef _DEBUG
 			//For now debug has the ability to reload.

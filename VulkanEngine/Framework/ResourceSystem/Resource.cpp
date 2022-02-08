@@ -21,7 +21,7 @@ namespace Engine
             return true;
         }
 
-        const HashIndex Resource::GetHashIndex()
+        const hashindex Resource::GetHashIndex()
         {
             return m_HashID;
         }

@@ -1,6 +1,8 @@
 #pragma once
+#pragma warning (push, 0)
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#pragma warning (pop)
 
 class Transform
 {

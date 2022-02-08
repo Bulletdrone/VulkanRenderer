@@ -1,7 +1,9 @@
 #pragma once
 #include <vector>
 
-#include <Vulkan/vulkan.hpp>
+#pragma warning (push, 0)
+#include <Vulkan/vulkan.h>
+#pragma warning (pop)
 
 struct MeshData;
 class Renderer;
