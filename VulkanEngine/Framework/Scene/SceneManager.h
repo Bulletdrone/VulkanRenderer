@@ -26,10 +26,6 @@ namespace Engine
 		void SetScene(uint32_t a_SceneID);
 
 	private:
-		//temp for testing purposes.
-		Material* mat1;
-		Material* mat2;
-
 		int32_t CurrentScene = -1;
 		std::vector<Scene> m_Scenes;
 

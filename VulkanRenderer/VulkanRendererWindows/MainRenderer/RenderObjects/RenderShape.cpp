@@ -1,7 +1,7 @@
 #include "RenderShape.h"
 
-RenderShape::RenderShape(const uint32_t a_ID, Transform* a_Transform, Material& a_Material, MeshData* a_MeshData)
-	:	BaseRenderObject(a_ID, a_Transform, a_Material)
+RenderShape::RenderShape(const uint32_t a_ID, Transform* a_Transform, uint32_t a_MatHandle, MeshData* a_MeshData)
+	:	BaseRenderObject(a_ID, a_Transform, a_MatHandle)
 {
 	p_MeshData = a_MeshData;
 }

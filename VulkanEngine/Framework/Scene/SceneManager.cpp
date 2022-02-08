@@ -98,15 +98,15 @@ namespace Engine
 		m_Renderer->CreateStartBuffers();
 
 		Transform* t_PTrans = new Transform(glm::vec3(0, 0, 0), 1);
-		mat1 = new Material(m_Renderer->CreateMaterial(0, nullptr, 1,
-			&ResourceAllocator::GetInstance().GetResource<Resource::TextureResource>("../VulkanRenderer/Resources/Images/Background.png", Resource::ResourceType::Texture).texture));
+		uint32_t mat1 = m_Renderer->CreateMaterial(0, nullptr, 1,
+			&ResourceAllocator::GetInstance().GetResource<Resource::TextureResource>("../VulkanRenderer/Resources/Images/Background.png", Resource::ResourceType::Texture).texture);
 
-		m_ObjectManager->CreateRenderObject(t_PTrans, *mat1, "../VulkanRenderer/Resources/Models/Pavillion.obj");
+		m_ObjectManager->CreateRenderObject(t_PTrans, mat1, "../VulkanRenderer/Resources/Models/Pavillion.obj");
 
 		Transform* t_Transform2 = new Transform(glm::vec3(-0.7f, 0.9f, 0.2), 1);
-		mat2 = new Material(m_Renderer->CreateMaterial(0, nullptr, 1,
-			&ResourceAllocator::GetInstance().GetResource<Resource::TextureResource>("../VulkanRenderer/Resources/Images/Background1.png", Resource::ResourceType::Texture).texture));
+		uint32_t mat2 = m_Renderer->CreateMaterial(0, nullptr, 1,
+			&ResourceAllocator::GetInstance().GetResource<Resource::TextureResource>("../VulkanRenderer/Resources/Images/Background1.png", Resource::ResourceType::Texture).texture);
 
-		m_ObjectManager->CreateRenderObject(t_Transform2, *mat2, GeometryType::Quad);
+		m_ObjectManager->CreateRenderObject(t_Transform2, mat2, GeometryType::Quad);
 	}
 }

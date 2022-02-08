@@ -58,7 +58,7 @@ public:
 
 	//Only handles single images at the moment.
 	void CreateGlobalDescriptor();
-	Material CreateMaterial(uint32_t a_UniCount, VkBuffer* a_UniBuffers,
+	uint32_t CreateMaterial(uint32_t a_UniCount, VkBuffer* a_UniBuffers,
 		uint32_t a_ImageCount, Texture* a_Images, 
 		glm::vec4 a_Color = glm::vec4(0, 0, 0, 1));
 
@@ -96,6 +96,7 @@ private:
 
 	//All the renderObjects in ObjectManager.
 	std::vector<BaseRenderObject*>* p_RenderObjects;
+	ObjectPool<Material> m_MaterialPool;
 
 	//Window Data.
 	Window* m_Window;

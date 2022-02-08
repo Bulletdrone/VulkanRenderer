@@ -405,9 +405,10 @@ void Renderer::CreateGlobalDescriptor()
 	t_Builder.Build(m_GlobalSet[1], m_GlobalSetLayout);
 }
 
-Material Renderer::CreateMaterial(uint32_t a_UniCount, VkBuffer* a_UniBuffers, uint32_t a_ImageCount, Texture* a_Images, glm::vec4 a_Color)
+uint32_t Renderer::CreateMaterial(uint32_t a_UniCount, VkBuffer* a_UniBuffers, uint32_t a_ImageCount, Texture* a_Images, glm::vec4 a_Color)
 {
-	Material material{};
+	uint32_t t_Index = 0;
+	Material& material = m_MaterialPool.GetEmptyObject(t_Index);
 
 	VkDescriptorSetLayoutBinding t_ImageBinding = VkInit::CreateDescriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, MATERIALBINDING);
 	VkDescriptorSetLayoutCreateInfo t_ImageLayoutInfo = VkInit::CreateDescriptorSetLayoutCreateInfo(VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO, 1, &t_ImageBinding);
@@ -434,7 +435,7 @@ Material Renderer::CreateMaterial(uint32_t a_UniCount, VkBuffer* a_UniBuffers, u
 
 	material.ambientColor = a_Color;
 
-	return material;
+	return t_Index;
 }
 
 void Renderer::DrawFrame(uint32_t& r_ImageIndex)
@@ -533,10 +534,14 @@ void Renderer::DrawObjects(VkCommandBuffer& r_CmdBuffer)
 {
 	//Performance boost when getting the same data needed.
 	MeshData* t_LastMeshData = nullptr;
-	Material* t_LastMaterial = nullptr;
+
+	uint32_t t_LastMaterial = UINT32_MAX;
+	Material t_Material;
 
 	uint32_t t_LastPipelineID = UINT32_MAX;
-	PipeLineData* t_CurrentPipeLine = nullptr;
+	PipeLineData t_CurrentPipeLine;
+
+	Material t_CurrentMaterial{};
 
 	//Create this once for performance boost of not creating a mat4 everytime.
 	InstanceModel t_PushInstance{};
@@ -544,28 +549,32 @@ void Renderer::DrawObjects(VkCommandBuffer& r_CmdBuffer)
 	for (size_t i = 0; i < p_RenderObjects->size(); i++)
 	{
 		BaseRenderObject* t_RenderObject = p_RenderObjects->at(i);
-		uint32_t t_PipelineID = t_RenderObject->GetPipeLineID();
 
-		//only bind the pipeline if it doesn't match with the already bound one
-		if (t_PipelineID != t_LastPipelineID)
+		if (t_RenderObject->GetMaterialHandle() != t_LastMaterial)
 		{
-			t_CurrentPipeLine = &m_ShaderManager->PipelinePool.Get(t_PipelineID);
-			t_LastPipelineID = t_PipelineID;
+			t_LastMaterial = t_RenderObject->GetMaterialHandle();
+			t_Material = m_MaterialPool.Get(t_LastMaterial);
 
-			vkCmdBindPipeline(r_CmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, t_CurrentPipeLine->pipeLine);
+			uint32_t t_PipelineID = t_Material.pipelineID;
+			
+			//only bind the pipeline if it doesn't match with the already bound one
+			if (t_PipelineID != t_LastPipelineID)
+			{
+				t_CurrentPipeLine = m_ShaderManager->PipelinePool.Get(t_PipelineID);
+				t_LastPipelineID = t_PipelineID;
 
-			vkCmdBindDescriptorSets(r_CmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, t_CurrentPipeLine->pipeLineLayout, 0, 1, &m_GlobalSet[m_CurrentFrame], 0, nullptr);
-			vkCmdBindDescriptorSets(r_CmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, t_CurrentPipeLine->pipeLineLayout, MATERIALBINDING, 1, &t_RenderObject->GetMaterialDescriptorSet(), 0, nullptr);
-		}
-		else if (t_RenderObject->GetMaterial() != t_LastMaterial)
-		{
-			vkCmdBindDescriptorSets(r_CmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, t_CurrentPipeLine->pipeLineLayout, 1, 1, &t_RenderObject->GetMaterialDescriptorSet(), 0, nullptr);
+				vkCmdBindPipeline(r_CmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, t_CurrentPipeLine.pipeLine);
+
+				vkCmdBindDescriptorSets(r_CmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, t_CurrentPipeLine.pipeLineLayout, 0, 1, &m_GlobalSet[m_CurrentFrame], 0, nullptr);
+				//vkCmdBindDescriptorSets(r_CmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, t_CurrentPipeLine.pipeLineLayout, MATERIALBINDING, 1, &t_Material.secondDescriptorSet, 0, nullptr);
+			}
+			vkCmdBindDescriptorSets(r_CmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, t_CurrentPipeLine.pipeLineLayout, 1, 1, &t_Material.secondDescriptorSet, 0, nullptr);
 		}
 
 		//Set the Push constant data.
 		t_PushInstance.model = t_RenderObject->GetModelMatrix();
 
-		vkCmdPushConstants(r_CmdBuffer, t_CurrentPipeLine->pipeLineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(InstanceModel), &t_PushInstance);
+		vkCmdPushConstants(r_CmdBuffer, t_CurrentPipeLine.pipeLineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(InstanceModel), &t_PushInstance);
 
 		//only bind the mesh if it's a different one from last bind
 		if (t_RenderObject->GetMeshData() != t_LastMeshData) {

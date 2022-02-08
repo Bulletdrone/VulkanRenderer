@@ -9,7 +9,7 @@
 class BaseRenderObject : public SceneObject
 {
 public:
-	BaseRenderObject(const uint32_t a_ID, Transform* a_Transform, Material& a_Material);
+	BaseRenderObject(const uint32_t a_ID, Transform* a_Transform, uint32_t a_MatHandle);
 	virtual ~BaseRenderObject();
 
 	virtual void Update() = 0;
@@ -25,10 +25,7 @@ public:
 	//Getters
 	const glm::mat4& GetModelMatrix() const { return m_Model; }
 
-	uint32_t GetPipeLineID() const { return r_Material.pipelineID; }
-	VkDescriptorSet& GetMaterialDescriptorSet() const { return r_Material.secondDescriptorSet; }
-
-	Material* GetMaterial() const { return &r_Material; }
+	const uint32_t GetMaterialHandle() const { return m_MatHandle; }
 	MeshData* GetMeshData() const { return p_MeshData; }
 
 	BufferData<Vertex>* GetVertexData() const { return p_MeshData->GetVertexData(); }
@@ -41,7 +38,5 @@ protected:
 	//Vertex Data with it's buffers.
 	MeshData* p_MeshData = nullptr;
 	//PipelineData.
-	Material& r_Material;
-
-	
+	uint32_t m_MatHandle;
 };

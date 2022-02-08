@@ -39,9 +39,9 @@ void ObjectManager::UpdateObjects(float a_Dt)
 	p_Renderer->DrawFrame(t_ImageIndex);
 }
 
-BaseRenderObject* ObjectManager::CreateRenderObject(Transform* a_Transform, Material& a_Material, GeometryType a_Type)
+BaseRenderObject* ObjectManager::CreateRenderObject(Transform* a_Transform, uint32_t a_MaterialHandle, GeometryType a_Type)
 {
-	RenderShape* t_Shape = new RenderShape(GetNextRenderID(), a_Transform, a_Material, 
+	RenderShape* t_Shape = new RenderShape(GetNextRenderID(), a_Transform, a_MaterialHandle,
 		m_GeometryFactory.GetShape(a_Type));
 
 	m_RenderObjects.push_back(t_Shape);
@@ -49,9 +49,9 @@ BaseRenderObject* ObjectManager::CreateRenderObject(Transform* a_Transform, Mate
 	return t_Shape;
 }
 
-BaseRenderObject* ObjectManager::CreateRenderObject(Transform* a_Transform, Material& a_Material, const char* a_MeshPath)
+BaseRenderObject* ObjectManager::CreateRenderObject(Transform* a_Transform, uint32_t a_MaterialHandle, const char* a_MeshPath)
 {
-	RenderShape* t_Shape = new RenderShape(GetNextRenderID(), a_Transform, a_Material, 
+	RenderShape* t_Shape = new RenderShape(GetNextRenderID(), a_Transform, a_MaterialHandle,
 		&Engine::ResourceAllocator::GetInstance().GetResource<Engine::Resource::MeshResource>(a_MeshPath, Engine::Resource::ResourceType::Mesh).meshData);
 
 	m_RenderObjects.push_back(t_Shape);
