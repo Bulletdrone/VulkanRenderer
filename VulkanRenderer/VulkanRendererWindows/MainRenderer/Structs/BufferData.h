@@ -78,7 +78,7 @@ struct BufferData
 
 	const VkDeviceSize GetBufferSize() const;
 
-	uint32_t elementSize;
+	uint32_t elementSize = 0;
 
 	VkBuffer buffer = VK_NULL_HANDLE;
 	VkDeviceMemory bufferMemory = VK_NULL_HANDLE;

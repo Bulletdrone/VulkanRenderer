@@ -19,7 +19,7 @@ public:
 	//void RecreateDescriptors(const size_t a_FrameAmount, std::vector<VkBuffer>& r_UniformBuffers, VkDeviceSize a_BufferSize);
 
 public:
-	ObjectPool<PipeLineData> PipelinePool{ ObjectPool<PipeLineData>() };
+	ObjectPool<PipeLineData, uint32_t> PipelinePool;
 
 private:
 	VulkanDevice& rm_VulkanDevice;

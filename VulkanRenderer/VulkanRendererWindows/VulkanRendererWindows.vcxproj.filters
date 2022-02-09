@@ -192,5 +192,6 @@
     <ClInclude Include="MainRenderer\Structs\Texture.h" />
     <ClInclude Include="MainRenderer\RenderObjects\Geometry\GeometryFactory.h" />
     <ClInclude Include="MainRenderer\Structs\Shader.h" />
+    <ClInclude Include="MainRenderer\Tools\RenderHandle.h" />
   </ItemGroup>
 </Project>

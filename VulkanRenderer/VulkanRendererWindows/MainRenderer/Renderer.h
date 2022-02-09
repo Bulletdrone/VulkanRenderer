@@ -15,6 +15,8 @@
 #include "Handlers/ImageHandler.h"
 #include "Handlers/DepthHandler.h"
 
+#include "Tools/RenderHandle.h"
+
 constexpr uint32_t FRAMEBUFFER_AMOUNT = 2;
 constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
@@ -52,13 +54,13 @@ public:
 	void ReplaceActiveCamera(CameraObject* a_Cam);
 
 	//BufferData
-	uint32_t GenerateMesh(const std::vector<Vertex>& a_Vertices, const std::vector<uint32_t>& a_Indices);
+	RenderHandle GenerateMesh(const std::vector<Vertex>& a_Vertices, const std::vector<uint32_t>& a_Indices);
 	void SetupImage(Texture& a_Texture, const unsigned char* a_ImageBuffer);
 	Shader CreateShader(const unsigned char* a_ShaderCode, const size_t a_CodeSize);
 
 	//Only handles single images at the moment.
 	void CreateGlobalDescriptor();
-	uint32_t CreateMaterial(uint32_t a_UniCount, VkBuffer* a_UniBuffers,
+	RenderHandle CreateMaterial(uint32_t a_UniCount, VkBuffer* a_UniBuffers,
 		uint32_t a_ImageCount, Texture* a_Images, 
 		glm::vec4 a_Color = glm::vec4(0, 0, 0, 1));
 
@@ -96,8 +98,8 @@ private:
 
 	//All the renderObjects in ObjectManager.
 	std::vector<BaseRenderObject*>* p_RenderObjects;
-	ObjectPool<Material> m_MaterialPool;
-	ObjectPool<MeshData> m_MeshPool;
+	ObjectPool<Material, RenderHandle> m_MaterialPool;
+	ObjectPool<MeshData, RenderHandle> m_MeshPool;
 
 	//Window Data.
 	Window* m_Window;

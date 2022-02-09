@@ -1,6 +1,7 @@
 #pragma once
 
 #include "SceneObject.h"
+#include "Tools/RenderHandle.h"
 
 #include "Components/MeshData.h"
 #include "Components/Material.h"
@@ -9,7 +10,7 @@
 class BaseRenderObject : public SceneObject
 {
 public:
-	BaseRenderObject(const uint32_t a_ID, Transform* a_Transform, uint32_t a_MatHandle);
+	BaseRenderObject(const uint32_t a_ID, Transform* a_Transform, RenderHandle a_MatHandle);
 	virtual ~BaseRenderObject();
 
 	virtual void Update() = 0;
@@ -25,13 +26,13 @@ public:
 	//Getters
 	const glm::mat4& GetModelMatrix() const { return m_Model; }
 
-	const uint32_t GetMaterialHandle() const { return m_MatHandle; }
-	const uint32_t GetMeshHandle() const { return m_MeshHandle; }
+	const RenderHandle GetMaterialHandle() const { return m_MatHandle; }
+	const RenderHandle GetMeshHandle() const { return m_MeshHandle; }
 
 protected:
 	//Matrices.
 	glm::mat4 m_Model = glm::mat4(0);
 
-	uint32_t m_MeshHandle = 0;
-	uint32_t m_MatHandle = 0;
+	RenderHandle m_MeshHandle = 0;
+	RenderHandle m_MatHandle = RENDER_NULL_HANDLE;
 };

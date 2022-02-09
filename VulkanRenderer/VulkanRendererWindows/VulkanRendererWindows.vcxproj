@@ -78,6 +78,7 @@
     <ClInclude Include="MainRenderer\Structs\Shader.h" />
     <ClInclude Include="MainRenderer\Structs\Texture.h" />
     <ClInclude Include="MainRenderer\Structs\TextureData.h" />
+    <ClInclude Include="MainRenderer\Tools\RenderHandle.h" />
     <ClInclude Include="MainRenderer\Tools\ObjectPool.h" />
     <ClInclude Include="MainRenderer\Tools\VulkanInitializers.h" />
     <ClInclude Include="MainRenderer\VulkanDebugger\VulkanDebug.h" />

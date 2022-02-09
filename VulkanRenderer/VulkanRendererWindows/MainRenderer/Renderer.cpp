@@ -360,10 +360,10 @@ void Renderer::ReplaceActiveCamera(CameraObject* a_Cam)
 	p_ActiveCamera = a_Cam;
 }
 
-uint32_t Renderer::GenerateMesh(const std::vector<Vertex>& a_Vertices, const std::vector<uint32_t>& a_Indices)
+RenderHandle Renderer::GenerateMesh(const std::vector<Vertex>& a_Vertices, const std::vector<uint32_t>& a_Indices)
 {
-	uint32_t t_Index = 0;
-	MeshData& mesh = m_MeshPool.GetEmptyObject(t_Index);
+	RenderHandle t_Handle;
+	MeshData& mesh = m_MeshPool.GetEmptyObject(t_Handle);
 
 	mesh.vertices.elementSize = static_cast<uint32_t>(a_Vertices.size());
 	mesh.indices.elementSize = static_cast<uint32_t>(a_Indices.size());
@@ -371,7 +371,7 @@ uint32_t Renderer::GenerateMesh(const std::vector<Vertex>& a_Vertices, const std
 	m_VulkanDevice.CreateVertexBuffers(mesh.vertices, a_Vertices);
 	m_VulkanDevice.CreateIndexBuffers(mesh.indices, a_Indices);
 
-	return t_Index;
+	return t_Handle;
 }
 
 void Renderer::SetupImage(Texture& a_Texture, const unsigned char* a_ImageBuffer)
@@ -413,10 +413,10 @@ void Renderer::CreateGlobalDescriptor()
 	t_Builder.Build(m_GlobalSet[1], m_GlobalSetLayout);
 }
 
-uint32_t Renderer::CreateMaterial(uint32_t a_UniCount, VkBuffer* a_UniBuffers, uint32_t a_ImageCount, Texture* a_Images, glm::vec4 a_Color)
+RenderHandle Renderer::CreateMaterial(uint32_t a_UniCount, VkBuffer* a_UniBuffers, uint32_t a_ImageCount, Texture* a_Images, glm::vec4 a_Color)
 {
-	uint32_t t_Index = 0;
-	Material& material = m_MaterialPool.GetEmptyObject(t_Index);
+	RenderHandle t_Handle;
+	Material& material = m_MaterialPool.GetEmptyObject(t_Handle);
 
 	VkDescriptorSetLayoutBinding t_ImageBinding = VkInit::CreateDescriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, MATERIALBINDING);
 	VkDescriptorSetLayoutCreateInfo t_ImageLayoutInfo = VkInit::CreateDescriptorSetLayoutCreateInfo(VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO, 1, &t_ImageBinding);
@@ -443,7 +443,7 @@ uint32_t Renderer::CreateMaterial(uint32_t a_UniCount, VkBuffer* a_UniBuffers, u
 
 	material.ambientColor = a_Color;
 
-	return t_Index;
+	return t_Handle;
 }
 
 void Renderer::DrawFrame(uint32_t& r_ImageIndex)
@@ -541,17 +541,15 @@ void Renderer::DrawFrame(uint32_t& r_ImageIndex)
 void Renderer::DrawObjects(VkCommandBuffer a_CmdBuffer)
 {
 	//Performance boost when getting the same data needed.
-	uint32_t t_LastMeshData = UINT32_MAX;
+	RenderHandle t_LastMeshData = RENDER_NULL_HANDLE;
 	MeshData t_MeshData;
 
-	uint32_t t_LastMaterial = UINT32_MAX;
+	RenderHandle t_LastMaterial = RENDER_NULL_HANDLE;
 	Material t_Material;
 	VkDescriptorSet t_LastMatDescriptorSet = VK_NULL_HANDLE;
 
 	uint32_t t_LastPipelineID = UINT32_MAX;
 	PipeLineData t_CurrentPipeLine;
-
-	
 
 	Material t_CurrentMaterial{};
 
