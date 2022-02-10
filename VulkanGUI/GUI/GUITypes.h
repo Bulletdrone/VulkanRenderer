@@ -1,72 +1,75 @@
 #pragma once
 #include <string>
 
-namespace GUITypes
+namespace GUI
 {
-	struct GUIElement
+	namespace GUITypes
 	{
-		virtual ~GUIElement() {};
+		struct GUIElement
+		{
+			virtual ~GUIElement() {};
 
-		const char* name = "Default";
+			const char* name = "Default";
 
-		virtual bool DrawElement() = 0;
-	};
+			virtual bool DrawElement() = 0;
+		};
 
-	struct Text : public GUIElement
-	{
-		bool DrawElement() override;
+		struct Text : public GUIElement
+		{
+			bool DrawElement() override;
 
-		std::string* value = nullptr;
-	};
+			std::string* value = nullptr;
+		};
 
-	struct StaticText : public GUIElement
-	{
-		bool DrawElement() override;
+		struct StaticText : public GUIElement
+		{
+			bool DrawElement() override;
 
-		const char* value = nullptr;
-	};
+			const char* value = nullptr;
+		};
 
-	struct Button : public GUIElement
-	{
-		bool DrawElement() override;
+		struct Button : public GUIElement
+		{
+			bool DrawElement() override;
 
-		operator bool* () const { return value; }
+			operator bool* () const { return value; }
 
-		bool* value = nullptr;
-	};
+			bool* value = nullptr;
+		};
 
-	struct ColorEdit : public GUIElement
-	{
-		bool DrawElement() override;
+		struct ColorEdit : public GUIElement
+		{
+			bool DrawElement() override;
 
-		float* value = nullptr;
-	};
+			float* value = nullptr;
+		};
 
 #pragma region Sliders
 
-	//imGUI slider using vec2.
-	struct ISlider : public GUIElement
-	{
-		bool DrawElement() override;
+		//imGUI slider using vec2.
+		struct ISlider : public GUIElement
+		{
+			bool DrawElement() override;
 
-		int min = 0;
-		int max = 0;
+			int min = 0;
+			int max = 0;
 
-		int elementSize = 0;
-		int* value = nullptr;
-	};
+			int elementSize = 0;
+			int* value = nullptr;
+		};
 
-	//imGUI slider using vec2.
-	struct FSlider : public GUIElement
-	{
-		bool DrawElement() override;
+		//imGUI slider using vec2.
+		struct FSlider : public GUIElement
+		{
+			bool DrawElement() override;
 
-		float min = 0;
-		float max = 0;
+			float min = 0;
+			float max = 0;
 
-		int elementSize = 0;
-		float* value = nullptr;
-	};
+			int elementSize = 0;
+			float* value = nullptr;
+		};
 
 #pragma endregion
+	}
 }

@@ -7,7 +7,7 @@ class Renderer;
 class ObjectManager;
 class CameraController;
 class RenderFactory;
-class GUISystem;
+namespace GUI { class GUISystem; }
 
 class Transform;
 class Material;
@@ -30,7 +30,7 @@ namespace Engine
 		std::vector<Scene> m_Scenes;
 
 		Renderer* m_Renderer;
-		GUISystem* m_GuiSystem;
+		GUI::GUISystem* m_GuiSystem;
 
 		ObjectManager* m_ObjectManager;
 		CameraController* m_CameraController;

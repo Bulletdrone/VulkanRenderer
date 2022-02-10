@@ -26,15 +26,19 @@ namespace Engine
 		m_CameraController = new CameraController(m_Renderer);
 
 		//Setup GUI
-		m_GuiSystem = new GUISystem(m_Renderer->GetWindow());
+		m_GuiSystem = new GUI::GUISystem(m_Renderer->GetWindow());
 		m_Renderer->SetupGUIsystem(m_GuiSystem);
 
-		GUIWindow* gUIwindow = m_GuiSystem->CreateGUIWindow();
-		gUIwindow->Init(glm::vec2(0, 0), glm::vec2(300, 100), "Test Window", true);
+		GUI::GUICreationData mainWindow{};
+		mainWindow.position = glm::vec2(0, 0);
+		mainWindow.scale = glm::vec2(300, 100);
+		mainWindow.windowName = "Test Window";
 
-		GUITypes::StaticText t_Text{};
+		GUIHandle windowHandle = m_GuiSystem->CreateGUIWindow(mainWindow);
+
+		GUI::GUITypes::StaticText t_Text{};
 		t_Text.value = "Vulkan Renderer says hello to the user.";
-		gUIwindow->AddElement(t_Text);
+		m_GuiSystem->AddElementToGUIWindow(windowHandle, t_Text);
 	}
 
 	SceneManager::~SceneManager()

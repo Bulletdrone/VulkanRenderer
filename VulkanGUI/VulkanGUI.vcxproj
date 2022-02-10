@@ -186,6 +186,7 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="GUI\GUI.h" />
     <ClInclude Include="GUI\GUITypes.h" />
+    <ClInclude Include="GUI\GUIHandle.h" />
     <ClInclude Include="imGUI\backends\imgui_impl_glfw.h" />
     <ClInclude Include="imGUI\backends\imgui_impl_vulkan.h" />
     <ClInclude Include="imGUI\imconfig.h" />
@@ -199,13 +200,27 @@
   <ItemGroup>
     <ClCompile Include="GUI\GUI.cpp" />
     <ClCompile Include="GUI\GUITypes.cpp" />
-    <ClCompile Include="imGUI\backends\imgui_impl_glfw.cpp" />
-    <ClCompile Include="imGUI\backends\imgui_impl_vulkan.cpp" />
-    <ClCompile Include="imGUI\imgui.cpp" />
-    <ClCompile Include="imGUI\imgui_demo.cpp" />
-    <ClCompile Include="imGUI\imgui_draw.cpp" />
-    <ClCompile Include="imGUI\imgui_tables.cpp" />
-    <ClCompile Include="imGUI\imgui_widgets.cpp" />
+    <ClCompile Include="imGUI\backends\imgui_impl_glfw.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="imGUI\backends\imgui_impl_vulkan.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="imGUI\imgui.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="imGUI\imgui_demo.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="imGUI\imgui_draw.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="imGUI\imgui_tables.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="imGUI\imgui_widgets.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="pch.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

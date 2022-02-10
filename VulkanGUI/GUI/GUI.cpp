@@ -9,18 +9,26 @@
 #include "ImGUI/Backends/imgui_impl_glfw.h"
 #pragma warning (pop)
 
-
+namespace GUI
+{
 	GUISystem::GUISystem(GLFWwindow* a_Window)
-		:	p_Window(a_Window)
+		: p_Window(a_Window)
 	{}
 
 	GUISystem::~GUISystem()
 	{
+		for (auto& it : m_GUIWindows)
+		{
+			static_cast<GUIHandle>(it.first) = GUI_NULL_HANDLE;
+			delete it.second;
+		}
+		m_GUIWindows.clear();
+
 		vkDestroyDescriptorPool(m_Device, m_ImguiPool, nullptr);
 		ImGui_ImplVulkan_Shutdown();
 	}
 
-	
+
 	//@param r_CommandBuffer, A commandbuffer that must have begon and must be ended after this function.
 	void GUISystem::Init(VkCommandBuffer& r_CommandBuffer, const VkDevice a_Device, const VkInstance a_Instance, const VkPhysicalDevice a_PhysDevice, const VkQueue a_Queue, const VkRenderPass a_MainRenderPass)
 	{
@@ -76,9 +84,9 @@
 		ImGui_ImplVulkan_CreateFontsTexture(r_CommandBuffer);
 
 		ImGui_ImplVulkan_DestroyFontUploadObjects();
-		
+
 		//Setup standard font.
-		
+
 
 		// Setup Dear ImGui style
 		ImGui::StyleColorsDark();
@@ -92,9 +100,9 @@
 
 		ImGui::NewFrame();
 
-		for (size_t i = 0; i < m_GUIWindows.size(); i++)
+		for (auto& it : m_GUIWindows)
 		{
-			m_GUIWindows[i].Update(false);
+			it.second->Update(false);;
 		}
 
 		ImGui::Render();
@@ -103,17 +111,47 @@
 		//ImGui::ShowDemoWindow();
 	}
 
-	GUIWindow* GUISystem::CreateGUIWindow()
+	GUIHandle GUISystem::CreateGUIWindow(GUICreationData a_CreationData)
 	{
-		m_GUIWindows.push_back(GUIWindow());
-		return &m_GUIWindows.back();
+		m_HandlerCount++;
+		GUIHandle handle = m_HandlerCount;
+		m_GUIWindows.emplace(std::make_pair(handle, new GUIWindow(a_CreationData)));
+
+		return handle;
+	}
+
+	bool GUISystem::DeleteGUIWindow(GUIHandle a_Handle)
+	{
+		if (a_Handle.IsValid())
+		{
+			auto it = m_GUIWindows.find(a_Handle);
+			if (it != m_GUIWindows.end())
+			{
+				delete it->second;
+				m_GUIWindows.erase(it);
+				return true;
+			}
+			printf("Failed to delete GUIWindow, hash couldn't find an element.");
+			return false;
+		}
+		printf("Failed to delete GUIWindow, handler invalid");
+		return false;
 	}
 
 #pragma region WindowData
 
 
-	GUIWindow::GUIWindow()
-	{}
+	GUIWindow::GUIWindow(GUICreationData a_CreationData)
+	{
+		m_Position = a_CreationData.position;
+		m_Scale = a_CreationData.scale;
+
+		m_WindowName = a_CreationData.windowName;
+		if (!a_CreationData.resizable)
+			m_WindowFlags = ImGuiWindowFlags_NoResize |
+			ImGuiWindowFlags_NoMove |
+			ImGuiWindowFlags_NoCollapse;
+	}
 
 	GUIWindow::~GUIWindow()
 	{
@@ -122,18 +160,6 @@
 			delete it;
 		}
 		m_GUIElements.clear();
-	}
-
-	void GUIWindow::Init(glm::vec2 a_Position, glm::vec2 a_Scale, const char* a_WindowName, bool a_Resizable)
-	{
-		m_Position = a_Position;
-		m_Scale = a_Scale;
-
-		m_WindowName = a_WindowName;
-		if (!a_Resizable)
-			m_WindowFlags = ImGuiWindowFlags_NoResize | 
-			ImGuiWindowFlags_NoMove |
-			ImGuiWindowFlags_NoCollapse;
 	}
 
 	bool GUIWindow::Update(bool a_IsChild)
@@ -173,11 +199,16 @@
 		return t_ValueChanged;
 	}
 
+	void GUIWindow::AddElement(GUITypes::GUIElement* a_Element)
+	{
+		m_GUIElements.push_back(a_Element);
+	}
+
 	GUIWindow& GUIWindow::CreateChildWindow()
 	{
 		m_ChildWindows.resize(m_ChildWindows.size() + 1);
 		return m_ChildWindows.back();
 	}
 
-
+}
 #pragma endregion

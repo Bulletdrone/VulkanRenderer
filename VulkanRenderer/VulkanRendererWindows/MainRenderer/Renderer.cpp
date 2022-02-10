@@ -393,7 +393,7 @@ Shader Renderer::CreateShader(const unsigned char* a_ShaderCode, const size_t a_
 	return shader;
 }
 
-void Renderer::SetupGUIsystem(GUISystem* p_GuiSystem)
+void Renderer::SetupGUIsystem(GUI::GUISystem* p_GuiSystem)
 {
 	VkCommandBuffer t_Cmd = m_VulkanDevice.BeginSingleTimeCommands();
 	p_GuiSystem->Init(t_Cmd, m_VulkanDevice, mvk_Instance, m_VulkanDevice.m_PhysicalDevice, mvk_GraphicsQueue, mvk_RenderPass);

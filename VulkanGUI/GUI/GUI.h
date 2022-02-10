@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <unordered_map>
 #include <string>
 
 #pragma warning (push, 0)
@@ -8,66 +9,96 @@
 #include <Vulkan/vulkan.hpp>
 #pragma warning (pop)
 #include "GUITypes.h"
+#include "GUIHandle.h"
 
 typedef int ImGuiWindowFlags;
 
-class GUIWindow
+namespace GUI 
 {
-public:
-	GUIWindow();
-	~GUIWindow();
+	struct GUICreationData
+	{
+		glm::vec2 position;
+		glm::vec2 scale;
 
-	void Init(glm::vec2 a_Position, glm::vec2 a_Scale, const char* a_WindowName, bool a_Resizable = true);
-	//Returns true if a condition changed that requires the values to be send back.
-	bool Update(bool a_IsChild);
+		const char* windowName;
 
-	void SetActive(bool a_IsActive) { m_Active = a_IsActive; }
+		//true by default
+		bool resizable = true;
+	};
 
-	template <typename TGUIElement>
-	void AddElement(TGUIElement a_Element);
+	class GUIWindow
+	{
+	public:
+		GUIWindow() {};
+		GUIWindow(GUICreationData a_CreationData);
+		~GUIWindow();
 
-	GUIWindow& CreateChildWindow();
+		//Returns true if a condition changed that requires the values to be send back.
+		bool Update(bool a_IsChild);
 
-private:
-	glm::vec2 m_Position = glm::vec2(0, 0);
-	glm::vec2 m_Scale = glm::vec2(100, 100);
-	ImGuiWindowFlags m_WindowFlags = 0;
+		void SetActive(bool a_IsActive) { m_Active = a_IsActive; }
 
-	bool m_Active = true;
+		void AddElement(GUITypes::GUIElement* a_Element);
 
-	const char* m_WindowName = "Default";
+		GUIWindow& CreateChildWindow();
 
-	std::vector<GUITypes::GUIElement*> m_GUIElements;
+	private:
+		glm::vec2 m_Position = glm::vec2(0, 0);
+		glm::vec2 m_Scale = glm::vec2(100, 100);
+		ImGuiWindowFlags m_WindowFlags = 0;
 
-	std::vector<GUIWindow> m_ChildWindows;
-};
+		bool m_Active = true;
 
-template <typename TGUIElement>
-void GUIWindow::AddElement(TGUIElement a_Element)
-{
-	GUITypes::GUIElement* element = new TGUIElement(a_Element);
-	m_GUIElements.push_back(element);
+		const char* m_WindowName = "Default";
+
+		std::vector<GUITypes::GUIElement*> m_GUIElements;
+
+		std::vector<GUIWindow> m_ChildWindows;
+	};
+
+
+
+	class GUISystem
+	{
+	public:
+		GUISystem(GLFWwindow* a_Window);
+		~GUISystem();
+
+		void Init(VkCommandBuffer& r_CommandBuffer, const VkDevice a_Device, const VkInstance a_Instance, const VkPhysicalDevice a_PhysDevice, const VkQueue a_Queue, const VkRenderPass a_MainRenderPass);
+		void Update();
+
+		//Creates an GUIWindow and returns a pointer of the one being creatd inside m_GUIWindows.
+		GUIHandle CreateGUIWindow(GUICreationData a_CreationData);
+		bool DeleteGUIWindow(GUIHandle a_Handle);
+
+		template <typename TGUIElement>
+		bool AddElementToGUIWindow(GUIHandle a_Handle, TGUIElement a_Element);
+
+	private:
+		std::unordered_map<uint32_t, GUIWindow*> m_GUIWindows;
+
+		uint32_t m_HandlerCount = 0;
+
+		VkDescriptorPool m_ImguiPool = VK_NULL_HANDLE;
+
+		VkDevice m_Device = VK_NULL_HANDLE;
+		GLFWwindow* p_Window = nullptr;
+	};
+
+	template<typename TGUIElement>
+	inline bool GUISystem::AddElementToGUIWindow(GUIHandle a_Handle, TGUIElement a_Element)
+	{
+		auto it = m_GUIWindows.find(a_Handle);
+
+		if (it != m_GUIWindows.end() && a_Handle.IsValid())
+		{
+			GUITypes::GUIElement* element = new TGUIElement(a_Element);
+			it->second->AddElement(element);
+
+			return true;
+		}
+
+		printf("GUI: Failed to add element. The handler isn't valid.");
+		return false;
+	}
 }
-
-
-
-class GUISystem
-{
-public:
-	GUISystem(GLFWwindow* a_Window);
-	~GUISystem();
-
-	void Init(VkCommandBuffer& r_CommandBuffer, const VkDevice a_Device, const VkInstance a_Instance, const VkPhysicalDevice a_PhysDevice, const VkQueue a_Queue, const VkRenderPass a_MainRenderPass);
-	void Update();
-
-	//Creates an GUIWindow and returns a pointer of the one being creatd inside m_GUIWindows.
-	GUIWindow* CreateGUIWindow();
-
-private:
-	std::vector<GUIWindow> m_GUIWindows;
-
-	VkDescriptorPool m_ImguiPool = VK_NULL_HANDLE;
-	
-	VkDevice m_Device = VK_NULL_HANDLE;
-	GLFWwindow* p_Window = nullptr;
-};
