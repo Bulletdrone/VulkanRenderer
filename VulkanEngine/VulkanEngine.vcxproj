@@ -101,19 +101,19 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)ExternalLibraries;$(SolutionDir)ExternalLibraries\GLFW\$(Platform)\include;$(SolutionDir)ExternalLibraries\Vulkan\Include;$(SolutionDir)VulkanRenderer\VulkanRendererWindows\GUISystem;$(SolutionDir)VulkanRenderer\VulkanRendererWindows\MainRenderer;$(ProjectDir)Framework\Precomp;$(ProjectDir)Framework;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)ExternalLibraries;$(SolutionDir)ExternalLibraries\GLFW\$(Platform)\include;$(SolutionDir)ExternalLibraries\Vulkan\Include;$(SolutionDir)VulkanGUI;$(SolutionDir)VulkanRenderer\VulkanRendererWindows\MainRenderer;$(ProjectDir)Framework\Precomp;$(ProjectDir)Framework;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)ExternalLibraries;$(SolutionDir)ExternalLibraries\GLFW\$(Platform)\include;$(SolutionDir)ExternalLibraries\Vulkan\Include;$(SolutionDir)VulkanRenderer\VulkanRendererWindows\GUISystem;$(SolutionDir)VulkanRenderer\VulkanRendererWindows\MainRenderer;$(ProjectDir)Framework\Precomp;$(ProjectDir)Framework;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)ExternalLibraries;$(SolutionDir)ExternalLibraries\GLFW\$(Platform)\include;$(SolutionDir)ExternalLibraries\Vulkan\Include;$(SolutionDir)VulkanGUI;$(SolutionDir)VulkanRenderer\VulkanRendererWindows\MainRenderer;$(ProjectDir)Framework\Precomp;$(ProjectDir)Framework;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)ExternalLibraries;$(SolutionDir)ExternalLibraries\GLFW\$(Platform)\include;$(SolutionDir)ExternalLibraries\Vulkan\Include;$(SolutionDir)VulkanRenderer\VulkanRendererWindows\GUISystem;$(SolutionDir)VulkanRenderer\VulkanRendererWindows\MainRenderer;$(ProjectDir)Framework\Precomp;$(ProjectDir)Framework;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)ExternalLibraries;$(SolutionDir)ExternalLibraries\GLFW\$(Platform)\include;$(SolutionDir)ExternalLibraries\Vulkan\Include;$(SolutionDir)VulkanGUI;$(SolutionDir)VulkanRenderer\VulkanRendererWindows\MainRenderer;$(ProjectDir)Framework\Precomp;$(ProjectDir)Framework;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)ExternalLibraries;$(SolutionDir)ExternalLibraries\GLFW\$(Platform)\include;$(SolutionDir)ExternalLibraries\Vulkan\Include;$(SolutionDir)VulkanRenderer\VulkanRendererWindows\GUISystem;$(SolutionDir)VulkanRenderer\VulkanRendererWindows\MainRenderer;$(ProjectDir)Framework\Precomp;$(ProjectDir)Framework;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)ExternalLibraries;$(SolutionDir)ExternalLibraries\GLFW\$(Platform)\include;$(SolutionDir)ExternalLibraries\Vulkan\Include;$(SolutionDir)VulkanGUI;$(SolutionDir)VulkanRenderer\VulkanRendererWindows\MainRenderer;$(ProjectDir)Framework\Precomp;$(ProjectDir)Framework;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -130,7 +130,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Renderer.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Renderer.lib;GUI.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/NODEFAULTLIB:LIBCMT %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <ProjectReference>
@@ -155,7 +155,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Renderer.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Renderer.lib;GUI.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/NODEFAULTLIB:LIBCMT %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <ProjectReference>
@@ -177,7 +177,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Renderer.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Renderer.lib;GUI.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/NODEFAULTLIB:LIBCMT %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <ProjectReference>
@@ -202,7 +202,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Renderer.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Renderer.lib;GUI.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/NODEFAULTLIB:LIBCMT %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <ProjectReference>

@@ -1,27 +1,31 @@
 #include "GUI.h"
-
-#include "VulkanSwapChain.h"
+#include "pch.h"
 
 #pragma warning (push, 0)
 #include "ImGUI/imgui.h"
+
 
 #include "imGUI/Backends/imgui_impl_vulkan.h"
 #include "ImGUI/Backends/imgui_impl_glfw.h"
 #pragma warning (pop)
 
 
-	GUISystem::GUISystem(GLFWwindow* a_Window, VulkanDevice& r_Device, const VulkanSwapChain& r_SwapChain)
-		:	rm_Device(r_Device), rm_SwapChain(r_SwapChain), p_Window(a_Window)
+	GUISystem::GUISystem(GLFWwindow* a_Window)
+		:	p_Window(a_Window)
 	{}
 
 	GUISystem::~GUISystem()
 	{
-		vkDestroyDescriptorPool(rm_Device, m_ImguiPool, nullptr);
+		vkDestroyDescriptorPool(m_Device, m_ImguiPool, nullptr);
 		ImGui_ImplVulkan_Shutdown();
 	}
 
-	void GUISystem::Init(const VkInstance r_Instance, const VkQueue r_Queue, const VkRenderPass r_MainRenderPass)
+	
+	//@param r_CommandBuffer, A commandbuffer that must have begon and must be ended after this function.
+	void GUISystem::Init(VkCommandBuffer& r_CommandBuffer, const VkDevice a_Device, const VkInstance a_Instance, const VkPhysicalDevice a_PhysDevice, const VkQueue a_Queue, const VkRenderPass a_MainRenderPass)
 	{
+		m_Device = a_Device;
+
 		VkDescriptorPoolSize t_PoolSizes[] =
 		{
 			{ VK_DESCRIPTOR_TYPE_SAMPLER, 1000 },
@@ -44,7 +48,7 @@
 		t_PoolInfo.poolSizeCount = sizeof(t_PoolSizes) / sizeof(t_PoolSizes[0]);
 		t_PoolInfo.pPoolSizes = t_PoolSizes;
 
-		vkCreateDescriptorPool(rm_Device, &t_PoolInfo, nullptr, &m_ImguiPool);
+		vkCreateDescriptorPool(m_Device, &t_PoolInfo, nullptr, &m_ImguiPool);
 
 		//Setup context
 		IMGUI_CHECKVERSION();
@@ -54,11 +58,11 @@
 
 		//setup renderer bindings.
 		ImGui_ImplVulkan_InitInfo t_InitInfo = {};
-		t_InitInfo.Instance = r_Instance;
-		t_InitInfo.PhysicalDevice = rm_Device.m_PhysicalDevice;
-		t_InitInfo.Device = rm_Device;
+		t_InitInfo.Instance = a_Instance;
+		t_InitInfo.PhysicalDevice = a_PhysDevice;
+		t_InitInfo.Device = m_Device;
 		t_InitInfo.QueueFamily = VK_NULL_HANDLE;
-		t_InitInfo.Queue = r_Queue;
+		t_InitInfo.Queue = a_Queue;
 		t_InitInfo.PipelineCache = VK_NULL_HANDLE;
 		t_InitInfo.DescriptorPool = m_ImguiPool;
 		t_InitInfo.Allocator = VK_NULL_HANDLE;
@@ -67,11 +71,9 @@
 		t_InitInfo.ImageCount = 3;
 		t_InitInfo.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
 
-		ImGui_ImplVulkan_Init(&t_InitInfo, r_MainRenderPass);
+		ImGui_ImplVulkan_Init(&t_InitInfo, a_MainRenderPass);
 
-		VkCommandBuffer t_Cmd = rm_Device.BeginSingleTimeCommands();
-		ImGui_ImplVulkan_CreateFontsTexture(t_Cmd);
-		rm_Device.EndSingleTimeCommands(t_Cmd);
+		ImGui_ImplVulkan_CreateFontsTexture(r_CommandBuffer);
 
 		ImGui_ImplVulkan_DestroyFontUploadObjects();
 		

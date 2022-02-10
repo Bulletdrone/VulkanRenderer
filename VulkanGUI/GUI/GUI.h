@@ -2,17 +2,14 @@
 #include <vector>
 #include <string>
 
-#include "glm/vec2.hpp"
+#pragma warning (push, 0)
+#include <glm/vec2.hpp>
+#include <glfw3.h>
+#include <Vulkan/vulkan.hpp>
+#pragma warning (pop)
 #include "GUITypes.h"
 
-#include "Window.h"
-
 typedef int ImGuiWindowFlags;
-
-struct VulkanDevice;
-class VulkanSwapChain;
-
-struct GLFWwindow;
 
 class GUIWindow
 {
@@ -80,10 +77,10 @@ private:
 class GUISystem
 {
 public:
-	GUISystem(GLFWwindow* a_Window, VulkanDevice& r_Device, const VulkanSwapChain& r_SwapChain);
+	GUISystem(GLFWwindow* a_Window);
 	~GUISystem();
 
-	void Init(const VkInstance r_Instance, const VkQueue r_Queue, const VkRenderPass r_MainRenderPass);
+	void Init(VkCommandBuffer& r_CommandBuffer, const VkDevice a_Device, const VkInstance a_Instance, const VkPhysicalDevice a_PhysDevice, const VkQueue a_Queue, const VkRenderPass a_MainRenderPass);
 	void Update();
 
 	//Creates an GUIWindow and returns a pointer of the one being creatd inside m_GUIWindows.
@@ -94,7 +91,6 @@ private:
 
 	VkDescriptorPool m_ImguiPool = VK_NULL_HANDLE;
 	
-	VulkanDevice& rm_Device;
-	const VulkanSwapChain& rm_SwapChain;
+	VkDevice m_Device;
 	GLFWwindow* p_Window;
 };

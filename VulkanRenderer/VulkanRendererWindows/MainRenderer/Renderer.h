@@ -22,6 +22,7 @@ constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
 struct Texture;
 struct Shader;
+class GUISystem;
 
 class Renderer
 {
@@ -57,6 +58,7 @@ public:
 	RenderHandle GenerateMesh(const std::vector<Vertex>& a_Vertices, const std::vector<uint32_t>& a_Indices);
 	void SetupImage(Texture& a_Texture, const unsigned char* a_ImageBuffer);
 	Shader CreateShader(const unsigned char* a_ShaderCode, const size_t a_CodeSize);
+	void SetupGUIsystem(GUISystem* p_GuiSystem);
 
 	//Only handles single images at the moment.
 	void CreateGlobalDescriptor();
@@ -72,11 +74,6 @@ public:
 
 	//Getters
 	GLFWwindow* GetWindow() const { return m_Window->GetWindow(); }
-	VulkanDevice& GetVulkanDevice() { return m_VulkanDevice; }
-	VulkanSwapChain& GetVulkanSwapChain() { return m_VulkanSwapChain; }
-	const VkInstance GetInstance() const { return mvk_Instance; }
-	const VkQueue GetQueue() const { return mvk_GraphicsQueue; }
-	const VkRenderPass GetRenderPass() const { return mvk_RenderPass; }
 
 	const float GetAspectRatio() { return m_VulkanSwapChain.SwapChainExtent.width / static_cast<float>(m_VulkanSwapChain.SwapChainExtent.height); }
 

@@ -7,10 +7,9 @@
 #include <algorithm>
 
 #pragma warning (push, 0)
-#include "ImGUI/imgui.h"
-
-#include "imGUI/Backends/imgui_impl_vulkan.h"
+#include <imGUI/Backends/imgui_impl_vulkan.h>
 #pragma warning (pop)
+#include <GUI/GUI.h>
 
 #include "Structs/Texture.h"
 #include "Structs/Shader.h"
@@ -73,10 +72,10 @@ void Renderer::SetupHandlers()
 	m_DepthHandler = new DepthHandler(m_VulkanDevice, m_ImageHandler);
 
 	m_DescriptorAllocator = new DescriptorAllocator();
-	m_DescriptorAllocator->Init(GetVulkanDevice());
+	m_DescriptorAllocator->Init(m_VulkanDevice);
 
 	m_DescriptorLayoutCache = new DescriptorLayoutCache();
-	m_DescriptorLayoutCache->Init(GetVulkanDevice());
+	m_DescriptorLayoutCache->Init(m_VulkanDevice);
 }
 
 //Call this after the creation of Vulkan.
@@ -392,6 +391,13 @@ Shader Renderer::CreateShader(const unsigned char* a_ShaderCode, const size_t a_
 	}
 
 	return shader;
+}
+
+void Renderer::SetupGUIsystem(GUISystem* p_GuiSystem)
+{
+	VkCommandBuffer t_Cmd = m_VulkanDevice.BeginSingleTimeCommands();
+	p_GuiSystem->Init(t_Cmd, m_VulkanDevice, mvk_Instance, m_VulkanDevice.m_PhysicalDevice, mvk_GraphicsQueue, mvk_RenderPass);
+	m_VulkanDevice.EndSingleTimeCommands(t_Cmd);
 }
 
 void Renderer::CreateGlobalDescriptor()

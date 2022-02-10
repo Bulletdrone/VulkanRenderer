@@ -3,7 +3,8 @@
 
 #include "ObjectManager.h"
 #include "CameraController.h"
-#include "GUI.h"
+#include "GUI/GUI.h"
+
 
 #include "ResourceSystem/ResourceAllocator.h"
 #include "ResourceSystem/TextureResource.h"
@@ -25,8 +26,8 @@ namespace Engine
 		m_CameraController = new CameraController(m_Renderer);
 
 		//Setup GUI
-		m_GuiSystem = new GUISystem(m_Renderer->GetWindow(), m_Renderer->GetVulkanDevice(), m_Renderer->GetVulkanSwapChain());
-		m_GuiSystem->Init(m_Renderer->GetInstance(), m_Renderer->GetQueue(), m_Renderer->GetRenderPass());
+		m_GuiSystem = new GUISystem(m_Renderer->GetWindow());
+		m_Renderer->SetupGUIsystem(m_GuiSystem);
 
 		GUIWindow* gUIwindow = m_GuiSystem->CreateGUIWindow();
 		gUIwindow->Init(glm::vec2(0, 0), glm::vec2(300, 100), "Test Window", true);

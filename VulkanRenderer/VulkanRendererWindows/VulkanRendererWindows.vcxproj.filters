@@ -28,12 +28,6 @@
     <Filter Include="MainRenderer\VulkanDebug">
       <UniqueIdentifier>{41425b40-895c-4d50-b6f7-c413859c8a44}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ImGuiFiles">
-      <UniqueIdentifier>{312b92d5-a7f9-4926-83e3-75ca059323f8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GUISystem">
-      <UniqueIdentifier>{ab55315d-2646-4ff9-8747-ee50e6477e16}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MainRenderer\Renderer.cpp">
@@ -87,19 +81,6 @@
     <ClCompile Include="MainRenderer\Handlers\DescriptorHandler.cpp">
       <Filter>MainRenderer\Handlers</Filter>
     </ClCompile>
-    <ClCompile Include="GUISystem\GUI.cpp">
-      <Filter>GUISystem</Filter>
-    </ClCompile>
-    <ClCompile Include="GUISystem\GUITypes.cpp">
-      <Filter>GUISystem</Filter>
-    </ClCompile>
-    <ClCompile Include="GUISystem\ImGUI\imgui.cpp" />
-    <ClCompile Include="GUISystem\ImGUI\imgui_demo.cpp" />
-    <ClCompile Include="GUISystem\ImGUI\imgui_draw.cpp" />
-    <ClCompile Include="GUISystem\ImGUI\imgui_tables.cpp" />
-    <ClCompile Include="GUISystem\ImGUI\imgui_widgets.cpp" />
-    <ClCompile Include="GUISystem\ImGUI\backends\imgui_impl_glfw.cpp" />
-    <ClCompile Include="GUISystem\ImGUI\backends\imgui_impl_vulkan.cpp" />
     <ClCompile Include="MainRenderer\RenderObjects\Geometry\GeometryFactory.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -175,20 +156,7 @@
     <ClInclude Include="MainRenderer\Handlers\DescriptorHandler.h">
       <Filter>MainRenderer\Handlers</Filter>
     </ClInclude>
-    <ClInclude Include="GUISystem\GUI.h">
-      <Filter>GUISystem</Filter>
-    </ClInclude>
-    <ClInclude Include="GUISystem\GUITypes.h">
-      <Filter>GUISystem</Filter>
-    </ClInclude>
     <ClInclude Include="GUISystem\ImGUI\imconfig.h" />
-    <ClInclude Include="GUISystem\ImGUI\imgui.h" />
-    <ClInclude Include="GUISystem\ImGUI\imgui_internal.h" />
-    <ClInclude Include="GUISystem\ImGUI\imstb_rectpack.h" />
-    <ClInclude Include="GUISystem\ImGUI\imstb_textedit.h" />
-    <ClInclude Include="GUISystem\ImGUI\imstb_truetype.h" />
-    <ClInclude Include="GUISystem\ImGUI\backends\imgui_impl_glfw.h" />
-    <ClInclude Include="GUISystem\ImGUI\backends\imgui_impl_vulkan.h" />
     <ClInclude Include="MainRenderer\Structs\Texture.h" />
     <ClInclude Include="MainRenderer\RenderObjects\Geometry\GeometryFactory.h" />
     <ClInclude Include="MainRenderer\Structs\Shader.h" />
