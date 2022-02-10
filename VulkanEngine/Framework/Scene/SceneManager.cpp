@@ -32,8 +32,9 @@ namespace Engine
 		GUIWindow* gUIwindow = m_GuiSystem->CreateGUIWindow();
 		gUIwindow->Init(glm::vec2(0, 0), glm::vec2(300, 100), "Test Window", true);
 
-		gUIwindow->AddText("Vulkan Renderer says hello to the user.");
-
+		GUITypes::StaticText t_Text{};
+		t_Text.value = "Vulkan Renderer says hello to the user.";
+		gUIwindow->AddElement(t_Text);
 	}
 
 	SceneManager::~SceneManager()

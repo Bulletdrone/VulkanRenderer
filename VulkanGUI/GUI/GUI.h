@@ -23,40 +23,8 @@ public:
 
 	void SetActive(bool a_IsActive) { m_Active = a_IsActive; }
 
-	/*	Add text on this window.
-		@param a_Text, Pointer to the text.*/
-	void AddText(std::string* a_Text);
-
-	/*	Add text on this window, this one isn't meant to be changed.
-		@param a_Text, the text, this is non-pointer and static.*/
-	void AddText(const char* a_Text);
-
-	/*	Create an slider for floats, can be to a maximum of 4 floats.
-		@param a_Name, slider name.
-		@param a_Values, the value_ptr of a glm::vec4. Must be that.*/
-	void AddColorEdit(const char* a_Name, float* a_Values);
-
-	/*	Create an slider for intergers, can be to a maximum of 4 ints.
-		@param a_Name, slider name.
-		@param a_Values, the int as a pointer. (max 4 ints)
-		@param a_ElementSize, how big the int array is.
-		@param a_Max, the maximum value for the slider.
-		@param a_Min, the minimum value for the slider. */
-	void AddIntSlider(const char* a_Name, int* a_Values, int a_ElementSize, int a_Min, int a_Max);
-
-	/*	Create an slider for floats, can be to a maximum of 4 floats.
-		@param a_Name, slider name.
-		@param a_Values, the float as a pointer. (max 4 floats)
-		@param a_ElementSize, how big the float array is.
-		@param a_Max, the maximum value for the slider.
-		@param a_Min, the minimum value for the slider. */
-	void AddFloatSlider(const char* a_Name, float* a_Values, int a_ElementSize, float a_Min, float a_Max);
-
-
-	/*	Create an imGUI button on this window.
-		@param a_Name, button name.
-		@param a_Values, Pointer to the bool.*/
-	void AddButton(const char* a_Name, bool* a_Values);
+	template <typename TGUIElement>
+	void AddElement(TGUIElement a_Element);
 
 	GUIWindow& CreateChildWindow();
 
@@ -73,6 +41,15 @@ private:
 
 	std::vector<GUIWindow> m_ChildWindows;
 };
+
+template <typename TGUIElement>
+void GUIWindow::AddElement(TGUIElement a_Element)
+{
+	GUITypes::GUIElement* element = new TGUIElement(a_Element);
+	m_GUIElements.push_back(element);
+}
+
+
 
 class GUISystem
 {
@@ -91,6 +68,6 @@ private:
 
 	VkDescriptorPool m_ImguiPool = VK_NULL_HANDLE;
 	
-	VkDevice m_Device;
-	GLFWwindow* p_Window;
+	VkDevice m_Device = VK_NULL_HANDLE;
+	GLFWwindow* p_Window = nullptr;
 };

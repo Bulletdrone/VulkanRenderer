@@ -173,64 +173,6 @@
 		return t_ValueChanged;
 	}
 
-	void GUIWindow::AddText(std::string* a_Text)
-	{
-		GUITypes::Text* t_Text = new GUITypes::Text;
-		t_Text->value = a_Text;
-
-		m_GUIElements.push_back(t_Text);
-	}
-
-	void GUIWindow::AddText(const char* a_Text)
-	{
-		GUITypes::StaticText* t_Text = new GUITypes::StaticText;
-		t_Text->value = a_Text;
-
-		m_GUIElements.push_back(t_Text);
-	}
-
-	void GUIWindow::AddColorEdit(const char* a_Name, float* a_Values)
-	{
-		GUITypes::ColorEdit* t_ColorEdit = new GUITypes::ColorEdit;
-		t_ColorEdit->name = a_Name;
-		t_ColorEdit->value = a_Values;
-
-		m_GUIElements.push_back(t_ColorEdit);
-	}
-
-	void GUIWindow::AddIntSlider(const char* a_Name, int* a_Values, int a_ElementSize, int a_Min, int a_Max)
-	{
-		GUITypes::ISlider* t_Slider = new GUITypes::ISlider;
-		t_Slider->name = a_Name;
-		t_Slider->value = a_Values;
-		t_Slider->elementSize = a_ElementSize;
-		t_Slider->max = a_Max;
-		t_Slider->min = a_Min;
-
-		m_GUIElements.push_back(t_Slider);
-	}
-
-	void GUIWindow::AddFloatSlider(const char* a_Name, float* a_Values, int a_ElementSize, float a_Min, float a_Max)
-	{
-		GUITypes::FSlider* t_Slider = new GUITypes::FSlider;
-		t_Slider->name = a_Name;
-		t_Slider->value = a_Values;
-		t_Slider->elementSize = a_ElementSize;
-		t_Slider->max = a_Max;
-		t_Slider->min = a_Min;
-
-		m_GUIElements.push_back(t_Slider);
-	}
-
-	void GUIWindow::AddButton(const char* a_Name, bool* a_Values)
-	{
-		GUITypes::Button* t_Slider = new GUITypes::Button;
-		t_Slider->name = a_Name;
-		t_Slider->value = a_Values;
-
-		m_GUIElements.push_back(t_Slider);
-	}
-
 	GUIWindow& GUIWindow::CreateChildWindow()
 	{
 		m_ChildWindows.resize(m_ChildWindows.size() + 1);
