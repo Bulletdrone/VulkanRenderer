@@ -64,7 +64,7 @@ namespace GUI
 		GUISystem(GLFWwindow* a_Window);
 		~GUISystem();
 
-		void Init(VkCommandBuffer& r_CommandBuffer, const VkDevice a_Device, const VkInstance a_Instance, const VkPhysicalDevice a_PhysDevice, const VkQueue a_Queue, const VkRenderPass a_MainRenderPass);
+		void Init(const VkDevice a_Device, const VkInstance a_Instance, const VkPhysicalDevice a_PhysDevice, const VkQueue a_Queue, const VkRenderPass a_MainRenderPass);
 		void Update();
 
 		//Creates an GUIWindow and returns a pointer of the one being creatd inside m_GUIWindows.

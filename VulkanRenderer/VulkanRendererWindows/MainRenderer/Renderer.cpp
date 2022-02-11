@@ -395,8 +395,11 @@ Shader Renderer::CreateShader(const unsigned char* a_ShaderCode, const size_t a_
 
 void Renderer::SetupGUIsystem(GUI::GUISystem* p_GuiSystem)
 {
+	p_GuiSystem->Init(m_VulkanDevice, mvk_Instance, m_VulkanDevice.m_PhysicalDevice, mvk_GraphicsQueue, mvk_RenderPass);
+	
+	//Setup standard font for imGUI.
 	VkCommandBuffer t_Cmd = m_VulkanDevice.BeginSingleTimeCommands();
-	p_GuiSystem->Init(t_Cmd, m_VulkanDevice, mvk_Instance, m_VulkanDevice.m_PhysicalDevice, mvk_GraphicsQueue, mvk_RenderPass);
+	ImGui_ImplVulkan_CreateFontsTexture(t_Cmd);
 	m_VulkanDevice.EndSingleTimeCommands(t_Cmd);
 }
 

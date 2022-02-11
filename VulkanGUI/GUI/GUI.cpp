@@ -30,7 +30,7 @@ namespace GUI
 
 
 	//@param r_CommandBuffer, A commandbuffer that must have begon and must be ended after this function.
-	void GUISystem::Init(VkCommandBuffer& r_CommandBuffer, const VkDevice a_Device, const VkInstance a_Instance, const VkPhysicalDevice a_PhysDevice, const VkQueue a_Queue, const VkRenderPass a_MainRenderPass)
+	void GUISystem::Init(const VkDevice a_Device, const VkInstance a_Instance, const VkPhysicalDevice a_PhysDevice, const VkQueue a_Queue, const VkRenderPass a_MainRenderPass)
 	{
 		m_Device = a_Device;
 
@@ -80,13 +80,6 @@ namespace GUI
 		t_InitInfo.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
 
 		ImGui_ImplVulkan_Init(&t_InitInfo, a_MainRenderPass);
-
-		ImGui_ImplVulkan_CreateFontsTexture(r_CommandBuffer);
-
-		ImGui_ImplVulkan_DestroyFontUploadObjects();
-
-		//Setup standard font.
-
 
 		// Setup Dear ImGui style
 		ImGui::StyleColorsDark();
