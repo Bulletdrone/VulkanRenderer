@@ -13,6 +13,7 @@
 
 typedef int ImGuiWindowFlags;
 
+
 namespace GUI 
 {
 	struct GUICreationData
@@ -72,7 +73,7 @@ namespace GUI
 		bool DeleteGUIWindow(GUIHandle a_Handle);
 
 		template <typename TGUIElement>
-		bool AddElementToGUIWindow(GUIHandle a_Handle, TGUIElement a_Element);
+		TGUIElement* AddElementToGUIWindow(GUIHandle a_Handle, TGUIElement a_Element);
 
 	private:
 		std::unordered_map<uint32_t, GUIWindow*> m_GUIWindows;
@@ -86,7 +87,7 @@ namespace GUI
 	};
 
 	template<typename TGUIElement>
-	inline bool GUISystem::AddElementToGUIWindow(GUIHandle a_Handle, TGUIElement a_Element)
+	inline TGUIElement* GUISystem::AddElementToGUIWindow(GUIHandle a_Handle, TGUIElement a_Element)
 	{
 		auto it = m_GUIWindows.find(a_Handle);
 
@@ -95,10 +96,10 @@ namespace GUI
 			GUITypes::GUIElement* element = new TGUIElement(a_Element);
 			it->second->AddElement(element);
 
-			return true;
+			return dynamic_cast<TGUIElement*>(element);
 		}
 
 		printf("GUI: Failed to add element. The handler isn't valid.");
-		return false;
+		return nullptr;
 	}
 }

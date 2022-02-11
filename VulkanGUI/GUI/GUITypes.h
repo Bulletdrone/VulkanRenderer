@@ -1,5 +1,10 @@
 #pragma once
 #include <string>
+#include <windows.h>
+
+#include <vector>
+
+#include <../VulkanEngine/Framework/ResourceSystem/ResourceAllocator.h>
 
 namespace GUI
 {
@@ -28,13 +33,19 @@ namespace GUI
 			const char* value = nullptr;
 		};
 
-		struct Button : public GUIElement
+		struct Button : GUIElement
+		{
+			virtual bool DrawElement();
+		};
+
+		struct GetPathButton : public Button
 		{
 			bool DrawElement() override;
 
-			operator bool* () const { return value; }
+			LPCWSTR fileFilter = nullptr;
 
-			bool* value = nullptr;
+			char* filePath = nullptr;
+			bool active = false;
 		};
 
 		struct ColorEdit : public GUIElement
@@ -56,6 +67,15 @@ namespace GUI
 
 			int elementSize = 0;
 			int* value = nullptr;
+		};
+
+		struct ITextSlider : public GUIElement
+		{
+			bool DrawElement() override;
+
+			int currentValue = 0;
+
+			std::vector<const char*> texts;
 		};
 
 		//imGUI slider using vec2.

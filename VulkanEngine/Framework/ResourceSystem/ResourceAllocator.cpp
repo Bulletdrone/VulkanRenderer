@@ -11,8 +11,7 @@
 namespace Engine
 {
 	ResourceAllocator::ResourceAllocator()
-	{
-	}
+	{}
 
 	ResourceAllocator::~ResourceAllocator()
 	{

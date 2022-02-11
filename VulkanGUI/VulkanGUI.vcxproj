@@ -110,7 +110,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>vulkan-1.lib;glfw3_mt.lib;</AdditionalDependencies>
+      <AdditionalDependencies>vulkan-1.lib;Comdlg32.lib;glfw3_mt.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)ExternalLibraries\GLFW\$(Platform)\lib;$(SolutionDir)ExternalLibraries\Vulkan\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
@@ -134,7 +134,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>vulkan-1.lib; glfw3.lib;</AdditionalDependencies>
+      <AdditionalDependencies>vulkan-1.lib;Comdlg32.lib; glfw3.lib;</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)ExternalLibraries\GLFW\$(Platform)\lib;$(SolutionDir)ExternalLibraries\Vulkan\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
@@ -155,7 +155,7 @@
     </Link>
     <Lib>
       <AdditionalLibraryDirectories>$(SolutionDir)ExternalLibraries\GLFW\$(Platform)\lib;$(SolutionDir)ExternalLibraries\Vulkan\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vulkan-1.lib;glfw3_mt.lib;</AdditionalDependencies>
+      <AdditionalDependencies>vulkan-1.lib;Comdlg32.lib;glfw3_mt.lib;</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -178,7 +178,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>vulkan-1.lib; glfw3.lib;</AdditionalDependencies>
+      <AdditionalDependencies>vulkan-1.lib;Comdlg32.lib; glfw3.lib;</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)ExternalLibraries\GLFW\$(Platform)\lib;$(SolutionDir)ExternalLibraries\Vulkan\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>

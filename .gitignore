@@ -8,9 +8,7 @@ Debug/
 VulkanMemoryAllocator/
 STB/
 ObjLoader/
-VulkanRenderer/Resources/Images/Background 1.png
-VulkanRenderer/Resources/Images/Background.png
 VulkanRenderer/Resources/Models/Pavillion.obj
-VulkanRenderer/GLSLShaders/compile.bat
-VulkanRenderer/VulkanRendererWindows/imgui.ini
 *.vcxproj.user
+*.ini
+*.bat

@@ -2,6 +2,8 @@
 #include <stdint.h>
 #include <unordered_map>
 
+#include <../VulkanGUI/GUI/GUITypes.h>
+
 struct Model;
 class Material;
 

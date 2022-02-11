@@ -2,6 +2,8 @@
 #include <stdint.h>
 
 #include "Scene.h"
+#include "GUI/GUI.h"
+#include "ObjectManager.h"
 
 class Renderer;
 class ObjectManager;
@@ -11,6 +13,17 @@ namespace GUI { class GUISystem; }
 
 class Transform;
 class Material;
+
+struct SceneObjectCreationGUI
+{
+	GUI::GUITypes::ITextSlider* MaterialSlider;
+	GUI::GUITypes::GetPathButton* PathButton;
+
+	std::vector<RenderHandle> Materials;
+
+	void AddMaterial(RenderHandle a_Rh, const char* a_Materialname);
+	void CreateRenderObject(ObjectManager* a_ObjectManager);
+};
 
 namespace Engine 
 {
@@ -34,5 +47,8 @@ namespace Engine
 
 		ObjectManager* m_ObjectManager;
 		CameraController* m_CameraController;
+
+
+		SceneObjectCreationGUI m_CreationWindow;
 	};
 }

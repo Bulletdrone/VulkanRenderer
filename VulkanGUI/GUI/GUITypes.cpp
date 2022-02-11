@@ -1,10 +1,13 @@
 #include "GUITypes.h"
-#include <assert.h>
 #include "pch.h"
 
 #pragma warning (push, 0)
 #include "ImGUI/imgui.h"
 #pragma warning (pop)
+#include <assert.h>
+#include <commdlg.h>
+
+constexpr uint16_t MAXFILE = 256;
 
 namespace GUI
 {
@@ -24,12 +27,39 @@ namespace GUI
 
 		bool Button::DrawElement()
 		{
+			return ImGui::Button(name);
+		}
+
+		bool GetPathButton::DrawElement()
+		{
 			if (ImGui::Button(name))
 			{
-				*value = !*value;
-				return true;
-			}
+				OPENFILENAME t_Ofn;
+				TCHAR t_ReadFile[MAXFILE]{0};
 
+				ZeroMemory(&t_Ofn, sizeof(OPENFILENAME));
+				t_Ofn.lStructSize = sizeof(OPENFILENAME);
+				t_Ofn.lpstrFile = t_ReadFile;
+				t_Ofn.nMaxFile = MAXFILE;
+				t_Ofn.lpstrFilter = fileFilter;
+				t_Ofn.nFilterIndex = 1;
+				t_Ofn.lpstrFileTitle = nullptr;
+				t_Ofn.nMaxFileTitle = 0;
+				t_Ofn.lpstrInitialDir = nullptr;
+				t_Ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+
+				if (GetOpenFileName(&t_Ofn) == TRUE)
+				{
+					if (filePath != nullptr)
+						delete[] filePath;
+
+					filePath = new char[wcslen(t_Ofn.lpstrFile) + 1];
+					wsprintfA(filePath, "%S", t_Ofn.lpstrFile);
+					active = true;
+					return true;
+				}
+			}
+			active = false;
 			return false;
 		}
 
@@ -59,6 +89,15 @@ namespace GUI
 				break;
 			}
 			return false;
+		}
+
+		bool ITextSlider::DrawElement()
+		{
+			if (texts.size() == 0)
+			{
+				return false;
+			}
+			return ImGui::SliderInt(texts[currentValue], &currentValue, 0, static_cast<size_t>(texts.size() - 1));
 		}
 
 		bool FSlider::DrawElement()

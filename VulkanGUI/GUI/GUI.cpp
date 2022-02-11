@@ -99,9 +99,6 @@ namespace GUI
 		}
 
 		ImGui::Render();
-
-		//imgui commands
-		//ImGui::ShowDemoWindow();
 	}
 
 	GUIHandle GUISystem::CreateGUIWindow(GUICreationData a_CreationData)

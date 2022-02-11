@@ -1,10 +1,8 @@
 #include "Precomp.h"
 #include "SceneManager.h"
 
-#include "ObjectManager.h"
-#include "CameraController.h"
-#include "GUI/GUI.h"
 
+#include "CameraController.h"
 
 #include "ResourceSystem/ResourceAllocator.h"
 #include "ResourceSystem/TextureResource.h"
@@ -39,6 +37,17 @@ namespace Engine
 		GUI::GUITypes::StaticText t_Text{};
 		t_Text.value = "Vulkan Renderer says hello to the user.";
 		m_GuiSystem->AddElementToGUIWindow(windowHandle, t_Text);
+
+		//Creation Window
+		GUI::GUITypes::GetPathButton t_PathButton{};
+		t_PathButton.name = "Load Mesh";
+		t_PathButton.fileFilter = DIR_PATH::OBJFILE;
+		m_CreationWindow.PathButton = m_GuiSystem->AddElementToGUIWindow(windowHandle, t_PathButton);
+
+		GUI::GUITypes::ITextSlider t_TextSlider{};
+		t_TextSlider.name = "Materials";
+		m_CreationWindow.MaterialSlider = m_GuiSystem->AddElementToGUIWindow(windowHandle, t_TextSlider);
+
 	}
 
 	SceneManager::~SceneManager()
@@ -77,6 +86,10 @@ namespace Engine
 			m_GuiSystem->Update();
 			m_ObjectManager->UpdateObjects(deltaTime);
 
+			if (m_CreationWindow.PathButton->active)
+			{
+				m_CreationWindow.CreateRenderObject(m_ObjectManager);
+			}
 
 			double t_End = glfwGetTime();
 			deltaTime = static_cast<float>(t_End - t_CurrentTime);
@@ -104,17 +117,34 @@ namespace Engine
 
 		m_Renderer->CreateStartBuffers();
 
-		Transform* t_PTrans = new Transform(glm::vec3(0, 0, 0), 1);
-		RenderHandle mat1 = m_Renderer->CreateMaterial(0, nullptr, 1,
-			&ResourceAllocator::GetInstance().GetResource<Resource::TextureResource>("../VulkanRenderer/Resources/Images/Background.png", Resource::ResourceType::Texture).texture);
+		//Transform* t_PTrans = new Transform(glm::vec3(0, 0, 0), 1);
+		m_CreationWindow.AddMaterial(m_Renderer->CreateMaterial(0, nullptr, 1,
+			&ResourceAllocator::GetInstance().GetResource<Resource::TextureResource>("../VulkanRenderer/Resources/Images/Background.png", Resource::ResourceType::Texture).texture),
+			"Pavillion Material");
 
-		m_ObjectManager->CreateRenderObject(t_PTrans, mat1,
-			ResourceAllocator::GetInstance().GetResource<Resource::MeshResource>("../VulkanRenderer/Resources/Models/Pavillion.obj", Engine::Resource::ResourceType::Mesh).meshHandle);
+		//m_ObjectManager->CreateRenderObject(t_PTrans, mat1,
+		//	ResourceAllocator::GetInstance().GetResource<Resource::MeshResource>("../VulkanRenderer/Resources/Models/Pavillion.obj", Engine::Resource::ResourceType::Mesh).meshHandle);
 
-		Transform* t_Transform2 = new Transform(glm::vec3(-0.7f, 0.9f, 0.2), 1);
-		RenderHandle mat2 = m_Renderer->CreateMaterial(0, nullptr, 1,
-			&ResourceAllocator::GetInstance().GetResource<Resource::TextureResource>("../VulkanRenderer/Resources/Images/Background1.png", Resource::ResourceType::Texture).texture);
+		//Transform* t_Transform2 = new Transform(glm::vec3(-0.7f, 0.9f, 0.2), 1);
+		m_CreationWindow.AddMaterial(m_Renderer->CreateMaterial(0, nullptr, 1,
+			&ResourceAllocator::GetInstance().GetResource<Resource::TextureResource>("../VulkanRenderer/Resources/Images/Background1.png", Resource::ResourceType::Texture).texture),
+			"Space Texture");
 
-		m_ObjectManager->CreateRenderObject(t_Transform2, mat2, GeometryType::Quad);
+		//m_ObjectManager->CreateRenderObject(t_Transform2, mat2, GeometryType::Quad);
 	}
+}
+
+void SceneObjectCreationGUI::AddMaterial(RenderHandle a_Rh, const char* a_Materialname)
+{
+	Materials.push_back(a_Rh);
+	MaterialSlider->texts.push_back(a_Materialname);
+}
+
+void SceneObjectCreationGUI::CreateRenderObject(ObjectManager* a_ObjectManager)
+{
+	Transform* t_PTrans = new Transform(glm::vec3(0, 0, 0), 1);
+
+	a_ObjectManager->CreateRenderObject(t_PTrans, Materials[MaterialSlider->currentValue],
+		Engine::ResourceAllocator::GetInstance().GetResource<Engine::Resource::MeshResource>(PathButton->filePath, Engine::Resource::ResourceType::Mesh).meshHandle);
+
 }
