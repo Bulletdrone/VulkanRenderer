@@ -29,6 +29,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Framework\Precomp\Precomp.cpp" />
     <ClCompile Include="Framework\ResourceSystem\MeshResource.cpp" />
+    <ClCompile Include="GameComponents\Transform.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Framework\ResourceSystem\Resource.h" />
@@ -41,6 +42,7 @@
     <ClInclude Include="Framework\Precomp\Precomp.h" />
     <ClInclude Include="Framework\Precomp\Logger.h" />
     <ClInclude Include="Framework\ResourceSystem\MeshResource.h" />
+    <ClInclude Include="GameComponents\Transform.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\VulkanRenderer\VulkanRendererWindows\VulkanRendererWindows.vcxproj">
@@ -102,18 +104,24 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(SolutionDir)ExternalLibraries;$(SolutionDir)ExternalLibraries\GLFW\$(Platform)\include;$(SolutionDir)ExternalLibraries\Vulkan\Include;$(SolutionDir)VulkanGUI;$(SolutionDir)VulkanRenderer\VulkanRendererWindows\MainRenderer;$(ProjectDir)Framework\Precomp;$(ProjectDir)Framework;$(IncludePath)</IncludePath>
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)$(Platform)\$(Configuration)\BuildFiles\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(SolutionDir)ExternalLibraries;$(SolutionDir)ExternalLibraries\GLFW\$(Platform)\include;$(SolutionDir)ExternalLibraries\Vulkan\Include;$(SolutionDir)VulkanGUI;$(SolutionDir)VulkanRenderer\VulkanRendererWindows\MainRenderer;$(ProjectDir)Framework\Precomp;$(ProjectDir)Framework;$(IncludePath)</IncludePath>
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)$(Platform)\$(Configuration)\BuildFiles\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(SolutionDir)ExternalLibraries;$(SolutionDir)ExternalLibraries\GLFW\$(Platform)\include;$(SolutionDir)ExternalLibraries\Vulkan\Include;$(SolutionDir)VulkanGUI;$(SolutionDir)VulkanRenderer\VulkanRendererWindows\MainRenderer;$(ProjectDir)Framework\Precomp;$(ProjectDir)Framework;$(IncludePath)</IncludePath>
+    <IntDir>$(SolutionDir)$(Platform)\$(Configuration)\BuildFiles\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(SolutionDir)ExternalLibraries;$(SolutionDir)ExternalLibraries\GLFW\$(Platform)\include;$(SolutionDir)ExternalLibraries\Vulkan\Include;$(SolutionDir)VulkanGUI;$(SolutionDir)VulkanRenderer\VulkanRendererWindows\MainRenderer;$(ProjectDir)Framework\Precomp;$(ProjectDir)Framework;$(IncludePath)</IncludePath>
+    <IntDir>$(SolutionDir)$(Platform)\$(Configuration)\BuildFiles\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

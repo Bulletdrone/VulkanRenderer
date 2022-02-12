@@ -97,7 +97,7 @@ namespace GUI
 			{
 				return false;
 			}
-			return ImGui::SliderInt(texts[currentValue], &currentValue, 0, static_cast<size_t>(texts.size() - 1));
+			return ImGui::SliderInt(texts[currentValue], &currentValue, 0, static_cast<int>(texts.size() - 1));
 		}
 
 		bool FSlider::DrawElement()
