@@ -56,14 +56,14 @@ public:
 	void ReplaceActiveCamera(CameraObject* a_Cam);
 
 	//BufferData
-	RenderHandle GenerateMesh(const std::vector<Vertex>& a_Vertices, const std::vector<uint32_t>& a_Indices);
+	MeshHandle GenerateMesh(const std::vector<Vertex>& a_Vertices, const std::vector<uint32_t>& a_Indices);
 	void SetupImage(Texture& a_Texture, const unsigned char* a_ImageBuffer);
 	Shader CreateShader(const unsigned char* a_ShaderCode, const size_t a_CodeSize);
 	void SetupGUIsystem(GUI::GUISystem* p_GuiSystem);
 
 	//Only handles single images at the moment.
 	void CreateGlobalDescriptor();
-	RenderHandle CreateMaterial(uint32_t a_UniCount, VkBuffer* a_UniBuffers,
+	MaterialHandle CreateMaterial(uint32_t a_UniCount, VkBuffer* a_UniBuffers,
 		uint32_t a_ImageCount, Texture* a_Images, 
 		glm::vec4 a_Color = glm::vec4(0, 0, 0, 1));
 
@@ -96,8 +96,8 @@ private:
 
 	//All the renderObjects in ObjectManager.
 	std::vector<BaseRenderObject*>* p_RenderObjects;
-	ObjectPool<Material, RenderHandle> m_MaterialPool;
-	ObjectPool<MeshData, RenderHandle> m_MeshPool;
+	ObjectPool<Material, MaterialHandle> m_MaterialPool;
+	ObjectPool<MeshData, MeshHandle> m_MeshPool;
 
 	//Window Data.
 	Window* m_Window;

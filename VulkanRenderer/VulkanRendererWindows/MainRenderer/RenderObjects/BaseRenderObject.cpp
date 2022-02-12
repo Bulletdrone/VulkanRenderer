@@ -1,6 +1,6 @@
 #include "BaseRenderObject.h"
 
-BaseRenderObject::BaseRenderObject(const uint32_t a_ID, Transform* a_Transform, RenderHandle a_MatHandle)
+BaseRenderObject::BaseRenderObject(const uint32_t a_ID, Transform* a_Transform, MaterialHandle a_MatHandle)
 	:	SceneObject(a_ID, a_Transform), m_MatHandle(a_MatHandle)
 {
 	UpdateModelMatrix();

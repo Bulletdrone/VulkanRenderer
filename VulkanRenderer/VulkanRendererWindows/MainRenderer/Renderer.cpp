@@ -359,9 +359,9 @@ void Renderer::ReplaceActiveCamera(CameraObject* a_Cam)
 	p_ActiveCamera = a_Cam;
 }
 
-RenderHandle Renderer::GenerateMesh(const std::vector<Vertex>& a_Vertices, const std::vector<uint32_t>& a_Indices)
+MeshHandle Renderer::GenerateMesh(const std::vector<Vertex>& a_Vertices, const std::vector<uint32_t>& a_Indices)
 {
-	RenderHandle t_Handle;
+	MeshHandle t_Handle;
 	MeshData& mesh = m_MeshPool.GetEmptyObject(t_Handle);
 
 	mesh.vertices.elementSize = static_cast<uint32_t>(a_Vertices.size());
@@ -422,9 +422,9 @@ void Renderer::CreateGlobalDescriptor()
 	t_Builder.Build(m_GlobalSet[1], m_GlobalSetLayout);
 }
 
-RenderHandle Renderer::CreateMaterial(uint32_t a_UniCount, VkBuffer* a_UniBuffers, uint32_t a_ImageCount, Texture* a_Images, glm::vec4 a_Color)
+MaterialHandle Renderer::CreateMaterial(uint32_t a_UniCount, VkBuffer* a_UniBuffers, uint32_t a_ImageCount, Texture* a_Images, glm::vec4 a_Color)
 {
-	RenderHandle t_Handle;
+	MaterialHandle t_Handle;
 	Material& material = m_MaterialPool.GetEmptyObject(t_Handle);
 
 	VkDescriptorSetLayoutBinding t_ImageBinding = VkInit::CreateDescriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, MATERIALBINDING);
@@ -550,10 +550,10 @@ void Renderer::DrawFrame(uint32_t& r_ImageIndex)
 void Renderer::DrawObjects(VkCommandBuffer a_CmdBuffer)
 {
 	//Performance boost when getting the same data needed.
-	RenderHandle t_LastMeshData = RENDER_NULL_HANDLE;
+	MeshHandle t_LastMeshData = RENDER_NULL_HANDLE;
 	MeshData t_MeshData;
 
-	RenderHandle t_LastMaterial = RENDER_NULL_HANDLE;
+	MaterialHandle t_LastMaterial = RENDER_NULL_HANDLE;
 	Material t_Material;
 	VkDescriptorSet t_LastMatDescriptorSet = VK_NULL_HANDLE;
 

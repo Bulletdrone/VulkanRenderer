@@ -19,9 +19,9 @@ struct SceneObjectCreationGUI
 	GUI::GUITypes::ITextSlider* MaterialSlider;
 	GUI::GUITypes::GetPathButton* PathButton;
 
-	std::vector<RenderHandle> Materials;
+	std::vector<MaterialHandle> Materials;
 
-	void AddMaterial(RenderHandle a_Rh, const char* a_Materialname);
+	void AddMaterial(MaterialHandle a_Rh, const char* a_Materialname);
 	void CreateRenderObject(ObjectManager* a_ObjectManager);
 };
 

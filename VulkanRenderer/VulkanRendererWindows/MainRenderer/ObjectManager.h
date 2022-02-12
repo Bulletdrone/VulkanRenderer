@@ -14,9 +14,9 @@ public:
 	void UpdateObjects(float a_Dt);
 
 	//Create a renderobject from a basic shape.
-	BaseRenderObject* CreateRenderObject(Transform* a_Transform, RenderHandle a_MaterialHandle, GeometryType a_Type);
+	BaseRenderObject* CreateRenderObject(Transform* a_Transform, MaterialHandle a_MaterialHandle, GeometryType a_Type);
 	//Create a renderobject from a mesh.
-	BaseRenderObject* CreateRenderObject(Transform* a_Transform, RenderHandle a_MaterialHandle, RenderHandle a_MeshHandle);
+	BaseRenderObject* CreateRenderObject(Transform* a_Transform, MaterialHandle a_MaterialHandle, MeshHandle a_MeshHandle);
 
 	//Increases the m_CurrentRenderID by 1 and returns it.
 	uint32_t GetNextRenderID() { return m_CurrentRenderID++; }

@@ -134,7 +134,7 @@ namespace Engine
 	}
 }
 
-void SceneObjectCreationGUI::AddMaterial(RenderHandle a_Rh, const char* a_Materialname)
+void SceneObjectCreationGUI::AddMaterial(MaterialHandle a_Rh, const char* a_Materialname)
 {
 	Materials.push_back(a_Rh);
 	MaterialSlider->texts.push_back(a_Materialname);

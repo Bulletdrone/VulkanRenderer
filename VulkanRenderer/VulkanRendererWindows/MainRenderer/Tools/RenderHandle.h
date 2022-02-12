@@ -3,10 +3,13 @@
 
 constexpr uint32_t RENDER_NULL_HANDLE = UINT32_MAX;
 
-struct RenderHandle
+typedef struct BasicRenderHandle MeshHandle;
+typedef struct BasicRenderHandle MaterialHandle;
+
+struct BasicRenderHandle
 {
-	RenderHandle() {};
-	RenderHandle(const uint32_t a_Handle) { m_Handle = a_Handle; }
+	BasicRenderHandle() {};
+	BasicRenderHandle(const uint32_t a_Handle) { m_Handle = a_Handle; }
 
 	operator uint32_t() const
 	{
