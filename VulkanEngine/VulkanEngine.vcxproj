@@ -30,6 +30,7 @@
     <ClCompile Include="Framework\Precomp\Precomp.cpp" />
     <ClCompile Include="Framework\ResourceSystem\MeshResource.cpp" />
     <ClCompile Include="GameComponents\Transform.cpp" />
+    <ClCompile Include="GameComponents\SceneObject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Framework\ResourceSystem\Resource.h" />
@@ -43,6 +44,7 @@
     <ClInclude Include="Framework\Precomp\Logger.h" />
     <ClInclude Include="Framework\ResourceSystem\MeshResource.h" />
     <ClInclude Include="GameComponents\Transform.h" />
+    <ClInclude Include="GameComponents\SceneObject.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\VulkanRenderer\VulkanRendererWindows\VulkanRendererWindows.vcxproj">

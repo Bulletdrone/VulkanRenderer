@@ -3,6 +3,11 @@
 
 namespace Engine
 {
+	void Transform::SetParent(Transform* m_Transform)
+	{
+		m_Parent = m_Transform;
+	}
+
 	void Transform::RotateAxis(const glm::vec3& a_Axis, const float a_Angle, const Space a_Space)
 	{
 		glm::quat t_Quat(a_Angle, a_Axis.x, a_Axis.y, a_Axis.z);
@@ -21,7 +26,7 @@ namespace Engine
 		{
 			m_WorldPosition = a_Pos;
 			if (m_Parent == nullptr) m_LocalPosition = a_Pos;
-			else { m_LocalPosition = -m_Parent->GetWorldPosition(); }
+			else { m_LocalPosition = -((m_Parent->GetWorldRotation() * m_LocalPosition) + m_Parent->GetWorldPosition()); }
 		}
 		m_DirtyMatrix = true;
 	}

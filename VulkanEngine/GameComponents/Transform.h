@@ -20,8 +20,11 @@ namespace Engine
 	class Transform
 	{
 	public:
-		Transform(glm::vec3 a_Pos = glm::vec3(0), glm::vec3 a_Rot = glm::vec3(0), glm::vec3 a_Scale = glm::vec3(1));
-		~Transform();
+		Transform() {};
+		//Transform(glm::vec3 a_Pos = glm::vec3(0), glm::vec3 a_Rot = glm::vec3(0), glm::vec3 a_Scale = glm::vec3(1));
+		~Transform() {};
+
+		void SetParent(Transform* m_Transform);
 
 		void RotateAxis(const glm::vec3& a_Axis, const float a_Angle, const Space a_Space);
 
@@ -36,19 +39,17 @@ namespace Engine
 		const glm::mat4& GetModelMatrix();
 
 	private:
-
 		const glm::mat4& CreateModelMatrix();
 
+		glm::vec3 m_LocalPosition = glm::vec3(0);
+		glm::quat m_LocalRotation = glm::vec3(0);
+		glm::vec3 m_LocalScale = glm::vec3(1);
 
-		glm::vec3 m_LocalPosition;
-		glm::quat m_LocalRotation;
-		glm::vec3 m_LocalScale;
+		glm::vec3 m_WorldPosition = glm::vec3(0);
+		glm::quat m_WorldRotation = glm::vec3(0);
+		glm::vec3 m_WorldScale = glm::vec3(1);
 
-		glm::vec3 m_WorldPosition;
-		glm::quat m_WorldRotation;
-		glm::vec3 m_WorldScale;
-
-		glm::mat4 m_ModelMatrix;
+		glm::mat4 m_ModelMatrix = glm::identity<glm::mat4>();
 		bool m_DirtyMatrix = false;
 
 		Transform* m_Parent = nullptr;
