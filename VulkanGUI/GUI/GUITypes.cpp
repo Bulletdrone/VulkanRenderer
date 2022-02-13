@@ -122,5 +122,27 @@ namespace GUI
 			}
 			return false;
 		}
-	}
+		bool InputF::DrawElement()
+		{
+			switch (elementSize)
+			{
+			case 1:
+				return ImGui::InputFloat(name, value);
+				break;
+			case 2:
+				return ImGui::InputFloat2(name, value);
+				break;
+			case 3:
+				return ImGui::InputFloat3(name, value);
+				break;
+			case 4:
+				return ImGui::InputFloat4(name, value);
+				break;
+			default:
+				assert(elementSize < 4 || elementSize > 1);
+				break;
+			}
+			return false;
+		}
+}
 }

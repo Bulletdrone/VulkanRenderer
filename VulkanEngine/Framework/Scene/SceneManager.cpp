@@ -138,7 +138,7 @@ namespace Engine
 	{
 		GUI::GUICreationData guiData{};
 		guiData.position = glm::vec3(0);
-		guiData.scale = glm::vec2(100, 50);
+		guiData.scale = glm::vec2(400, 100);
 		guiData.windowName = "SceneObject";
 
 		GUIHandle sceneObjectHandle = m_GuiSystem->CreateGUIWindow(guiData);
@@ -153,11 +153,9 @@ namespace Engine
 			matHandle
 		));
 
-		GUI::GUITypes::FSlider slider{};
+		GUI::GUITypes::InputF slider{};
 		slider.name = "Position";
 		slider.elementSize = 3;
-		slider.min = 2;
-		slider.max = -2;
 		slider.value = glm::value_ptr(t_SceneObj.GetTransform().GetWorldPosition());
 
 		m_GuiSystem->AddElementToGUIWindow(sceneObjectHandle, slider);

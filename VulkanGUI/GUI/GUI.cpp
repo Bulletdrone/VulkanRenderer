@@ -174,7 +174,6 @@ namespace GUI
 		{
 			it->DrawElement();
 		}
-
 		for (GUIWindow& it : m_ChildWindows)
 		{
 			it.Update(true);

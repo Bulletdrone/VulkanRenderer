@@ -91,6 +91,14 @@ namespace GUI
 			float* value = nullptr;
 		};
 
+		struct InputF : public GUIElement
+		{
+			bool DrawElement() override;
+
+			int elementSize = 0;
+			float* value = nullptr;
+		};
+
 #pragma endregion
 	}
 }
