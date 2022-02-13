@@ -9,7 +9,7 @@ namespace Engine
 	}
 	SceneObject& Scene::AddSceneObject(SceneObject a_SceneObject)
 	{
-		m_SceneObjects.push_back(a_SceneObject);
-		return m_SceneObjects.back();
+		m_SceneObjects.push_back(new SceneObject(a_SceneObject));
+		return *m_SceneObjects.back();
 	}
 }
