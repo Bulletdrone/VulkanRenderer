@@ -4,18 +4,20 @@
 
 #include "ShaderManager.h"
 #include "VulkanDebugger/VulkanDebug.h"
-
-#include <RenderObjects/BaseRenderObject.h>
-#include <RenderObjects/CameraObject.h>
+#include "RenderObjects/CameraObject.h"
 
 #include "Structs/FrameData.h"
 #include "VulkanSwapChain.h"
 
+#include "RenderObjects/Components/MeshData.h"
+#include "RenderObjects/Components/Material.h"
+
 //Handlers
 #include "Handlers/ImageHandler.h"
 #include "Handlers/DepthHandler.h"
+#include "RenderObjects/Geometry/GeometryFactory.h"
 
-#include "Tools/RenderHandle.h"
+#include "RenderObjects/RenderObject.h"
 
 constexpr uint32_t FRAMEBUFFER_AMOUNT = 2;
 constexpr int MAX_FRAMES_IN_FLIGHT = 2;
@@ -59,7 +61,10 @@ public:
 	MeshHandle GenerateMesh(const std::vector<Vertex>& a_Vertices, const std::vector<uint32_t>& a_Indices);
 	void SetupImage(Texture& a_Texture, const unsigned char* a_ImageBuffer);
 	Shader CreateShader(const unsigned char* a_ShaderCode, const size_t a_CodeSize);
+	RenderObject CreateRenderObject(Engine::Transform* a_Transform, MaterialHandle a_MaterialHandle, MeshHandle a_MeshHandle);
+	RenderObject CreateRenderObject(Engine::Transform* a_Transform, MaterialHandle a_MaterialHandle, GeometryType a_Type);
 	void SetupGUIsystem(GUI::GUISystem* p_GuiSystem);
+	void SetupGeometryFactory();
 
 	//Only handles single images at the moment.
 	void CreateGlobalDescriptor();
@@ -78,10 +83,6 @@ public:
 
 	const float GetAspectRatio() { return m_VulkanSwapChain.SwapChainExtent.width / static_cast<float>(m_VulkanSwapChain.SwapChainExtent.height); }
 
-	//Set the mesh vector pointer in the Renderer from the one in ObjectManager.
-	void SetRenderObjectsVector(std::vector<BaseRenderObject*>* a_RenderObjects);
-
-
 	std::vector<VkBuffer> mvk_ViewProjectionBuffers;
 	std::vector<VkDeviceMemory> mvk_ViewProjectionBuffersMemory;
 
@@ -95,7 +96,10 @@ private:
 	VkDescriptorSet m_GlobalSet[2];
 
 	//All the renderObjects in ObjectManager.
-	std::vector<BaseRenderObject*>* p_RenderObjects;
+	std::vector<RenderObject> m_RenderObjects;
+	GeometryFactory m_GeometryFactory;
+
+
 	ObjectPool<Material, MaterialHandle> m_MaterialPool;
 	ObjectPool<MeshData, MeshHandle> m_MeshPool;
 
@@ -144,9 +148,3 @@ private:
 	const bool DE_EnableValidationLayers = true;
 #endif
 };
-
-//SetRenderObjects from ObjectManager.
-inline void Renderer::SetRenderObjectsVector(std::vector<BaseRenderObject*>* a_RenderObjects)
-{
-	p_RenderObjects = a_RenderObjects;
-}

@@ -45,10 +45,10 @@
     <ClCompile Include="Framework\ResourceSystem\ShaderResource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GameComponents\Transform.cpp">
+    <ClCompile Include="GameComponents\SceneObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GameComponents\SceneObject.cpp">
+    <ClCompile Include="GameComponents\Transform.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -83,10 +83,10 @@
     <ClInclude Include="Framework\ResourceSystem\ShaderResource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GameComponents\Transform.h">
+    <ClInclude Include="GameComponents\SceneObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GameComponents\SceneObject.h">
+    <ClInclude Include="GameComponents\Transform.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

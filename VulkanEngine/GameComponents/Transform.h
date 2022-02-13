@@ -32,9 +32,9 @@ namespace Engine
 		void SetRotation(const glm::quat& a_Quat, const Space a_Space);
 		void SetScale(const glm::vec3& a_Scale, const Space a_Space);
 
-		const glm::vec3 GetWorldPosition() const { return m_WorldPosition; }
-		const glm::quat GetWorldRotation() const { return m_WorldRotation; }
-		const glm::vec3 GetWorldScale() const { return m_WorldScale; }
+		glm::vec3& GetWorldPosition() { return m_WorldPosition; }
+		glm::quat& GetWorldRotation() { return m_WorldRotation; }
+		glm::vec3& GetWorldScale() { return m_WorldScale; }
 
 		const glm::mat4& GetModelMatrix();
 

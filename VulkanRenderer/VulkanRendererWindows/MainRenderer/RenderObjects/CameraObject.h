@@ -1,5 +1,5 @@
 #pragma once
-#include "SceneObject.h"
+#include "Components/Transform.h"
 
 struct ViewProjection
 {
@@ -7,10 +7,10 @@ struct ViewProjection
 	alignas(16) glm::mat4 Projection;
 };
 
-class CameraObject : public SceneObject
+class CameraObject
 {
 public:
-	CameraObject(const uint32_t a_ID, Transform* a_Transform, const uint32_t a_CameraID, float a_Fov, float a_AspectRatio, float a_NearField, float a_FarField);
+	CameraObject(Transform* a_Transform, const uint32_t a_CameraID, float a_Fov, float a_AspectRatio, float a_NearField, float a_FarField);
 	virtual ~CameraObject();
 
 	virtual void Update();
@@ -33,5 +33,7 @@ protected:
 	float m_AspectRatio;
 	float m_NearField;
 	float m_FarField;
+
+	Transform* p_Transform = nullptr;
 };
 

@@ -11,6 +11,7 @@
 #pragma warning (pop)
 #include <GUI/GUI.h>
 
+
 #include "Structs/Texture.h"
 #include "Structs/Shader.h"
 #include "Tools/VulkanInitializers.h"
@@ -393,6 +394,25 @@ Shader Renderer::CreateShader(const unsigned char* a_ShaderCode, const size_t a_
 	return shader;
 }
 
+RenderObject Renderer::CreateRenderObject(Engine::Transform* a_Transform, MaterialHandle a_MaterialHandle, MeshHandle a_MeshHandle)
+{
+	RenderObject rendObj{};
+	rendObj.p_Transform = a_Transform;
+	rendObj.materialHandle = a_MaterialHandle;
+	rendObj.meshHandle = a_MeshHandle;
+
+	rendObj.IsValid();
+
+	m_RenderObjects.push_back(rendObj);
+
+	return rendObj;
+}
+
+RenderObject Renderer::CreateRenderObject(Engine::Transform* a_Transform, MaterialHandle a_MaterialHandle, GeometryType a_Type)
+{
+	return CreateRenderObject(a_Transform, a_MaterialHandle, m_GeometryFactory.GetShape(a_Type));
+}
+
 void Renderer::SetupGUIsystem(GUI::GUISystem* p_GuiSystem)
 {
 	p_GuiSystem->Init(m_VulkanDevice, mvk_Instance, m_VulkanDevice.m_PhysicalDevice, mvk_GraphicsQueue, mvk_RenderPass);
@@ -401,6 +421,11 @@ void Renderer::SetupGUIsystem(GUI::GUISystem* p_GuiSystem)
 	VkCommandBuffer t_Cmd = m_VulkanDevice.BeginSingleTimeCommands();
 	ImGui_ImplVulkan_CreateFontsTexture(t_Cmd);
 	m_VulkanDevice.EndSingleTimeCommands(t_Cmd);
+}
+
+void Renderer::SetupGeometryFactory()
+{
+	m_GeometryFactory.Init(this);
 }
 
 void Renderer::CreateGlobalDescriptor()
@@ -565,13 +590,13 @@ void Renderer::DrawObjects(VkCommandBuffer a_CmdBuffer)
 	//Create this once for performance boost of not creating a mat4 everytime.
 	InstanceModel t_PushInstance{};
 
-	for (size_t i = 0; i < p_RenderObjects->size(); i++)
+	for (size_t i = 0; i < m_RenderObjects.size(); i++)
 	{
-		BaseRenderObject* t_RenderObject = p_RenderObjects->at(i);
+		RenderObject t_RenderObject = m_RenderObjects.at(i);
 
-		if (t_RenderObject->GetMaterialHandle() != t_LastMaterial)
+		if (t_RenderObject.materialHandle != t_LastMaterial)
 		{
-			t_LastMaterial = t_RenderObject->GetMaterialHandle();
+			t_LastMaterial = t_RenderObject.materialHandle;
 			t_Material = m_MaterialPool.Get(t_LastMaterial);
 
 			uint32_t t_PipelineID = t_Material.pipelineID;
@@ -593,14 +618,14 @@ void Renderer::DrawObjects(VkCommandBuffer a_CmdBuffer)
 		}
 
 		//Set the Push constant data.
-		t_PushInstance.model = t_RenderObject->GetModelMatrix();
+		t_PushInstance.model = t_RenderObject.p_Transform->GetModelMatrix();
 
 		vkCmdPushConstants(a_CmdBuffer, t_CurrentPipeLine.pipeLineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(InstanceModel), &t_PushInstance);
 
 		//only bind the mesh if it's a different one from last bind
-		if (t_RenderObject->GetMeshHandle() != t_LastMeshData) {
+		if (t_RenderObject.meshHandle != t_LastMeshData) {
 
-			t_MeshData = m_MeshPool.Get(t_RenderObject->GetMeshHandle());
+			t_MeshData = m_MeshPool.Get(t_RenderObject.meshHandle);
 
 			//bind the mesh vertex buffer with offset 0
 			VkDeviceSize t_VertOffset = 0;

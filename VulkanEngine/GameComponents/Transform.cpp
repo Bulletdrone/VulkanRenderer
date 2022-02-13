@@ -66,8 +66,8 @@ namespace Engine
 	}
 	const glm::mat4& Transform::GetModelMatrix()
 	{
-		if (!m_DirtyMatrix)
-			return m_ModelMatrix;
+		//if (!m_DirtyMatrix)
+		//	return m_ModelMatrix;
 
 		m_DirtyMatrix = false;
 		return CreateModelMatrix();

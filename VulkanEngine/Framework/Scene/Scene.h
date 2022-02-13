@@ -4,6 +4,8 @@
 #include <stdexcept>
 
 #include "SceneData.h"
+#include "GameComponents/SceneObject.h"
+
 namespace Engine
 {
 	class Scene
@@ -15,11 +17,15 @@ namespace Engine
 		Scene(const char* a_SceneName, SceneData a_SceneData);
 		~Scene() {};
 
+		SceneObject& AddSceneObject(SceneObject a_SceneObject);
+		const std::vector<SceneObject>& GetSceneObjectList() { return m_SceneObjects; }
 
 		const char* GetSceneName() { return m_SceneName; }
 		SceneData& GetSceneData() { return m_SceneData; }
 
 	private:
+		std::vector<SceneObject> m_SceneObjects;
+
 		const char* m_SceneName;
 
 		SceneData m_SceneData;

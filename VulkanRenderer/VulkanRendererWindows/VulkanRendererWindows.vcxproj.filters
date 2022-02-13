@@ -39,12 +39,6 @@
     <ClCompile Include="MainRenderer\VulkanDebugger\VulkanDebug.cpp">
       <Filter>MainRenderer\VulkanDebug</Filter>
     </ClCompile>
-    <ClCompile Include="MainRenderer\RenderObjects\BaseRenderObject.cpp">
-      <Filter>RenderObjects</Filter>
-    </ClCompile>
-    <ClCompile Include="MainRenderer\RenderObjects\RenderShape.cpp">
-      <Filter>RenderObjects</Filter>
-    </ClCompile>
     <ClCompile Include="MainRenderer\ShaderManager.cpp">
       <Filter>MainRenderer</Filter>
     </ClCompile>
@@ -64,9 +58,6 @@
       <Filter>MainRenderer</Filter>
     </ClCompile>
     <ClCompile Include="MainRenderer\RenderObjects\CameraObject.cpp">
-      <Filter>RenderObjects</Filter>
-    </ClCompile>
-    <ClCompile Include="MainRenderer\RenderObjects\SceneObject.cpp">
       <Filter>RenderObjects</Filter>
     </ClCompile>
     <ClCompile Include="MainRenderer\CameraController.cpp">
@@ -98,12 +89,6 @@
     </ClInclude>
     <ClInclude Include="MainRenderer\RenderObjects\Components\Transform.h">
       <Filter>RenderObjects\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="MainRenderer\RenderObjects\BaseRenderObject.h">
-      <Filter>RenderObjects</Filter>
-    </ClInclude>
-    <ClInclude Include="MainRenderer\RenderObjects\RenderShape.h">
-      <Filter>RenderObjects</Filter>
     </ClInclude>
     <ClInclude Include="MainRenderer\ShaderManager.h">
       <Filter>MainRenderer</Filter>
@@ -138,16 +123,10 @@
     <ClInclude Include="MainRenderer\RenderObjects\CameraObject.h">
       <Filter>RenderObjects</Filter>
     </ClInclude>
-    <ClInclude Include="MainRenderer\RenderObjects\SceneObject.h">
-      <Filter>RenderObjects</Filter>
-    </ClInclude>
     <ClInclude Include="MainRenderer\Tools\VulkanInitializers.h">
       <Filter>Tools</Filter>
     </ClInclude>
     <ClInclude Include="MainRenderer\CameraController.h">
-      <Filter>RenderInterfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="MainRenderer\ObjectManager.h">
       <Filter>RenderInterfaces</Filter>
     </ClInclude>
     <ClInclude Include="MainRenderer\RenderObjects\Components\Material.h">
@@ -161,5 +140,7 @@
     <ClInclude Include="MainRenderer\RenderObjects\Geometry\GeometryFactory.h" />
     <ClInclude Include="MainRenderer\Structs\Shader.h" />
     <ClInclude Include="MainRenderer\Tools\RenderHandle.h" />
+    <ClInclude Include="MainRenderer\RenderObjects\RenderObject.h" />
+    <ClInclude Include="MainRenderer\ObjectManager.h" />
   </ItemGroup>
 </Project>

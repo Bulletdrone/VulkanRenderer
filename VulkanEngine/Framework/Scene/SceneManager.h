@@ -22,7 +22,6 @@ struct SceneObjectCreationGUI
 	std::vector<MaterialHandle> Materials;
 
 	void AddMaterial(MaterialHandle a_Rh, const char* a_Materialname);
-	void CreateRenderObject(ObjectManager* a_ObjectManager);
 };
 
 namespace Engine 
@@ -38,12 +37,15 @@ namespace Engine
 		void NewScene(const char* a_SceneName, SceneData a_SceneData, bool a_SetScene);
 		void SetScene(uint32_t a_SceneID);
 
+		void CreateRenderObject();
+
 	private:
 		int32_t CurrentScene = -1;
 		std::vector<Scene> m_Scenes;
 
 		Renderer* m_Renderer;
 		GUI::GUISystem* m_GuiSystem;
+		GUIHandle m_MainWindowHandle;
 
 		ObjectManager* m_ObjectManager;
 		CameraController* m_CameraController;

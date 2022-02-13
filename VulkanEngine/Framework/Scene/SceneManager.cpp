@@ -3,10 +3,11 @@
 
 
 #include "CameraController.h"
+#include <glm/gtc/type_ptr.hpp>
 
-#include "ResourceSystem/ResourceAllocator.h"
-#include "ResourceSystem/TextureResource.h"
-#include "ResourceSystem/MeshResource.h"
+#include "Framework/ResourceSystem/ResourceAllocator.h"
+#include "Framework/ResourceSystem/TextureResource.h"
+#include "Framework/ResourceSystem/MeshResource.h"
 
 namespace Engine
 {
@@ -26,27 +27,28 @@ namespace Engine
 		//Setup GUI
 		m_GuiSystem = new GUI::GUISystem(m_Renderer->GetWindow());
 		m_Renderer->SetupGUIsystem(m_GuiSystem);
+		m_Renderer->SetupGeometryFactory();
 
 		GUI::GUICreationData mainWindow{};
 		mainWindow.position = glm::vec2(0, 0);
 		mainWindow.scale = glm::vec2(300, 100);
 		mainWindow.windowName = "Test Window";
 
-		GUIHandle windowHandle = m_GuiSystem->CreateGUIWindow(mainWindow);
+		m_MainWindowHandle = m_GuiSystem->CreateGUIWindow(mainWindow);
 
 		GUI::GUITypes::StaticText t_Text{};
 		t_Text.value = "Vulkan Renderer says hello to the user.";
-		m_GuiSystem->AddElementToGUIWindow(windowHandle, t_Text);
+		m_GuiSystem->AddElementToGUIWindow(m_MainWindowHandle, t_Text);
 
 		//Creation Window
 		GUI::GUITypes::GetPathButton t_PathButton{};
 		t_PathButton.name = "Load Mesh";
 		t_PathButton.fileFilter = DIR_PATH::OBJFILE;
-		m_CreationWindow.PathButton = m_GuiSystem->AddElementToGUIWindow(windowHandle, t_PathButton);
+		m_CreationWindow.PathButton = m_GuiSystem->AddElementToGUIWindow(m_MainWindowHandle, t_PathButton);
 
 		GUI::GUITypes::ITextSlider t_TextSlider{};
 		t_TextSlider.name = "Materials";
-		m_CreationWindow.MaterialSlider = m_GuiSystem->AddElementToGUIWindow(windowHandle, t_TextSlider);
+		m_CreationWindow.MaterialSlider = m_GuiSystem->AddElementToGUIWindow(m_MainWindowHandle, t_TextSlider);
 
 	}
 
@@ -88,7 +90,7 @@ namespace Engine
 
 			if (m_CreationWindow.PathButton->active)
 			{
-				m_CreationWindow.CreateRenderObject(m_ObjectManager);
+				CreateRenderObject();
 			}
 
 			double t_End = glfwGetTime();
@@ -132,19 +134,43 @@ namespace Engine
 
 		//m_ObjectManager->CreateRenderObject(t_Transform2, mat2, GeometryType::Quad);
 	}
+	void SceneManager::CreateRenderObject()
+	{
+		GUI::GUICreationData guiData{};
+		guiData.position = glm::vec3(0);
+		guiData.scale = glm::vec2(100, 50);
+		guiData.windowName = "SceneObject";
+
+		GUIHandle sceneObjectHandle = m_GuiSystem->CreateGUIWindow(guiData);
+		MaterialHandle matHandle = m_CreationWindow.Materials[m_CreationWindow.MaterialSlider->currentValue];
+		MeshHandle meshHandle = Engine::ResourceAllocator::GetInstance().GetResource<Resource::MeshResource>(m_CreationWindow.PathButton->filePath, Resource::ResourceType::Mesh).meshHandle;
+
+		SceneObject& t_SceneObj = m_Scenes[CurrentScene].AddSceneObject(SceneObject(
+			Engine::Space::WORLD,
+			nullptr,
+			sceneObjectHandle,
+			meshHandle,
+			matHandle
+		));
+
+		GUI::GUITypes::FSlider slider{};
+		slider.name = "Position";
+		slider.elementSize = 3;
+		slider.min = 2;
+		slider.max = -2;
+		slider.value = glm::value_ptr(t_SceneObj.GetTransform().GetWorldPosition());
+
+		m_GuiSystem->AddElementToGUIWindow(sceneObjectHandle, slider);
+		
+		m_Renderer->CreateRenderObject(
+			&t_SceneObj.GetTransform(),
+			t_SceneObj.GetMaterialHandle(),
+			t_SceneObj.GetMeshHandle());
+	}
 }
 
 void SceneObjectCreationGUI::AddMaterial(MaterialHandle a_Rh, const char* a_Materialname)
 {
 	Materials.push_back(a_Rh);
 	MaterialSlider->texts.push_back(a_Materialname);
-}
-
-void SceneObjectCreationGUI::CreateRenderObject(ObjectManager* a_ObjectManager)
-{
-	Transform* t_PTrans = new Transform(glm::vec3(0, 0, 0), 1);
-
-	a_ObjectManager->CreateRenderObject(t_PTrans, Materials[MaterialSlider->currentValue],
-		Engine::ResourceAllocator::GetInstance().GetResource<Engine::Resource::MeshResource>(PathButton->filePath, Engine::Resource::ResourceType::Mesh).meshHandle);
-
 }
