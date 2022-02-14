@@ -63,9 +63,6 @@
     <ClCompile Include="MainRenderer\CameraController.cpp">
       <Filter>RenderInterfaces</Filter>
     </ClCompile>
-    <ClCompile Include="MainRenderer\ObjectManager.cpp">
-      <Filter>RenderInterfaces</Filter>
-    </ClCompile>
     <ClCompile Include="MainRenderer\RenderObjects\Components\Material.cpp">
       <Filter>RenderObjects\Components</Filter>
     </ClCompile>
@@ -141,6 +138,5 @@
     <ClInclude Include="MainRenderer\Structs\Shader.h" />
     <ClInclude Include="MainRenderer\Tools\RenderHandle.h" />
     <ClInclude Include="MainRenderer\RenderObjects\RenderObject.h" />
-    <ClInclude Include="MainRenderer\ObjectManager.h" />
   </ItemGroup>
 </Project>

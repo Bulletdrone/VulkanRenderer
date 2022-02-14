@@ -1,6 +1,5 @@
 #pragma once
 #include <string>
-#define NOMINMAX
 #include <windows.h>
 
 #include <vector>

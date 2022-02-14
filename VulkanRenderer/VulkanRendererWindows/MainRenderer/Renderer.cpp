@@ -480,15 +480,15 @@ MaterialHandle Renderer::CreateMaterial(uint32_t a_UniCount, VkBuffer* a_UniBuff
 	return t_Handle;
 }
 
-void Renderer::DrawFrame(uint32_t& r_ImageIndex)
+void Renderer::DrawFrame()
 {
 	FrameData& frameData = m_FrameData[m_CurrentFrame];
 
 	vkWaitForFences(m_VulkanDevice, 1, &frameData.InFlightFence, VK_TRUE, UINT64_MAX);
 
-	VkResult t_Result = vkAcquireNextImageKHR(m_VulkanDevice, m_VulkanSwapChain.SwapChain, UINT64_MAX, frameData.ImageAvailableSemaphore, VK_NULL_HANDLE, &r_ImageIndex);
-
-	UpdateUniformBuffer(r_ImageIndex);
+	uint32_t t_ImageIndex = 0;
+	VkResult t_Result = vkAcquireNextImageKHR(m_VulkanDevice, m_VulkanSwapChain.SwapChain, UINT64_MAX, frameData.ImageAvailableSemaphore, VK_NULL_HANDLE, &t_ImageIndex);
+	UpdateUniformBuffer(t_ImageIndex);
 
 	if (t_Result == VK_ERROR_OUT_OF_DATE_KHR || t_Result == VK_SUBOPTIMAL_KHR || m_Window->m_FrameBufferResized)
 	{
@@ -553,7 +553,7 @@ void Renderer::DrawFrame(uint32_t& r_ImageIndex)
 	VkSwapchainKHR t_SwapChains[] = { m_VulkanSwapChain.SwapChain };
 	t_PresentInfo.swapchainCount = 1;
 	t_PresentInfo.pSwapchains = t_SwapChains;
-	t_PresentInfo.pImageIndices = &r_ImageIndex;
+	t_PresentInfo.pImageIndices = &t_ImageIndex;
 
 	t_PresentInfo.pResults = nullptr; // Optional
 

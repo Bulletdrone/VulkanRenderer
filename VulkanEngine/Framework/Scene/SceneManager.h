@@ -3,7 +3,6 @@
 
 #include "Scene.h"
 #include "GUI/GUI.h"
-#include "ObjectManager.h"
 
 class Renderer;
 class ObjectManager;

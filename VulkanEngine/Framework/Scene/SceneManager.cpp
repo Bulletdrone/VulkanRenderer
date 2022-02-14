@@ -20,8 +20,6 @@ namespace Engine
 		m_Renderer->CreateDepthResources();
 		m_Renderer->CreateFrameBuffers();
 
-
-		m_ObjectManager = new ObjectManager(m_Renderer);
 		m_CameraController = new CameraController(m_Renderer);
 
 		//Setup GUI
@@ -86,7 +84,7 @@ namespace Engine
 			m_CameraController->UpdateActiveCamera();
 
 			m_GuiSystem->Update();
-			m_ObjectManager->UpdateObjects(deltaTime);
+			m_Renderer->DrawFrame();
 
 			if (m_CreationWindow.PathButton->active)
 			{
