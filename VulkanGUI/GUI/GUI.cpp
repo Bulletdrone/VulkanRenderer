@@ -26,6 +26,8 @@ namespace GUI
 
 		vkDestroyDescriptorPool(m_Device, m_ImguiPool, nullptr);
 		ImGui_ImplVulkan_Shutdown();
+		ImGui_ImplGlfw_Shutdown();
+		ImGui::DestroyContext();
 	}
 
 
@@ -95,7 +97,7 @@ namespace GUI
 
 		for (auto& it : m_GUIWindows)
 		{
-			it.second->Update(false);;
+			it.second->Update();
 		}
 
 		ImGui::Render();
@@ -106,6 +108,7 @@ namespace GUI
 		m_HandlerCount++;
 		GUIHandle handle = m_HandlerCount;
 		m_GUIWindows.emplace(std::make_pair(handle, new GUIWindow(a_CreationData)));
+		m_GUIWindows.at(handle)->handle = handle;
 
 		return handle;
 	}
@@ -128,76 +131,8 @@ namespace GUI
 		return false;
 	}
 
-#pragma region WindowData
-
-
-	GUIWindow::GUIWindow(GUICreationData a_CreationData)
+	const char* GUISystem::GetGUIWindowName(GUIHandle a_Handle)
 	{
-		m_Position = a_CreationData.position;
-		m_Scale = a_CreationData.scale;
-
-		m_WindowName = a_CreationData.windowName;
-		if (!a_CreationData.resizable)
-			m_WindowFlags = ImGuiWindowFlags_NoResize |
-			ImGuiWindowFlags_NoMove |
-			ImGuiWindowFlags_NoCollapse;
+		return m_GUIWindows.at(a_Handle)->GetName();
 	}
-
-	GUIWindow::~GUIWindow()
-	{
-		for (GUITypes::GUIElement* it : m_GUIElements)
-		{
-			delete it;
-		}
-		m_GUIElements.clear();
-	}
-
-	bool GUIWindow::Update(bool a_IsChild)
-	{
-		//if the window is inactive just return.
-		if (!m_Active) return false;
-
-
-		bool t_ValueChanged = false;
-
-		if (!a_IsChild)
-		{
-			ImGui::SetNextWindowPos(ImVec2(m_Position.x, m_Position.y), ImGuiCond_Once);
-			ImGui::SetNextWindowSize(ImVec2(m_Scale.x, m_Scale.y), ImGuiCond_Once);
-
-			ImGui::Begin(m_WindowName, NULL, m_WindowFlags);
-		}
-		else
-			ImGui::BeginChild(m_WindowName);
-
-		for (GUITypes::GUIElement* it : m_GUIElements)
-		{
-			it->DrawElement();
-		}
-		for (GUIWindow& it : m_ChildWindows)
-		{
-			it.Update(true);
-		}
-
-
-		if (!a_IsChild)
-			ImGui::End();
-		else
-			ImGui::EndChild();
-
-		return t_ValueChanged;
-	}
-
-	void GUIWindow::AddElement(GUITypes::GUIElement* a_Element)
-	{
-		m_GUIElements.push_back(a_Element);
-	}
-
-	GUIWindow& GUIWindow::CreateChildWindow()
-	{
-		m_ChildWindows.resize(m_ChildWindows.size() + 1);
-		return m_ChildWindows.back();
-	}
-
 }
-#pragma endregion

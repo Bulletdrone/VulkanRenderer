@@ -4,61 +4,14 @@
 #include <string>
 
 #pragma warning (push, 0)
-#include <glm/vec2.hpp>
 #include <glfw3.h>
 #include <Vulkan/vulkan.hpp>
 #pragma warning (pop)
-#include "GUITypes.h"
-#include "GUIHandle.h"
 
-typedef int ImGuiWindowFlags;
-
+#include "GUIWindow.h"
 
 namespace GUI 
 {
-	struct GUICreationData
-	{
-		glm::vec2 position;
-		glm::vec2 scale;
-
-		const char* windowName;
-
-		//true by default
-		bool resizable = true;
-	};
-
-	class GUIWindow
-	{
-	public:
-		GUIWindow() {};
-		GUIWindow(GUICreationData a_CreationData);
-		~GUIWindow();
-
-		//Returns true if a condition changed that requires the values to be send back.
-		bool Update(bool a_IsChild);
-
-		void SetActive(bool a_IsActive) { m_Active = a_IsActive; }
-
-		void AddElement(GUITypes::GUIElement* a_Element);
-
-		GUIWindow& CreateChildWindow();
-
-	private:
-		glm::vec2 m_Position = glm::vec2(0, 0);
-		glm::vec2 m_Scale = glm::vec2(100, 100);
-		ImGuiWindowFlags m_WindowFlags = 0;
-
-		bool m_Active = true;
-
-		const char* m_WindowName = "Default";
-
-		std::vector<GUITypes::GUIElement*> m_GUIElements;
-
-		std::vector<GUIWindow> m_ChildWindows;
-	};
-
-
-
 	class GUISystem
 	{
 	public:
@@ -71,6 +24,7 @@ namespace GUI
 		//Creates an GUIWindow and returns a pointer of the one being creatd inside m_GUIWindows.
 		GUIHandle CreateGUIWindow(GUICreationData a_CreationData);
 		bool DeleteGUIWindow(GUIHandle a_Handle);
+		const char* GetGUIWindowName(GUIHandle a_Handle);
 
 		template <typename TGUIElement>
 		TGUIElement* AddElementToGUIWindow(GUIHandle a_Handle, TGUIElement a_Element);

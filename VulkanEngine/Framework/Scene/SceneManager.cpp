@@ -139,7 +139,10 @@ namespace Engine
 		GUI::GUICreationData guiData{};
 		guiData.position = glm::vec3(0);
 		guiData.scale = glm::vec2(400, 100);
-		guiData.windowName = "SceneObject";
+		guiData.windowName = "Scene Object";
+
+		guiData.parent = m_MainWindowHandle;
+		guiData.parentname = "Transforms";
 
 		GUIHandle sceneObjectHandle = m_GuiSystem->CreateGUIWindow(guiData);
 		MaterialHandle matHandle = m_CreationWindow.Materials[m_CreationWindow.MaterialSlider->currentValue];
@@ -159,6 +162,14 @@ namespace Engine
 		slider.value = glm::value_ptr(t_SceneObj.GetTransform().GetWorldPosition());
 
 		m_GuiSystem->AddElementToGUIWindow(sceneObjectHandle, slider);
+
+
+		GUI::GUITypes::InputF Scaleslider{};
+		Scaleslider.name = "Scale";
+		Scaleslider.elementSize = 3;
+		Scaleslider.value = glm::value_ptr(t_SceneObj.GetTransform().GetWorldScale());
+
+		m_GuiSystem->AddElementToGUIWindow(sceneObjectHandle, Scaleslider);
 		
 		m_Renderer->CreateRenderObject(
 			&t_SceneObj.GetTransform(),

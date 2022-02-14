@@ -54,6 +54,9 @@
     <ClInclude Include="GUI\GUIHandle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="GUI\GUIWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GUI\GUI.cpp">
@@ -84,6 +87,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="pch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\GUIWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

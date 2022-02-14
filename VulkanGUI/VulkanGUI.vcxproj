@@ -186,6 +186,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
+    <ClInclude Include="GUI\GUIWindow.h" />
     <ClInclude Include="GUI\GUI.h" />
     <ClInclude Include="GUI\GUITypes.h" />
     <ClInclude Include="GUI\GUIHandle.h" />
@@ -200,6 +201,7 @@
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="GUI\GUIWindow.cpp" />
     <ClCompile Include="GUI\GUI.cpp" />
     <ClCompile Include="GUI\GUITypes.cpp" />
     <ClCompile Include="imGUI\backends\imgui_impl_glfw.cpp">
