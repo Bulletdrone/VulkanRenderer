@@ -67,7 +67,7 @@ public:
 		glm::vec4 a_Color = glm::vec4(0, 0, 0, 1));
 
 	RenderObject CreateRenderObject(Engine::Transform* a_Transform, MaterialHandle a_MaterialHandle, MeshHandle a_MeshHandle);
-	RenderObject CreateRenderObject(Engine::Transform* a_Transform, MaterialHandle a_MaterialHandle, GeometryType a_Type);
+	RenderObject CreateRenderObject(Engine::Transform* a_Transform, GeometryType a_Type, MaterialHandle a_MaterialHandle = RENDER_NULL_HANDLE);
 	void SetupGUIsystem(GUI::GUISystem* p_GuiSystem);
 	void SetupGeometryFactory();
 

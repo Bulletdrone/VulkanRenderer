@@ -395,30 +395,42 @@ MaterialHandle Renderer::CreateMaterial(ShaderHandle a_Vert, ShaderHandle a_Frag
 	MaterialHandle t_Handle;
 	Material& material = m_MaterialPool.GetEmptyObject(t_Handle);
 
-	VkDescriptorSetLayoutBinding t_ImageBinding = VkInit::DescriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, MATERIALBINDING);
-	VkDescriptorSetLayoutCreateInfo t_ImageLayoutInfo = VkInit::DescriptorSetLayoutCreateInfo(1, &t_ImageBinding);
-	VkDescriptorSetLayout t_ImageLayout = m_DescriptorLayoutCache->CreateLayout(&t_ImageLayoutInfo);
-
-	std::vector<VkDescriptorSetLayout> t_DescriptorLayouts{ m_GlobalSetLayout, t_ImageLayout };
-	material.pipelineID = m_ShaderManager->CreatePipelineData(m_ShaderPool.Get(a_Vert), m_ShaderPool.Get(a_Frag), mvk_RenderPass, t_DescriptorLayouts);
-
-	//Building descriptor sets.
-	DescriptorBuilder t_Builder{};
-
-	VkDescriptorImageInfo* t_Images = new VkDescriptorImageInfo[a_ImageCount];
-	for (uint32_t i = 0; i < a_ImageCount; i++)
-	{
-		t_Images[i] = VkInit::DescriptorImageInfo(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, a_Images[i].textureImageView, a_Images[i].textureSampler);
-	}
-
-	t_Builder = DescriptorBuilder::Begin(m_DescriptorLayoutCache, m_DescriptorAllocator);
-	t_Builder.BindImage(a_ImageCount, t_Images, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);
-	t_Builder.Build(material.secondDescriptorSet, t_ImageLayout);
-
-
-	delete[] t_Images;
+	std::vector<VkDescriptorSetLayout> t_DescriptorLayouts{ m_GlobalSetLayout };
 
 	material.ambientColor = a_Color;
+
+	if (a_ImageCount != 0)
+	{
+		VkDescriptorSetLayoutBinding t_ImageBinding = VkInit::DescriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, MATERIALBINDING);
+		VkDescriptorSetLayoutCreateInfo t_ImageLayoutInfo = VkInit::DescriptorSetLayoutCreateInfo(1, &t_ImageBinding);
+		VkDescriptorSetLayout t_ImageLayout = m_DescriptorLayoutCache->CreateLayout(&t_ImageLayoutInfo);
+
+		t_DescriptorLayouts.push_back(t_ImageLayout);
+
+		material.pipelineID = m_ShaderManager->CreatePipelineData(m_ShaderPool.Get(a_Vert), m_ShaderPool.Get(a_Frag), mvk_RenderPass, t_DescriptorLayouts);
+
+		//Building descriptor sets.
+		DescriptorBuilder t_Builder{};
+
+		VkDescriptorImageInfo* t_Images = new VkDescriptorImageInfo[a_ImageCount];
+		for (uint32_t i = 0; i < a_ImageCount; i++)
+		{
+			t_Images[i] = VkInit::DescriptorImageInfo(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, a_Images[i].textureImageView, a_Images[i].textureSampler);
+		}
+
+		t_Builder = DescriptorBuilder::Begin(m_DescriptorLayoutCache, m_DescriptorAllocator);
+		t_Builder.BindImage(a_ImageCount, t_Images, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);
+		t_Builder.Build(material.secondDescriptorSet, t_ImageLayout);
+
+
+		delete[] t_Images;
+		return t_Handle;
+	}
+
+
+
+	material.pipelineID = m_ShaderManager->CreatePipelineData(m_ShaderPool.Get(a_Vert), m_ShaderPool.Get(a_Frag), mvk_RenderPass, t_DescriptorLayouts);
+
 
 	return t_Handle;
 }
@@ -437,9 +449,12 @@ RenderObject Renderer::CreateRenderObject(Engine::Transform* a_Transform, Materi
 	return rendObj;
 }
 
-RenderObject Renderer::CreateRenderObject(Engine::Transform* a_Transform, MaterialHandle a_MaterialHandle, GeometryType a_Type)
+RenderObject Renderer::CreateRenderObject(Engine::Transform* a_Transform, GeometryType a_Type, MaterialHandle a_MaterialHandle)
 {
-	return CreateRenderObject(a_Transform, a_MaterialHandle, m_GeometryFactory.GetShape(a_Type));
+	if (a_MaterialHandle != RENDER_NULL_HANDLE)
+		return CreateRenderObject(a_Transform, a_MaterialHandle, m_GeometryFactory.GetShape(a_Type));
+
+	return CreateRenderObject(a_Transform, m_GeometryFactory.GetDebugMaterial(), m_GeometryFactory.GetShape(a_Type));
 }
 
 void Renderer::SetupGUIsystem(GUI::GUISystem* p_GuiSystem)

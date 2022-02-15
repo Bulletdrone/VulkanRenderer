@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <Tools/RenderHandle.h>
 
 #pragma warning (push, 0)
 #include <Vulkan/vulkan.h>
@@ -21,9 +22,12 @@ class GeometryFactory
 {
 public:
 	void Init(Renderer* a_Renderer);
-	uint32_t GetShape(GeometryType a_Type);
+	MeshHandle GetShape(GeometryType a_Type);
+	MaterialHandle GetDebugMaterial() { return m_DebugMaterialHandle; }
 
 private:
-	uint32_t m_ShapeHandlers[static_cast<size_t>(GeometryType::Count)];
+	MeshHandle m_ShapeHandles[static_cast<size_t>(GeometryType::Count)];
+	MaterialHandle m_DebugMaterialHandle = RENDER_NULL_HANDLE;
 
+	const unsigned char* LoadShader(const char* a_FilePath, size_t& a_ShaderSize);
 };

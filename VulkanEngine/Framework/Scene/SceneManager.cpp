@@ -21,12 +21,13 @@ namespace Engine
 		m_Renderer->CreateDepthResources();
 		m_Renderer->CreateFrameBuffers();
 
+		m_Renderer->CreateStartBuffers();
+
 		m_CameraController = new CameraController(m_Renderer);
 
 		//Setup GUI
 		m_GuiSystem = new GUI::GUISystem(m_Renderer->GetWindow());
 		m_Renderer->SetupGUIsystem(m_GuiSystem);
-		m_Renderer->SetupGeometryFactory();
 
 		GUI::GUICreationData mainWindow{};
 		mainWindow.position = glm::vec2(0, 0);
@@ -49,6 +50,7 @@ namespace Engine
 		t_TextSlider.name = "Materials";
 		m_CreationWindow.MaterialSlider = m_GuiSystem->AddElementToGUIWindow(m_MainWindowHandle, t_TextSlider);
 
+		m_Renderer->SetupGeometryFactory();
 	}
 
 	SceneManager::~SceneManager()
@@ -114,9 +116,6 @@ namespace Engine
 
 		Scene t_Scene = m_Scenes[CurrentScene];
 
-
-		m_Renderer->CreateStartBuffers();
-
 		ShaderHandle vert = Engine::ResourceAllocator::GetInstance().GetResource<Engine::Resource::ShaderResource>("../VulkanRenderer/Resources/Shaders/unlitVert.spv", Engine::Resource::ResourceType::Shader).shaderHandle;
 		ShaderHandle frag = Engine::ResourceAllocator::GetInstance().GetResource<Engine::Resource::ShaderResource>("../VulkanRenderer/Resources/Shaders/unlitFrag.spv", Engine::Resource::ResourceType::Shader).shaderHandle;
 
@@ -134,7 +133,7 @@ namespace Engine
 			"Space Texture");
 
 		Transform* t = new Transform();
-		m_Renderer->CreateRenderObject(t, m_CreationWindow.Materials[1], GeometryType::Quad);
+		m_Renderer->CreateRenderObject(t, GeometryType::Quad);
 
 		//m_ObjectManager->CreateRenderObject(t_Transform2, mat2, GeometryType::Quad);
 	}
