@@ -304,7 +304,7 @@ void Renderer::CreateFrameBuffers()
 		m_DepthHandler->GetDepthTest().depthImageView
 		};
 
-		VkFramebufferCreateInfo t_FramebufferInfo{};
+		VkFramebufferCreateInfo t_FramebufferInfo = VkInit::FramebufferCreateInfo();
 		t_FramebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
 		t_FramebufferInfo.renderPass = mvk_RenderPass;
 		t_FramebufferInfo.attachmentCount = static_cast<uint32_t>(t_Attachments.size());
@@ -384,7 +384,7 @@ void Renderer::SetupImage(Texture& a_Texture, const unsigned char* a_ImageBuffer
 
 Shader Renderer::CreateShader(const unsigned char* a_ShaderCode, const size_t a_CodeSize)
 {
-	VkShaderModuleCreateInfo t_CreateInfo = VkInit::CreateShaderModule(a_ShaderCode, a_CodeSize);
+	VkShaderModuleCreateInfo t_CreateInfo = VkInit::ShaderModuleCreateInfo(a_ShaderCode, a_CodeSize);
 
 	Shader shader{};
 	if (vkCreateShaderModule(m_VulkanDevice, &t_CreateInfo, nullptr, &shader.shaderModule) != VK_SUCCESS) {
@@ -432,16 +432,16 @@ void Renderer::CreateGlobalDescriptor()
 {
 	DescriptorBuilder t_Builder{};
 
-	VkDescriptorSetLayoutBinding t_CameraBinding = VkInit::CreateDescriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 0);
-	VkDescriptorSetLayoutCreateInfo t_CameraLayoutInfo = VkInit::CreateDescriptorSetLayoutCreateInfo(VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO, 1, &t_CameraBinding);
+	VkDescriptorSetLayoutBinding t_CameraBinding = VkInit::DescriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 0);
+	VkDescriptorSetLayoutCreateInfo t_CameraLayoutInfo = VkInit::DescriptorSetLayoutCreateInfo(1, &t_CameraBinding);
 	m_GlobalSetLayout = m_DescriptorLayoutCache->CreateLayout(&t_CameraLayoutInfo);
 
-	VkDescriptorBufferInfo buffer1 = VkInit::CreateDescriptorBufferInfo(mvk_ViewProjectionBuffers[0], 0, sizeof(ViewProjection));
+	VkDescriptorBufferInfo buffer1 = VkInit::DescriptorBufferInfo(mvk_ViewProjectionBuffers[0], 0, sizeof(ViewProjection));
 	t_Builder = DescriptorBuilder::Begin(m_DescriptorLayoutCache, m_DescriptorAllocator);
 	t_Builder.BindBuffer(0, &buffer1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT);
 	t_Builder.Build(m_GlobalSet[0], m_GlobalSetLayout);
 
-	VkDescriptorBufferInfo buffer2 = VkInit::CreateDescriptorBufferInfo(mvk_ViewProjectionBuffers[1], 0, sizeof(ViewProjection));
+	VkDescriptorBufferInfo buffer2 = VkInit::DescriptorBufferInfo(mvk_ViewProjectionBuffers[1], 0, sizeof(ViewProjection));
 	t_Builder = DescriptorBuilder::Begin(m_DescriptorLayoutCache, m_DescriptorAllocator);
 	t_Builder.BindBuffer(0, &buffer2, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT);
 	t_Builder.Build(m_GlobalSet[1], m_GlobalSetLayout);
@@ -452,8 +452,8 @@ MaterialHandle Renderer::CreateMaterial(uint32_t a_UniCount, VkBuffer* a_UniBuff
 	MaterialHandle t_Handle;
 	Material& material = m_MaterialPool.GetEmptyObject(t_Handle);
 
-	VkDescriptorSetLayoutBinding t_ImageBinding = VkInit::CreateDescriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, MATERIALBINDING);
-	VkDescriptorSetLayoutCreateInfo t_ImageLayoutInfo = VkInit::CreateDescriptorSetLayoutCreateInfo(VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO, 1, &t_ImageBinding);
+	VkDescriptorSetLayoutBinding t_ImageBinding = VkInit::DescriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, MATERIALBINDING);
+	VkDescriptorSetLayoutCreateInfo t_ImageLayoutInfo = VkInit::DescriptorSetLayoutCreateInfo(1, &t_ImageBinding);
 	VkDescriptorSetLayout t_ImageLayout = m_DescriptorLayoutCache->CreateLayout(&t_ImageLayoutInfo);
 
 	std::vector<VkDescriptorSetLayout> r_DescriptorLayouts{ m_GlobalSetLayout, t_ImageLayout };
@@ -465,7 +465,7 @@ MaterialHandle Renderer::CreateMaterial(uint32_t a_UniCount, VkBuffer* a_UniBuff
 	VkDescriptorImageInfo* t_Images = new VkDescriptorImageInfo[a_ImageCount];
 	for (uint32_t i = 0; i < a_ImageCount; i++)
 	{
-		t_Images[i] = VkInit::CreateDescriptorImageInfo(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, a_Images[i].textureImageView, a_Images[i].textureSampler);
+		t_Images[i] = VkInit::DescriptorImageInfo(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, a_Images[i].textureImageView, a_Images[i].textureSampler);
 	}
 
 	t_Builder = DescriptorBuilder::Begin(m_DescriptorLayoutCache, m_DescriptorAllocator);

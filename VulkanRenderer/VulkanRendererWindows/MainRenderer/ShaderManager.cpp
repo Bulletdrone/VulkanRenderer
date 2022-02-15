@@ -3,6 +3,8 @@
 #include "Structs/BufferData.h"
 #include "Structs/Shader.h"
 
+#include "Tools/VulkanInitializers.h"
+
 #include <VulkanEngine/Framework/ResourceSystem/ResourceAllocator.h>
 #include <VulkanEngine/Framework/ResourceSystem/ShaderResource.h>
 
@@ -59,30 +61,20 @@ uint32_t ShaderManager::CreatePipelineData(const VkRenderPass& r_RenderPass, std
 	auto t_BindingDescription = Vertex::GetBindingDescription();
 	auto t_AttributeDescriptions = Vertex::GetAttributeDescriptions();
 
-	VkPipelineVertexInputStateCreateInfo t_VertexInputInfo{};
-	t_VertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-	t_VertexInputInfo.vertexBindingDescriptionCount = 1;
-	t_VertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(t_AttributeDescriptions.size());
-	t_VertexInputInfo.pVertexBindingDescriptions = &t_BindingDescription;
-	t_VertexInputInfo.pVertexAttributeDescriptions = t_AttributeDescriptions.data();
+	VkPipelineVertexInputStateCreateInfo t_VertexInputInfo = VkInit::PipeLineVertexInputStateCreateInfo(
+		1, &t_BindingDescription,
+		static_cast<uint32_t>(t_AttributeDescriptions.size()), t_AttributeDescriptions.data());
 
 	VkPipelineInputAssemblyStateCreateInfo t_InputAssembly{};
 	t_InputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
 	t_InputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
 	t_InputAssembly.primitiveRestartEnable = VK_FALSE;
 
-	VkViewport t_Viewport{};
-	t_Viewport.x = 0.0f;
-	t_Viewport.y = 0.0f;
-	t_Viewport.width = (float)rmvk_SwapChainExtent.width;
-	t_Viewport.height = (float)rmvk_SwapChainExtent.height;
-	t_Viewport.minDepth = 0.0f;
-	t_Viewport.maxDepth = 1.0f;
+	VkViewport t_Viewport = VkInit::ViewPort(
+		static_cast<float>(rmvk_SwapChainExtent.width), static_cast<float>(rmvk_SwapChainExtent.height),
+		0, 1);
 
-	VkRect2D t_Scissor{};
-	t_Scissor.offset = { 0, 0 };
-	t_Scissor.extent = rmvk_SwapChainExtent;
-
+	VkRect2D t_Scissor = VkInit::Rect2D(0, 0, rmvk_SwapChainExtent);
 
 	VkPipelineViewportStateCreateInfo t_ViewportState{};
 	t_ViewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
