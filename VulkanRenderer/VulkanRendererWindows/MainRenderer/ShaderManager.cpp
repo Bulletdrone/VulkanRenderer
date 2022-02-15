@@ -1,12 +1,7 @@
 #include "ShaderManager.h"
 
 #include "Structs/BufferData.h"
-#include "Structs/Shader.h"
-
 #include "Tools/VulkanInitializers.h"
-
-#include <VulkanEngine/Framework/ResourceSystem/ResourceAllocator.h>
-#include <VulkanEngine/Framework/ResourceSystem/ShaderResource.h>
 
 #include <iostream>
 
@@ -20,22 +15,16 @@ ShaderManager::~ShaderManager()
 
 }
 
-uint32_t ShaderManager::CreatePipelineData(const VkRenderPass& r_RenderPass, std::vector<VkDescriptorSetLayout>& a_DescriptorSetLayouts)
+uint32_t ShaderManager::CreatePipelineData(const Shader a_VertShader, const Shader a_FragShader, const VkRenderPass& r_RenderPass, std::vector<VkDescriptorSetLayout>& a_DescriptorSetLayouts)
 {
 	uint32_t pipelineID;
 
 	PipeLineData& pipeLineData = PipelinePool.GetEmptyObject(pipelineID);
 	pipeLineData.pipeID = pipelineID;
 
-	VkShaderModule t_VertShaderModule = Engine::ResourceAllocator::GetInstance()
-		.GetResource<Engine::Resource::ShaderResource>(
-			"../VulkanRenderer/Resources/Shaders/unlitVert.spv", 
-			Engine::Resource::ResourceType::Shader).shader.shaderModule;
+	const VkShaderModule t_VertShaderModule = a_VertShader.shaderModule;
 
-	VkShaderModule t_FragShaderModule = Engine::ResourceAllocator::GetInstance()
-		.GetResource<Engine::Resource::ShaderResource>(
-			"../VulkanRenderer/Resources/Shaders/unlitFrag.spv", 
-			Engine::Resource::ResourceType::Shader).shader.shaderModule;
+	const VkShaderModule t_FragShaderModule = a_FragShader.shaderModule;/* */
 
 	//Setting up Vertex.
 	VkPipelineShaderStageCreateInfo t_VertShaderStageInfo{};

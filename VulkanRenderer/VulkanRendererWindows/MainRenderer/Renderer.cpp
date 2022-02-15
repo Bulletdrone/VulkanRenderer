@@ -290,11 +290,6 @@ void Renderer::CreateRenderPass()
 	}
 }
 
-uint32_t Renderer::CreateGraphicsPipeline(std::vector<VkDescriptorSetLayout>& a_DescriptorSetLayouts)
-{
-	return m_ShaderManager->CreatePipelineData(mvk_RenderPass, a_DescriptorSetLayouts);
-}
-
 void Renderer::CreateFrameBuffers()
 {
 	for (size_t i = 0; i < m_FrameData.size(); i++)
@@ -382,16 +377,50 @@ void Renderer::SetupImage(Texture& a_Texture, const unsigned char* a_ImageBuffer
 	a_Texture.textureSampler = m_ImageHandler->CreateTextureSampler();
 }
 
-Shader Renderer::CreateShader(const unsigned char* a_ShaderCode, const size_t a_CodeSize)
+ShaderHandle Renderer::CreateShader(const unsigned char* a_ShaderCode, const size_t a_CodeSize)
 {
 	VkShaderModuleCreateInfo t_CreateInfo = VkInit::ShaderModuleCreateInfo(a_ShaderCode, a_CodeSize);
 
-	Shader shader{};
-	if (vkCreateShaderModule(m_VulkanDevice, &t_CreateInfo, nullptr, &shader.shaderModule) != VK_SUCCESS) {
+	ShaderHandle t_Handle;
+	Shader& t_Shader = m_ShaderPool.GetEmptyObject(t_Handle);
+	if (vkCreateShaderModule(m_VulkanDevice, &t_CreateInfo, nullptr, &t_Shader.shaderModule) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create shader module!");
 	}
 
-	return shader;
+	return t_Handle;
+}
+
+MaterialHandle Renderer::CreateMaterial(ShaderHandle a_Vert, ShaderHandle a_Frag, uint32_t a_UniCount, VkBuffer* a_UniBuffers, uint32_t a_ImageCount, Texture* a_Images, glm::vec4 a_Color)
+{
+	MaterialHandle t_Handle;
+	Material& material = m_MaterialPool.GetEmptyObject(t_Handle);
+
+	VkDescriptorSetLayoutBinding t_ImageBinding = VkInit::DescriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, MATERIALBINDING);
+	VkDescriptorSetLayoutCreateInfo t_ImageLayoutInfo = VkInit::DescriptorSetLayoutCreateInfo(1, &t_ImageBinding);
+	VkDescriptorSetLayout t_ImageLayout = m_DescriptorLayoutCache->CreateLayout(&t_ImageLayoutInfo);
+
+	std::vector<VkDescriptorSetLayout> t_DescriptorLayouts{ m_GlobalSetLayout, t_ImageLayout };
+	material.pipelineID = m_ShaderManager->CreatePipelineData(m_ShaderPool.Get(a_Vert), m_ShaderPool.Get(a_Frag), mvk_RenderPass, t_DescriptorLayouts);
+
+	//Building descriptor sets.
+	DescriptorBuilder t_Builder{};
+
+	VkDescriptorImageInfo* t_Images = new VkDescriptorImageInfo[a_ImageCount];
+	for (uint32_t i = 0; i < a_ImageCount; i++)
+	{
+		t_Images[i] = VkInit::DescriptorImageInfo(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, a_Images[i].textureImageView, a_Images[i].textureSampler);
+	}
+
+	t_Builder = DescriptorBuilder::Begin(m_DescriptorLayoutCache, m_DescriptorAllocator);
+	t_Builder.BindImage(a_ImageCount, t_Images, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);
+	t_Builder.Build(material.secondDescriptorSet, t_ImageLayout);
+
+
+	delete[] t_Images;
+
+	material.ambientColor = a_Color;
+
+	return t_Handle;
 }
 
 RenderObject Renderer::CreateRenderObject(Engine::Transform* a_Transform, MaterialHandle a_MaterialHandle, MeshHandle a_MeshHandle)
@@ -445,39 +474,6 @@ void Renderer::CreateGlobalDescriptor()
 	t_Builder = DescriptorBuilder::Begin(m_DescriptorLayoutCache, m_DescriptorAllocator);
 	t_Builder.BindBuffer(0, &buffer2, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT);
 	t_Builder.Build(m_GlobalSet[1], m_GlobalSetLayout);
-}
-
-MaterialHandle Renderer::CreateMaterial(uint32_t a_UniCount, VkBuffer* a_UniBuffers, uint32_t a_ImageCount, Texture* a_Images, glm::vec4 a_Color)
-{
-	MaterialHandle t_Handle;
-	Material& material = m_MaterialPool.GetEmptyObject(t_Handle);
-
-	VkDescriptorSetLayoutBinding t_ImageBinding = VkInit::DescriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, MATERIALBINDING);
-	VkDescriptorSetLayoutCreateInfo t_ImageLayoutInfo = VkInit::DescriptorSetLayoutCreateInfo(1, &t_ImageBinding);
-	VkDescriptorSetLayout t_ImageLayout = m_DescriptorLayoutCache->CreateLayout(&t_ImageLayoutInfo);
-
-	std::vector<VkDescriptorSetLayout> r_DescriptorLayouts{ m_GlobalSetLayout, t_ImageLayout };
-	material.pipelineID = CreateGraphicsPipeline(r_DescriptorLayouts);
-
-	//Building descriptor sets.
-	DescriptorBuilder t_Builder{};
-
-	VkDescriptorImageInfo* t_Images = new VkDescriptorImageInfo[a_ImageCount];
-	for (uint32_t i = 0; i < a_ImageCount; i++)
-	{
-		t_Images[i] = VkInit::DescriptorImageInfo(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, a_Images[i].textureImageView, a_Images[i].textureSampler);
-	}
-
-	t_Builder = DescriptorBuilder::Begin(m_DescriptorLayoutCache, m_DescriptorAllocator);
-	t_Builder.BindImage(a_ImageCount, t_Images, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);
-	t_Builder.Build(material.secondDescriptorSet, t_ImageLayout);
-
-	
-	delete[] t_Images;
-
-	material.ambientColor = a_Color;
-
-	return t_Handle;
 }
 
 void Renderer::DrawFrame()

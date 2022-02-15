@@ -1,6 +1,6 @@
 #pragma once
 #include "Resource.h"
-#include "Structs/Shader.h"
+#include "Tools/RenderHandle.h"
 
 namespace Engine
 {
@@ -18,7 +18,7 @@ namespace Engine
 			bool Load(const char* a_FilePath);
 			virtual bool Unload();
 
-			Shader shader;
+			ShaderHandle shaderHandle;
 		};
 	}
 }

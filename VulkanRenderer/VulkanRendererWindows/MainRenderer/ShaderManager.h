@@ -4,6 +4,7 @@
 
 #include "Handlers/DescriptorHandler.h"
 
+#include "Structs/Shader.h"
 #include "VulkanDevice.h"
 
 class ShaderManager
@@ -12,7 +13,7 @@ public:
 	ShaderManager(VulkanDevice& r_VulkanDevice, const VkExtent2D& r_VKSwapChainExtent);
 	~ShaderManager();
 
-	uint32_t CreatePipelineData(const VkRenderPass& r_RenderPass, std::vector<VkDescriptorSetLayout>& a_DescriptorSetLayouts);
+	uint32_t CreatePipelineData(const Shader a_VertShader, const Shader a_FragShader, const VkRenderPass& r_RenderPass, std::vector<VkDescriptorSetLayout>& a_DescriptorSetLayouts);
 
 	////Recreation needs to be done from the ground up again, these are just here as a reminder.
 	//void RecreatePipelines(const VkRenderPass& r_RenderPass);

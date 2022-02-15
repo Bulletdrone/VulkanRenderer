@@ -8,6 +8,7 @@
 #include "Framework/ResourceSystem/ResourceAllocator.h"
 #include "Framework/ResourceSystem/TextureResource.h"
 #include "Framework/ResourceSystem/MeshResource.h"
+#include "Framework/ResourceSystem/ShaderResource.h"
 
 namespace Engine
 {
@@ -116,8 +117,11 @@ namespace Engine
 
 		m_Renderer->CreateStartBuffers();
 
+		ShaderHandle vert = Engine::ResourceAllocator::GetInstance().GetResource<Engine::Resource::ShaderResource>("../VulkanRenderer/Resources/Shaders/unlitVert.spv", Engine::Resource::ResourceType::Shader).shaderHandle;
+		ShaderHandle frag = Engine::ResourceAllocator::GetInstance().GetResource<Engine::Resource::ShaderResource>("../VulkanRenderer/Resources/Shaders/unlitFrag.spv", Engine::Resource::ResourceType::Shader).shaderHandle;
+
 		//Transform* t_PTrans = new Transform(glm::vec3(0, 0, 0), 1);
-		m_CreationWindow.AddMaterial(m_Renderer->CreateMaterial(0, nullptr, 1,
+		m_CreationWindow.AddMaterial(m_Renderer->CreateMaterial(vert, frag, 0, nullptr, 1,
 			&ResourceAllocator::GetInstance().GetResource<Resource::TextureResource>("../VulkanRenderer/Resources/Images/Background.png", Resource::ResourceType::Texture).texture),
 			"Pavillion Material");
 
@@ -125,9 +129,12 @@ namespace Engine
 		//	ResourceAllocator::GetInstance().GetResource<Resource::MeshResource>("../VulkanRenderer/Resources/Models/Pavillion.obj", Engine::Resource::ResourceType::Mesh).meshHandle);
 
 		//Transform* t_Transform2 = new Transform(glm::vec3(-0.7f, 0.9f, 0.2), 1);
-		m_CreationWindow.AddMaterial(m_Renderer->CreateMaterial(0, nullptr, 1,
+		m_CreationWindow.AddMaterial(m_Renderer->CreateMaterial(vert, frag, 0, nullptr, 1,
 			&ResourceAllocator::GetInstance().GetResource<Resource::TextureResource>("../VulkanRenderer/Resources/Images/Background1.png", Resource::ResourceType::Texture).texture),
 			"Space Texture");
+
+		Transform* t = new Transform();
+		m_Renderer->CreateRenderObject(t, m_CreationWindow.Materials[1], GeometryType::Quad);
 
 		//m_ObjectManager->CreateRenderObject(t_Transform2, mat2, GeometryType::Quad);
 	}

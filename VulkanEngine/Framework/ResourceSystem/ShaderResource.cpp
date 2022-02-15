@@ -19,7 +19,7 @@ namespace Engine
 
 		bool ShaderResource::IsInitialized()
 		{
-			if (shader.shaderModule != VK_NULL_HANDLE)
+			if (shaderHandle != RENDER_NULL_HANDLE)
 			{
 				return true;
 			}
@@ -32,7 +32,7 @@ namespace Engine
 
 			Buffer t_Buffer = ReadFile(a_FilePath);
 
-			shader = r_ResourceAllocator.p_Renderer->CreateShader(t_Buffer.data, t_Buffer.size);
+			shaderHandle = r_ResourceAllocator.p_Renderer->CreateShader(t_Buffer.data, t_Buffer.size);
 
 			return true;
 		}

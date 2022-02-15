@@ -5,6 +5,7 @@ constexpr uint32_t RENDER_NULL_HANDLE = UINT32_MAX;
 
 typedef struct BasicRenderHandle MeshHandle;
 typedef struct BasicRenderHandle MaterialHandle;
+typedef struct BasicRenderHandle ShaderHandle;
 
 struct BasicRenderHandle
 {

@@ -60,7 +60,12 @@ public:
 	//BufferData
 	MeshHandle GenerateMesh(const std::vector<Vertex>& a_Vertices, const std::vector<uint32_t>& a_Indices);
 	void SetupImage(Texture& a_Texture, const unsigned char* a_ImageBuffer);
-	Shader CreateShader(const unsigned char* a_ShaderCode, const size_t a_CodeSize);
+	ShaderHandle CreateShader(const unsigned char* a_ShaderCode, const size_t a_CodeSize);
+	MaterialHandle CreateMaterial(ShaderHandle a_Vert, ShaderHandle a_Frag,
+		uint32_t a_UniCount, VkBuffer* a_UniBuffers,
+		uint32_t a_ImageCount, Texture* a_Images,
+		glm::vec4 a_Color = glm::vec4(0, 0, 0, 1));
+
 	RenderObject CreateRenderObject(Engine::Transform* a_Transform, MaterialHandle a_MaterialHandle, MeshHandle a_MeshHandle);
 	RenderObject CreateRenderObject(Engine::Transform* a_Transform, MaterialHandle a_MaterialHandle, GeometryType a_Type);
 	void SetupGUIsystem(GUI::GUISystem* p_GuiSystem);
@@ -68,9 +73,6 @@ public:
 
 	//Only handles single images at the moment.
 	void CreateGlobalDescriptor();
-	MaterialHandle CreateMaterial(uint32_t a_UniCount, VkBuffer* a_UniBuffers,
-		uint32_t a_ImageCount, Texture* a_Images, 
-		glm::vec4 a_Color = glm::vec4(0, 0, 0, 1));
 
 	void DrawFrame();
 	void DrawObjects(VkCommandBuffer a_CmdBuffer);
@@ -102,6 +104,7 @@ private:
 
 	ObjectPool<Material, MaterialHandle> m_MaterialPool;
 	ObjectPool<MeshData, MeshHandle> m_MeshPool;
+	ObjectPool<Shader, ShaderHandle> m_ShaderPool;
 
 	//Window Data.
 	Window* m_Window;
