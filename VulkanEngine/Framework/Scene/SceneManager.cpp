@@ -53,7 +53,6 @@ namespace Engine
 	SceneManager::~SceneManager()
 	{
 		delete m_CameraController;
-		delete m_ObjectManager;
 
 		delete m_Renderer;
 	}

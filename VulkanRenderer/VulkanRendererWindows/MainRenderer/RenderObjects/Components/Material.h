@@ -9,7 +9,7 @@ constexpr uint32_t MATERIALBINDING = 1;
 class Material
 {
 public:
-	uint32_t pipelineID;
+	uint32_t pipelineID = 0;
 	VkDescriptorSet secondDescriptorSet = VK_NULL_HANDLE;
 	glm::vec4 ambientColor = glm::vec4(0, 0, 0, 1); //w is transparency.
 };

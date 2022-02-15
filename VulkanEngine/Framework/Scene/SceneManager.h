@@ -5,7 +5,6 @@
 #include "GUI/GUI.h"
 
 class Renderer;
-class ObjectManager;
 class CameraController;
 class RenderFactory;
 namespace GUI { class GUISystem; }
@@ -46,9 +45,7 @@ namespace Engine
 		GUI::GUISystem* m_GuiSystem;
 		GUIHandle m_MainWindowHandle;
 
-		ObjectManager* m_ObjectManager;
 		CameraController* m_CameraController;
-
 
 		SceneObjectCreationGUI m_CreationWindow;
 	};
