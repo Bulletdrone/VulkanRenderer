@@ -17,33 +17,7 @@
 #include "Tools/VulkanInitializers.h"
 
 Renderer::Renderer()
-{
-	m_FrameData.resize(FRAMEBUFFER_AMOUNT);
-	//Setting up GLFW.
-	m_Window = new Window(800, 600, "VulkanTest");
-
-	if (DE_EnableValidationLayers)
-		DE_VulkanDebug = new VulkanDebug(mvk_Instance);
-
-	CreateVKInstance();
-	
-	if (DE_EnableValidationLayers)
-		DE_VulkanDebug->SetupDebugMessanger(nullptr);
-
-	m_Window->SetupVKWindow(mvk_Instance);
-	VkPhysicalDevice physicalDevice = PickPhysicalDevice();
-
-	m_VulkanDevice.VulkanDeviceSetup(physicalDevice, DE_VulkanDebug, FRAMEBUFFER_AMOUNT);
-	m_VulkanDevice.CreateLogicalDevice(std::vector<const char*>(), *m_Window, mvk_GraphicsQueue, mvk_PresentQueue);
-	
-	SetupHandlers();
-	m_VulkanSwapChain.ConnectVulkanDevice(&m_VulkanDevice);
-	m_VulkanSwapChain.CreateSwapChain(*m_Window, static_cast<uint32_t>(m_FrameData.size()));
-	m_VulkanSwapChain.CreateImageViews(m_ImageHandler);
-	CreateRenderPass();
-
-	m_ShaderManager = new ShaderManager(m_VulkanDevice, m_VulkanSwapChain.SwapChainExtent);
-}
+{}
 
 Renderer::~Renderer()
 {
@@ -63,6 +37,44 @@ Renderer::~Renderer()
 	vkDestroySurfaceKHR(mvk_Instance, m_Window->GetSurface(), nullptr);
 	vkDestroyInstance(mvk_Instance, nullptr);
 	delete m_Window;
+}
+
+bool Renderer::Init()
+{
+	m_FrameData.resize(FRAMEBUFFER_AMOUNT);
+	//Setting up GLFW.
+	m_Window = new Window(800, 600, "VulkanTest");
+
+	if (DE_EnableValidationLayers)
+		DE_VulkanDebug = new VulkanDebug(mvk_Instance);
+
+	CreateVKInstance();
+
+	if (DE_EnableValidationLayers)
+		DE_VulkanDebug->SetupDebugMessanger(nullptr);
+
+	m_Window->SetupVKWindow(mvk_Instance);
+	VkPhysicalDevice physicalDevice = PickPhysicalDevice();
+
+	m_VulkanDevice.VulkanDeviceSetup(physicalDevice, DE_VulkanDebug, FRAMEBUFFER_AMOUNT);
+	m_VulkanDevice.CreateLogicalDevice(std::vector<const char*>(), *m_Window, mvk_GraphicsQueue, mvk_PresentQueue);
+
+	SetupHandlers();
+	m_VulkanSwapChain.ConnectVulkanDevice(&m_VulkanDevice);
+	m_VulkanSwapChain.CreateSwapChain(*m_Window, static_cast<uint32_t>(m_FrameData.size()));
+	m_VulkanSwapChain.CreateImageViews(m_ImageHandler);
+	CreateRenderPass();
+
+	m_ShaderManager = new ShaderManager(m_VulkanDevice, m_VulkanSwapChain.SwapChainExtent);
+
+	CreateCommandPool();
+	CreateDepthResources();
+	CreateFrameBuffers();
+
+	CreateStartBuffers();
+	SetupGeometryFactory();
+
+	return true;
 }
 
 //Must be done after setting up the physical device.
@@ -103,8 +115,8 @@ void Renderer::CleanupSwapChain()
 
 	//m_VulkanDevice.FreeCommandPool();
 
-	vkDestroyPipeline(m_VulkanDevice, mvk_Pipeline, nullptr);
-	vkDestroyPipelineLayout(m_VulkanDevice, mvk_PipelineLayout, nullptr);
+	//vkDestroyPipeline(m_VulkanDevice, mvk_Pipeline, nullptr);
+	//vkDestroyPipelineLayout(m_VulkanDevice, mvk_PipelineLayout, nullptr);
 	vkDestroyRenderPass(m_VulkanDevice, mvk_RenderPass, nullptr);
 
 	for (size_t i = 0; i < m_FrameData.size(); i++)

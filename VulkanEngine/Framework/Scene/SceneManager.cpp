@@ -15,13 +15,9 @@ namespace Engine
 	SceneManager::SceneManager()
 	{
 		m_Renderer = new Renderer();
+		m_Renderer->Init();
 		ResourceAllocator::GetInstance().SetRenderer(m_Renderer);
 		//Setting up the rest.
-		m_Renderer->CreateCommandPool();
-		m_Renderer->CreateDepthResources();
-		m_Renderer->CreateFrameBuffers();
-
-		m_Renderer->CreateStartBuffers();
 
 		m_CameraController = new CameraController(m_Renderer);
 
@@ -49,8 +45,6 @@ namespace Engine
 		GUI::GUITypes::ITextSlider t_TextSlider{};
 		t_TextSlider.name = "Materials";
 		m_CreationWindow.MaterialSlider = m_GuiSystem->AddElementToGUIWindow(m_MainWindowHandle, t_TextSlider);
-
-		m_Renderer->SetupGeometryFactory();
 	}
 
 	SceneManager::~SceneManager()

@@ -33,6 +33,8 @@ public:
 	Renderer();
 	~Renderer();
 
+	bool Init();
+
 	//Setting up that is done later.
 	void CreateStartBuffers();
 	void SetupHandlers();
@@ -43,8 +45,6 @@ public:
 	void CreateVKInstance();
 	VkPhysicalDevice PickPhysicalDevice();
 	void CreateRenderPass();
-
-	uint32_t CreateGraphicsPipeline(std::vector<VkDescriptorSetLayout>& a_DescriptorSetLayouts);
 
 	void CreateFrameBuffers();
 	void CreateCommandPool();
@@ -91,15 +91,15 @@ public:
 private:
 	bool IsDeviceSuitable(VkPhysicalDevice a_Device);
 
-	DescriptorAllocator* m_DescriptorAllocator;
-	DescriptorLayoutCache* m_DescriptorLayoutCache;
+	DescriptorAllocator* m_DescriptorAllocator = nullptr;
+	DescriptorLayoutCache* m_DescriptorLayoutCache = nullptr;
 
-	VkDescriptorSetLayout m_GlobalSetLayout;
+	VkDescriptorSetLayout m_GlobalSetLayout = VK_NULL_HANDLE;
 	VkDescriptorSet m_GlobalSet[2];
 
 	//All the renderObjects in ObjectManager.
 	std::vector<RenderObject> m_RenderObjects;
-	GeometryFactory m_GeometryFactory;
+	GeometryFactory m_GeometryFactory{};
 
 
 	ObjectPool<Material, MaterialHandle> m_MaterialPool;
@@ -107,17 +107,17 @@ private:
 	ObjectPool<Shader, ShaderHandle> m_ShaderPool;
 
 	//Window Data.
-	Window* m_Window;
+	Window* m_Window = nullptr;
 
 	//Handlers
-	ImageHandler* m_ImageHandler;
-	DepthHandler* m_DepthHandler;
+	ImageHandler* m_ImageHandler = nullptr;
+	DepthHandler* m_DepthHandler = nullptr;
 
 	//ShaderData
-	ShaderManager* m_ShaderManager;
+	ShaderManager* m_ShaderManager = nullptr;
 
 
-	CameraObject* p_ActiveCamera;
+	CameraObject* p_ActiveCamera = nullptr;
 
 	std::vector<FrameData> m_FrameData;
 
@@ -125,19 +125,16 @@ private:
 	int m_PreviousFrame = -1;
 
 	//Primary Vulkan Data;
-	VkInstance mvk_Instance;
+	VkInstance mvk_Instance = VK_NULL_HANDLE;;
 
 	VulkanDevice m_VulkanDevice;
 	VulkanSwapChain m_VulkanSwapChain;
 
-	VkQueue mvk_GraphicsQueue;
-	VkQueue mvk_PresentQueue;
+	VkQueue mvk_GraphicsQueue = VK_NULL_HANDLE;;
+	VkQueue mvk_PresentQueue = VK_NULL_HANDLE;;
 
 	//The RenderPipeline.
-	VkRenderPass mvk_RenderPass;
-
-	VkPipelineLayout mvk_PipelineLayout;
-	VkPipeline mvk_Pipeline;
+	VkRenderPass mvk_RenderPass = VK_NULL_HANDLE;;
 
 	const std::vector<const char*> m_DeviceExtensions = {
 	VK_KHR_SWAPCHAIN_EXTENSION_NAME
