@@ -71,7 +71,7 @@ namespace GUI
 		t_InitInfo.Instance = a_Instance;
 		t_InitInfo.PhysicalDevice = a_PhysDevice;
 		t_InitInfo.Device = m_Device;
-		t_InitInfo.QueueFamily = VK_NULL_HANDLE;
+		t_InitInfo.QueueFamily = 0;
 		t_InitInfo.Queue = a_Queue;
 		t_InitInfo.PipelineCache = VK_NULL_HANDLE;
 		t_InitInfo.DescriptorPool = m_ImguiPool;
