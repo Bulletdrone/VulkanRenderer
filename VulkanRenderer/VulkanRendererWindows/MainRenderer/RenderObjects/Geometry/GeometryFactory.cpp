@@ -1,7 +1,7 @@
 #include "GeometryFactory.h"
 
-#include "Renderer.h"
-#include "RenderObjects/Components/MeshData.h"
+#include "../../Renderer.h"
+#include "../Components/MeshData.h"
 
 void GeometryFactory::Init(Renderer* a_Renderer)
 {
@@ -60,7 +60,7 @@ const unsigned char* GeometryFactory::LoadShader(const char* a_FilePath, size_t&
 
 	if (!t_File.is_open())
 	{
-		assert(false, "failed to open file!");
+		assert("failed to open file!");
 	}
 
 	size_t t_FileSize = static_cast<size_t>(t_File.tellg());

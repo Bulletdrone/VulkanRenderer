@@ -7,7 +7,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #pragma warning (pop)
 
-#include "VulkanDevice.h"
+#include "../VulkanDevice.h"
 
 struct DepthTest
 {

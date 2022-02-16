@@ -1,5 +1,5 @@
 #include "ImageHandler.h"
-#include "Structs/Texture.h"
+#include "../Structs/Texture.h"
 
 #include <fstream>
 
