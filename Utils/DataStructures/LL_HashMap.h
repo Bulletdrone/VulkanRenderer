@@ -1,54 +1,87 @@
 #pragma once
-#include <cstdint>
+#include "hash.h"
 
-constexpr uint32_t standardSize = 1024;
+constexpr uint32_t STANDARDHASHMAPSIZE = 1024;
 
-typedef uint64_t hashindex;
-namespace Engine
-{
 
-	namespace Resource
-	{
-		class Resource;
-	}
-}
-
-struct Hash
-{
-	uint64_t hash;
-
-	operator const uint64_t() const { return hash; }
-
-	//Create with uint64_t.
-	static Hash MakeHash(uint64_t a_Value, uint64_t a_MaxSize);
-
-private:
-	Hash(uint64_t a_Hash) : hash(a_Hash) {};
-};
-	
+template<typename Key, typename Value>
 struct LL_HashEntry
 {
 	LL_HashEntry* next_Entry = nullptr;
-	hashindex key{};
-	Engine::Resource::Resource* value = nullptr;
+
+	Key key;
+	Value value;
 };
 
 
-//template<typename Key, typename Value>
+template<typename Key, typename Value>
 class LL_HashMap
 {
 public:
 	LL_HashMap();
 	~LL_HashMap();
 
-	void Insert(hashindex a_Key, Engine::Resource::Resource* a_Res);
-	Engine::Resource::Resource* Find(hashindex a_Key);
+	void Insert(Key a_Key, Value a_Res);
+	Value Find(Key a_Key);
 
 private:
-	bool match(LL_HashEntry* a_Entry, hashindex a_Key);
+	bool Match(LL_HashEntry<Key, Value>* a_Entry, Key a_Key);
 
 
-	LL_HashEntry* m_Map[standardSize]{ nullptr };
+	LL_HashEntry<Key, Value>* m_Map[STANDARDHASHMAPSIZE]{ nullptr };
 };
 
+template<typename Key, typename Value>
+LL_HashMap<Key, Value>::LL_HashMap()
+{}
 
+template<typename Key, typename Value>
+LL_HashMap<Key, Value>::~LL_HashMap()
+{
+	for (auto& t_Element : m_Map)
+	{
+		delete t_Element;
+	}
+}
+
+template<typename Key, typename Value>
+void LL_HashMap<Key, Value>::Insert(Key a_Key, Value a_Res)
+{
+	Hash t_Hash = Hash::MakeHash(a_Key);
+	t_Hash.hash = t_Hash % STANDARDHASHMAPSIZE;
+
+	LL_HashEntry<Key, Value>* entry = new LL_HashEntry<Key, Value>;
+	entry->key = a_Key;
+	entry->value = a_Res;
+
+	entry->next_Entry = m_Map[t_Hash];
+	m_Map[t_Hash.hash] = entry;
+}
+
+template<typename Key, typename Value>
+Value LL_HashMap<Key, Value>::Find(Key a_Key)
+{
+	Hash t_Hash = Hash::MakeHash(a_Key);
+	t_Hash = t_Hash % STANDARDHASHMAPSIZE;
+
+	LL_HashEntry<Key, Value>* entry = m_Map[t_Hash];
+	while (entry)
+	{
+		if (Match(entry, a_Key))
+		{
+			return entry->value;
+		}
+		entry = entry->next_Entry;
+	}
+	return nullptr;
+}
+
+template<typename Key, typename Value>
+bool LL_HashMap<Key, Value>::Match(LL_HashEntry<Key, Value>* a_Entry, Key a_Key)
+{
+	if (a_Entry->key == a_Key)
+	{
+		return true;
+	}
+	return false;
+}

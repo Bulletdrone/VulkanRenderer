@@ -27,12 +27,12 @@
     <ClInclude Include="DataStructures\ObjectPool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DataStructures\Hash.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Precomp\pch.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DataStructures\LL_HashMap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

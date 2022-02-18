@@ -8,6 +8,8 @@ public:
 	ObjectPool();
 	~ObjectPool();
 
+	T& operator[](HandleType a_Index);
+
 	/*  Get a filled object on a array position.
 	@param a_Pos, The position in the array.
 	@return the object on the Position. */
@@ -47,6 +49,16 @@ inline ObjectPool<T, HandleType>::~ObjectPool()
 {
 	delete[] arr;
 	delete[] isEmpty;
+}
+
+template<typename T, typename HandleType>
+inline T& ObjectPool<T, HandleType>::operator[](HandleType a_Index)
+{
+	if (a_Index > size)
+	{
+		//assert test.
+	}
+	return arr[a_Index];
 }
 
 template <typename T, typename HandleType>

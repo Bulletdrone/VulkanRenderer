@@ -68,7 +68,7 @@ namespace Engine
 		hashindex GetHashFromPath(const char* a_FilePath);
 
 	private:
-		LL_HashMap m_Resources;
+		LL_HashMap<hashindex, Resource::Resource*> m_Resources;
 
 		//std::unordered_map<hashindex, Resource::Resource*> m_Resources;
 
