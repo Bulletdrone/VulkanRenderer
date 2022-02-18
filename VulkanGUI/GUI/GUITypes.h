@@ -1,6 +1,9 @@
 #pragma once
 #include <string>
+
+#pragma warning (push, 0)
 #include <windows.h>
+#pragma warning (pop)
 
 #include <vector>
 

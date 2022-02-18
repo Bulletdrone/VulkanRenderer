@@ -4,11 +4,12 @@
 #include <string>
 
 #pragma warning (push, 0)
-#include <glfw3.h>
 #include <Vulkan/vulkan.hpp>
 #pragma warning (pop)
 
 #include "GUIWindow.h"
+
+struct GLFWwindow;
 
 namespace GUI 
 {

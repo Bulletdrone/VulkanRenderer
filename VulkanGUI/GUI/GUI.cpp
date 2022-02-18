@@ -1,9 +1,11 @@
 #include "GUI.h"
 
+#include "Logger/Logger.h"
+
 #pragma warning (push, 0)
+#include <glfw3.h>
+
 #include "ImGUI/imgui.h"
-
-
 #include "imGUI/Backends/imgui_impl_vulkan.h"
 #include "ImGUI/Backends/imgui_impl_glfw.h"
 #pragma warning (pop)
@@ -123,10 +125,10 @@ namespace GUI
 				m_GUIWindows.erase(it);
 				return true;
 			}
-			printf("Failed to delete GUIWindow, hash couldn't find an element.");
+			Logger::Assert(false, "Failed to delete GUIWindow, hash couldn't find an element.");
 			return false;
 		}
-		printf("Failed to delete GUIWindow, handler invalid");
+		Logger::Assert(false, "Failed to delete GUIWindow, handler invalid.");
 		return false;
 	}
 

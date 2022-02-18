@@ -3,7 +3,11 @@
 
 
 #include "CameraController.h"
+
+#pragma warning (push, 0)
 #include <glm/gtc/type_ptr.hpp>
+#include <glfw3.h>
+#pragma warning (pop)
 
 #include "Framework/ResourceSystem/ResourceAllocator.h"
 #include "Framework/ResourceSystem/TextureResource.h"

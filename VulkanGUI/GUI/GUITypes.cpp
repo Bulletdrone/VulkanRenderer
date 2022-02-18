@@ -1,10 +1,11 @@
 #include "GUITypes.h"
 
+#include "Logger/Logger.h"
+
 #pragma warning (push, 0)
 #include "ImGUI/imgui.h"
-#pragma warning (pop)
-#include <assert.h>
 #include <commdlg.h>
+#pragma warning (pop)
 
 constexpr uint16_t MAXFILE = 256;
 
@@ -84,7 +85,7 @@ namespace GUI
 				return ImGui::SliderInt4(name, value, min, max);
 				break;
 			default:
-				assert(elementSize < 4 || elementSize > 1);
+				Logger::Assert((elementSize < 4 || elementSize > 1), "GUIType ISlider elementType lower then 1 or higher then 4.");
 				break;
 			}
 			return false;
@@ -116,7 +117,7 @@ namespace GUI
 				return ImGui::SliderFloat4(name, value, min, max);
 				break;
 			default:
-				assert(elementSize < 4 || elementSize > 1);
+				Logger::Assert((elementSize < 4 || elementSize > 1), "GUIType FSlider elementType lower then 1 or higher then 4.");
 				break;
 			}
 			return false;
@@ -138,7 +139,7 @@ namespace GUI
 				return ImGui::InputFloat4(name, value);
 				break;
 			default:
-				assert(elementSize < 4 || elementSize > 1);
+				Logger::Assert((elementSize < 4 || elementSize > 1), "GUIType InputF elementType lower then 1 or higher then 4.");
 				break;
 			}
 			return false;

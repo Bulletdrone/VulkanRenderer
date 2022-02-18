@@ -1,5 +1,5 @@
 #pragma once
-#include <stdint.h>
+#include <cstdint>
 constexpr uint32_t GUI_NULL_HANDLE = 0;
 
 struct GUIHandle
