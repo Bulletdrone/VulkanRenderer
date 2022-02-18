@@ -1,5 +1,4 @@
 #include "GUITypes.h"
-#include "pch.h"
 
 #pragma warning (push, 0)
 #include "ImGUI/imgui.h"

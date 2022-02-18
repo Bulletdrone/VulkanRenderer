@@ -45,12 +45,6 @@
     <ClInclude Include="imGUI\backends\imgui_impl_vulkan.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="framework.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="pch.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="GUI\GUIHandle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -84,9 +78,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="imGUI\backends\imgui_impl_vulkan.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="pch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GUI\GUIWindow.cpp">

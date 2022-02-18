@@ -1,4 +1,3 @@
-#include "pch.h"
 #include "GUIWindow.h"
 
 #pragma warning (push, 0)
