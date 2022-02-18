@@ -9,8 +9,8 @@ struct LL_HashEntry
 {
 	LL_HashEntry* next_Entry = nullptr;
 
-	Key key;
-	Value value;
+	Key key{};
+	Value value{};
 };
 
 

@@ -1,6 +1,7 @@
 #pragma once
+#include "../Logger/Logger.h"
 #include <cstdint>
-#include <cassert>
+
 
 struct Hash
 {
@@ -17,6 +18,9 @@ struct Hash
 	template <uint64_t>
 	static Hash MakeHash(uint64_t a_Value);
 
+	template <const char*>
+	static Hash MakeHash(const char* a_Value);
+
 private:
 	Hash(uint64_t a_Hash) : hash(a_Hash) {};
 };
@@ -24,7 +28,7 @@ private:
 template<typename T>
 inline Hash Hash::MakeHash(T a_Value)
 {
-	assert("unsupported hash type");
+	Logger::Assert(false, "MakeHash function doesn't support this type");
 	return Hash();
 }
 
@@ -32,4 +36,17 @@ template<>
 inline Hash Hash::MakeHash(uint64_t a_Value)
 {
 	return Hash(a_Value * 8 ^ 8);
+}
+
+template<>
+inline Hash Hash::MakeHash(const char* a_Value)
+{
+	uint64_t t_Hash = 0;
+
+	while (*a_Value != '\0')
+	{
+		t_Hash += static_cast<uint64_t>(*a_Value++);
+	}
+
+	return Hash(t_Hash);
 }

@@ -165,11 +165,13 @@
   <ItemGroup>
     <ClInclude Include="DataStructures\Hash.h" />
     <ClInclude Include="DataStructures\ObjectPool.h" />
+    <ClInclude Include="Logger\Logger.h" />
     <ClInclude Include="Precomp\framework.h" />
     <ClInclude Include="DataStructures\LL_HashMap.h" />
     <ClInclude Include="Precomp\pch.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Logger\Logger.cpp" />
     <ClCompile Include="Precomp\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

@@ -25,7 +25,6 @@
     <ClCompile Include="Framework\ResourceSystem\TextureResource.cpp" />
     <ClCompile Include="Framework\Scene\Scene.cpp" />
     <ClCompile Include="Framework\Scene\SceneManager.cpp" />
-    <ClCompile Include="Framework\Precomp\Logger.cpp" />
     <ClCompile Include="GameComponents\Transform.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Framework\Precomp\Precomp.cpp">
@@ -46,7 +45,6 @@
     <ClInclude Include="Framework\Scene\SceneData.h" />
     <ClInclude Include="Framework\Scene\SceneManager.h" />
     <ClInclude Include="Framework\Precomp\Precomp.h" />
-    <ClInclude Include="Framework\Precomp\Logger.h" />
     <ClInclude Include="Framework\ResourceSystem\MeshResource.h" />
     <ClInclude Include="GameComponents\SceneObject.h" />
     <ClInclude Include="GameComponents\Transform.h" />
