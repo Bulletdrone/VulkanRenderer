@@ -1,6 +1,6 @@
 #pragma once
 #include "Structs/PipelineData.h"
-#include "Tools/ObjectPool.h"
+#include "DataStructures/ObjectPool.h"
 
 #include "Handlers/DescriptorHandler.h"
 

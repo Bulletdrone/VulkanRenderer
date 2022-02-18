@@ -4,8 +4,6 @@
 
 #include <vector>
 
-#include <../VulkanEngine/Framework/ResourceSystem/ResourceAllocator.h>
-
 namespace GUI
 {
 	namespace GUITypes

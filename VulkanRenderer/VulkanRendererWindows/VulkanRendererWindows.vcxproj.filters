@@ -102,9 +102,6 @@
     <ClInclude Include="MainRenderer\Structs\PipelineData.h">
       <Filter>Structs</Filter>
     </ClInclude>
-    <ClInclude Include="MainRenderer\Tools\ObjectPool.h">
-      <Filter>Tools</Filter>
-    </ClInclude>
     <ClInclude Include="MainRenderer\Structs\TextureData.h">
       <Filter>Structs</Filter>
     </ClInclude>

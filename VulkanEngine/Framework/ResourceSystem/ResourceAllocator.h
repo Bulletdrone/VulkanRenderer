@@ -1,22 +1,31 @@
 #pragma once
 #include <stdint.h>
 #include <unordered_map>
-
 #include <../VulkanGUI/GUI/GUITypes.h>
+
+#include "DataStructures/LL_HashMap.h"
 
 struct Model;
 class Material;
 
 class Renderer;
 
+typedef uint64_t hashindex;
 namespace Engine
 {
-	typedef uint64_t hashindex;
+
+	namespace Resource
+	{
+		class Resource;
+	}
+}
+
+
+namespace Engine
+{
 
 	namespace Resource 
 	{ 
-		class Resource;
-
 		enum class ResourceType
 		{
 			Texture,
@@ -59,7 +68,9 @@ namespace Engine
 		hashindex GetHashFromPath(const char* a_FilePath);
 
 	private:
-		std::unordered_map<hashindex, Resource::Resource*> m_Resources;
+		LL_HashMap m_Resources;
+
+		//std::unordered_map<hashindex, Resource::Resource*> m_Resources;
 
 	public:
 		Renderer* p_Renderer = nullptr;
@@ -68,7 +79,7 @@ namespace Engine
 	template<typename T>
 	inline T& ResourceAllocator::GetResource(hashindex a_ID)
 	{
-		Resource::Resource& t_Resource = m_Resources.at(a_ID);
+		Resource::Resource& t_Resource = m_Resources.Find(a_ID);
 
 		return *dynamic_cast<T*>(&t_Resource);
 	}
@@ -78,14 +89,14 @@ namespace Engine
 	{
 		hashindex t_HashIndex = GetHashFromPath(a_FilePath);
 
-		auto t_Iterator = m_Resources.find(t_HashIndex);
+		auto t_Iterator = m_Resources.Find(t_HashIndex);
 
 		//If you cannot find it create and return the resource.
-		if (t_Iterator != m_Resources.end())
+		if (t_Iterator != nullptr)
 		{
-			return *dynamic_cast<T*>(m_Resources.at(t_HashIndex));
+			return *dynamic_cast<T*>(t_Iterator);
 		}
 
-		return *dynamic_cast<T*>(m_Resources.at(LoadResource(a_FilePath, a_Type)));
+		return *dynamic_cast<T*>(m_Resources.Find(LoadResource(a_FilePath, a_Type)));
 	}
 };
